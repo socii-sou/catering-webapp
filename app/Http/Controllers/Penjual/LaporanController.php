@@ -3,15 +3,27 @@
 namespace App\Http\Controllers\Penjual;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PesananResource;
 use App\Models\Pesanan;
 use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
 
 class LaporanController extends Controller
 {
-    /**
-     * GET /penjual/laporan?tgl_awal=2026-07-01&tgl_akhir=2026-07-31
-     * Laporan penjualan untuk rentang tanggal tertentu.
-     */
+    #[OA\Get(
+        path: '/api/penjual/laporan',
+        summary: 'Laporan penjualan untuk rentang tanggal tertentu',
+        tags: ['Penjual - Laporan'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'tgl_awal', in: 'query', required: true, schema: new OA\Schema(type: 'string', format: 'date'), example: '2026-07-01'),
+            new OA\Parameter(name: 'tgl_akhir', in: 'query', required: true, schema: new OA\Schema(type: 'string', format: 'date'), example: '2026-07-31'),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Ringkasan + detail pesanan pada periode tersebut'),
+            new OA\Response(response: 422, description: 'Validasi gagal'),
+        ]
+    )]
     public function index(Request $request)
     {
         $request->validate([
@@ -41,7 +53,7 @@ class LaporanController extends Controller
                 'tgl_akhir' => $request->tgl_akhir,
             ],
             'ringkasan' => $ringkasan,
-            'data' => $pesanans,
+            'data' => PesananResource::collection($pesanans),
         ]);
     }
 }

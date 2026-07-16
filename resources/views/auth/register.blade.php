@@ -1,0 +1,229 @@
+@extends('layouts.auth')
+
+@section('title', 'Daftar')
+
+@section('content')
+<div class="flex-1 flex flex-col justify-center">
+    
+    <!-- Tabs -->
+    <div class="flex border-b border-stone-200 mb-6 space-x-8 text-2xl font-serif">
+        <a href="{{ route('login') }}" class="pb-3 font-medium text-stone-400 hover:text-stone-600 border-b-4 border-transparent transition-all">
+            Masuk
+        </a>
+        <a href="{{ route('register') }}" class="pb-3 font-bold border-b-4 border-[#2D5A27] text-gray-900 transition-all">
+            Daftar
+        </a>
+    </div>
+
+    <!-- Error/Session Messages -->
+    @if ($errors->any())
+        <div class="mb-5 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg text-sm text-red-700">
+            <ul class="list-disc pl-5 space-y-1">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <!-- Form -->
+    <form action="{{ route('register') }}" method="POST" class="space-y-4 overflow-y-auto max-h-[400px] pr-2 scrollbar-thin">
+        @csrf
+
+        <!-- Nama Lengkap Input -->
+        <div class="space-y-1.5">
+            <label for="name" class="text-xs font-semibold text-gray-700 block">
+                Nama Lengkap
+            </label>
+            <div class="relative rounded-xl">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500">
+                    <!-- User Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                    </svg>
+                </div>
+                <input 
+                    type="text" 
+                    name="name" 
+                    id="name" 
+                    value="{{ old('name') }}"
+                    placeholder="Contoh: Budi Santoso" 
+                    required
+                    class="block w-full pl-12 pr-4 py-3 bg-[#F1F3EA] border border-transparent rounded-xl text-stone-900 placeholder-stone-400 focus:outline-hidden focus:ring-2 focus:ring-[#2D5A27]/20 focus:border-[#2D5A27] focus:bg-white transition-all text-sm font-light"
+                />
+            </div>
+        </div>
+
+        <!-- Email Input -->
+        <div class="space-y-1.5">
+            <label for="email" class="text-xs font-semibold text-gray-700 block">
+                Email
+            </label>
+            <div class="relative rounded-xl">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500">
+                    <!-- @ Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 1 0-2.636 6.364M16.5 12V8.25" />
+                    </svg>
+                </div>
+                <input 
+                    type="email" 
+                    name="email" 
+                    id="email" 
+                    value="{{ old('email') }}"
+                    placeholder="Contoh: budi@email.com" 
+                    required
+                    class="block w-full pl-12 pr-4 py-3 bg-[#F1F3EA] border border-transparent rounded-xl text-stone-900 placeholder-stone-400 focus:outline-hidden focus:ring-2 focus:ring-[#2D5A27]/20 focus:border-[#2D5A27] focus:bg-white transition-all text-sm font-light"
+                />
+            </div>
+        </div>
+
+        <!-- Nomor Telepon Input -->
+        <div class="space-y-1.5">
+            <label for="no_telp" class="text-xs font-semibold text-gray-700 block">
+                Nomor Telepon
+            </label>
+            <div class="relative rounded-xl">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500">
+                    <!-- Phone Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+                    </svg>
+                </div>
+                <input 
+                    type="tel" 
+                    name="no_telp" 
+                    id="no_telp" 
+                    value="{{ old('no_telp') }}"
+                    placeholder="Contoh: 08123456789" 
+                    required
+                    class="block w-full pl-12 pr-4 py-3 bg-[#F1F3EA] border border-transparent rounded-xl text-stone-900 placeholder-stone-400 focus:outline-hidden focus:ring-2 focus:ring-[#2D5A27]/20 focus:border-[#2D5A27] focus:bg-white transition-all text-sm font-light"
+                />
+            </div>
+        </div>
+
+        <!-- Alamat Input -->
+        <div class="space-y-1.5">
+            <label for="alamat" class="text-xs font-semibold text-gray-700 block">
+                Alamat Rumah
+            </label>
+            <div class="relative rounded-xl">
+                <div class="absolute top-3 left-0 pl-4 flex pointer-events-none text-gray-500">
+                    <!-- Map Pin Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25s-7.5-4.108-7.5-11.25a7.5 7.5 0 1 1 15 0Z" />
+                    </svg>
+                </div>
+                <textarea 
+                    name="alamat" 
+                    id="alamat" 
+                    rows="2"
+                    placeholder="Contoh: Jl. Mawar No. 12, Jakarta" 
+                    required
+                    class="block w-full pl-12 pr-4 py-2.5 bg-[#F1F3EA] border border-transparent rounded-xl text-stone-900 placeholder-stone-400 focus:outline-hidden focus:ring-2 focus:ring-[#2D5A27]/20 focus:border-[#2D5A27] focus:bg-white transition-all text-sm resize-none font-light"
+                >{{ old('alamat') }}</textarea>
+            </div>
+        </div>
+
+        <!-- Password Input -->
+        <div class="space-y-1.5">
+            <label for="password" class="text-xs font-semibold text-gray-700 block">
+                Password
+            </label>
+            <div class="relative rounded-xl">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500">
+                    <!-- Lock Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                    </svg>
+                </div>
+                <input 
+                    type="password" 
+                    name="password" 
+                    id="password" 
+                    placeholder="••••••••" 
+                    required
+                    class="block w-full pl-12 pr-12 py-3 bg-[#F1F3EA] border border-transparent rounded-xl text-stone-900 placeholder-stone-400 focus:outline-hidden focus:ring-2 focus:ring-[#2D5A27]/20 focus:border-[#2D5A27] focus:bg-white transition-all text-sm font-light"
+                />
+                <button 
+                    type="button" 
+                    id="toggle-password" 
+                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-700 focus:outline-hidden"
+                >
+                    <!-- Eye Icon (Show) -->
+                    <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Konfirmasi Password Input -->
+        <div class="space-y-1.5">
+            <label for="password_confirmation" class="text-xs font-semibold text-gray-700 block">
+                Konfirmasi Password
+            </label>
+            <div class="relative rounded-xl">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500">
+                    <!-- Lock Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                    </svg>
+                </div>
+                <input 
+                    type="password" 
+                    name="password_confirmation" 
+                    id="password_confirmation" 
+                    placeholder="••••••••" 
+                    required
+                    class="block w-full pl-12 pr-4 py-3 bg-[#F1F3EA] border border-transparent rounded-xl text-stone-900 placeholder-stone-400 focus:outline-hidden focus:ring-2 focus:ring-[#2D5A27]/20 focus:border-[#2D5A27] focus:bg-white transition-all text-sm font-light"
+                />
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-2">
+            <button 
+                type="submit" 
+                class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-lg font-serif font-bold text-white bg-[#2D5A27] hover:bg-[#1e3f1a] active:bg-[#142a11] focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-[#2D5A27] transition-all cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0 duration-150"
+            >
+                Daftar Akun Baru
+            </button>
+        </div>
+    </form>
+
+</div>
+
+<!-- Footer Copyright -->
+<div class="mt-6 text-center text-[10px] text-stone-400 font-medium tracking-wide">
+    &copy; 2024 RASACI. Seluruh hak cipta dilindungi.
+</div>
+
+<!-- Tiny script for password visibility toggle -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('toggle-password');
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eye-icon');
+
+        toggleBtn.addEventListener('click', function() {
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            
+            // Modify SVG paths to show slash eye when revealed
+            if (isPassword) {
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.815 7.815 3 3m-3-3-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                `;
+            } else {
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                `;
+            }
+        });
+    });
+</script>
+@endsection

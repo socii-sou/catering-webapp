@@ -1,0 +1,1459 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Catering Webapp API",
+        "description": "Dokumentasi API untuk sistem pemesanan paket katering (role Penjual & Pelanggan).",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registrasi akun Pelanggan baru",
+                "operationId": "ca7c0cb6772de9bffbb8c896980cebc8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Budi Santoso"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "budi@example.test"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "no_telp": {
+                                        "type": "string",
+                                        "example": "081234567890"
+                                    },
+                                    "alamat": {
+                                        "type": "string",
+                                        "example": "Jl. Merdeka No. 10"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Registrasi berhasil, langsung dapat token"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login (Penjual atau Pelanggan)",
+                "operationId": "c373bc4cffa4a56fc64e3979b8ee7b96",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "penjual@catering.test"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login berhasil, dapat token"
+                    },
+                    "401": {
+                        "description": "Email atau password salah"
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout (mencabut token yang sedang dipakai)",
+                "operationId": "5ff2dc8b48bff52908d3821a0ecc9b3e",
+                "responses": {
+                    "200": {
+                        "description": "Berhasil logout"
+                    },
+                    "401": {
+                        "description": "Belum login"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Data user yang sedang login",
+                "operationId": "57d51f3fa328d534a6ee8562484d0687",
+                "responses": {
+                    "200": {
+                        "description": "Data user"
+                    },
+                    "401": {
+                        "description": "Belum login"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/pelanggan/pesanan": {
+            "get": {
+                "tags": [
+                    "Pelanggan - Pesanan"
+                ],
+                "summary": "Riwayat pesanan milik pelanggan yang sedang login",
+                "operationId": "643fe9a98cd5b5f65db6fb96be3f4d2f",
+                "responses": {
+                    "200": {
+                        "description": "Daftar pesanan (paginated)"
+                    },
+                    "401": {
+                        "description": "Belum login"
+                    },
+                    "403": {
+                        "description": "Bukan role pelanggan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Pelanggan - Pesanan"
+                ],
+                "summary": "Bikin pesanan baru (pilih paket + lauk + gubukan + jumlah pax + tanggal acara)",
+                "operationId": "d6d5ce8ae2ae48a3222701fcfa984353",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "tgl_acara",
+                                    "jumlah_pax",
+                                    "items"
+                                ],
+                                "properties": {
+                                    "gubukan_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "tgl_acara": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-08-20"
+                                    },
+                                    "jumlah_pax": {
+                                        "type": "integer",
+                                        "example": 50
+                                    },
+                                    "catatan": {
+                                        "type": "string",
+                                        "example": "Tolong pedas sedang",
+                                        "nullable": true
+                                    },
+                                    "items": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "paket_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "jml_paket": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "lauk_ids": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "integer"
+                                                    },
+                                                    "example": [
+                                                        1,
+                                                        2,
+                                                        3,
+                                                        4,
+                                                        5
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Pesanan berhasil dibuat"
+                    },
+                    "422": {
+                        "description": "Validasi gagal atau kapasitas tanggal tersebut sudah penuh"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/pelanggan/pesanan/{pesanan}": {
+            "get": {
+                "tags": [
+                    "Pelanggan - Pesanan"
+                ],
+                "summary": "Detail 1 pesanan milik sendiri",
+                "operationId": "639023029c33ff4f2a4e60a787503266",
+                "parameters": [
+                    {
+                        "name": "pesanan",
+                        "in": "path",
+                        "description": "ID pesanan",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detail pesanan lengkap"
+                    },
+                    "403": {
+                        "description": "Bukan pemilik pesanan ini"
+                    },
+                    "404": {
+                        "description": "Pesanan tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/pelanggan/pesanan/{pesanan}/review": {
+            "post": {
+                "tags": [
+                    "Pelanggan - Review"
+                ],
+                "summary": "Beri rating & ulasan untuk pesanan yang sudah selesai",
+                "description": "Hanya pemilik pesanan, pesanan harus berstatus \"selesai\", dan 1 pesanan cuma boleh direview sekali.",
+                "operationId": "1a8f991508e91b29804badb971100e19",
+                "parameters": [
+                    {
+                        "name": "pesanan",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "rating"
+                                ],
+                                "properties": {
+                                    "rating": {
+                                        "type": "integer",
+                                        "example": 5,
+                                        "maximum": 5,
+                                        "minimum": 1
+                                    },
+                                    "ulasan": {
+                                        "type": "string",
+                                        "example": "Makanannya enak, pengiriman tepat waktu!",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Review berhasil disimpan"
+                    },
+                    "403": {
+                        "description": "Bukan pemilik pesanan atau pesanan belum selesai"
+                    },
+                    "422": {
+                        "description": "Pesanan ini sudah pernah direview"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/pesanan/{pesanan}/bayar": {
+            "post": {
+                "tags": [
+                    "Pembayaran"
+                ],
+                "summary": "Generate Snap Token untuk munculkan popup pembayaran Midtrans",
+                "operationId": "1cf9807d5588d8833e199d10d3ba6567",
+                "parameters": [
+                    {
+                        "name": "pesanan",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "jumlah_bayar"
+                                ],
+                                "properties": {
+                                    "jumlah_bayar": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 2500000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "snap_token siap dipakai di frontend"
+                    },
+                    "403": {
+                        "description": "Bukan pemilik pesanan ini"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/webhook/midtrans": {
+            "post": {
+                "tags": [
+                    "Pembayaran"
+                ],
+                "summary": "Webhook notifikasi status pembayaran dari Midtrans",
+                "description": "Dipanggil otomatis oleh server Midtrans, bukan oleh user. Diverifikasi lewat signature_key.",
+                "operationId": "c02d21e8820a01d0f8a7ac3669722a28",
+                "responses": {
+                    "200": {
+                        "description": "Status pembayaran berhasil diupdate"
+                    },
+                    "403": {
+                        "description": "Signature tidak valid, kemungkinan request palsu"
+                    }
+                }
+            }
+        },
+        "/api/penjual/capacity-settings": {
+            "get": {
+                "tags": [
+                    "Penjual - Capacity Setting"
+                ],
+                "summary": "Daftar pengaturan kapasitas (default global + per tanggal khusus)",
+                "operationId": "80d314e9dbed0b7169da63b2608b1be6",
+                "responses": {
+                    "200": {
+                        "description": "Daftar pengaturan kapasitas (paginated)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Penjual - Capacity Setting"
+                ],
+                "summary": "Tambah pengaturan kapasitas baru",
+                "description": "Kosongkan \"tanggal\" untuk membuat pengaturan default/global (hanya boleh ada 1).",
+                "operationId": "e1b490206542c5c96abf816e2dedca68",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "kapasitas_maks_pax"
+                                ],
+                                "properties": {
+                                    "tanggal": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-08-17",
+                                        "nullable": true
+                                    },
+                                    "kapasitas_maks_pax": {
+                                        "type": "integer",
+                                        "example": 500
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Pengaturan berhasil dibuat"
+                    },
+                    "422": {
+                        "description": "Validasi gagal, atau default global sudah ada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/penjual/capacity-settings/{capacity_setting}": {
+            "get": {
+                "tags": [
+                    "Penjual - Capacity Setting"
+                ],
+                "summary": "Detail 1 pengaturan kapasitas",
+                "operationId": "253d7595c045d9d7377d0bcf818b1506",
+                "parameters": [
+                    {
+                        "name": "capacity_setting",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detail pengaturan"
+                    },
+                    "404": {
+                        "description": "Tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Penjual - Capacity Setting"
+                ],
+                "summary": "Update pengaturan kapasitas",
+                "operationId": "5d91ed0ad12429a74daa47319b52332f",
+                "parameters": [
+                    {
+                        "name": "capacity_setting",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "kapasitas_maks_pax"
+                                ],
+                                "properties": {
+                                    "tanggal": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "kapasitas_maks_pax": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pengaturan berhasil diupdate"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Penjual - Capacity Setting"
+                ],
+                "summary": "Hapus pengaturan kapasitas",
+                "operationId": "2f6a861cd2c99f682769f0cd17ea5139",
+                "parameters": [
+                    {
+                        "name": "capacity_setting",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil dihapus"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/penjual/gubukans": {
+            "get": {
+                "tags": [
+                    "Penjual - Gubukan"
+                ],
+                "summary": "Daftar semua gubukan",
+                "operationId": "4a2e5cc402512e220990434c2fd62007",
+                "responses": {
+                    "200": {
+                        "description": "Daftar gubukan (paginated)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Penjual - Gubukan"
+                ],
+                "summary": "Tambah gubukan baru",
+                "operationId": "e66fe166ffbbb2996f4bc0c354ae7d45",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nama_gubukan",
+                                    "harga_gubukan",
+                                    "kapasitas_orang"
+                                ],
+                                "properties": {
+                                    "nama_gubukan": {
+                                        "type": "string",
+                                        "example": "Gubukan Sedang"
+                                    },
+                                    "harga_gubukan": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 250000
+                                    },
+                                    "kapasitas_orang": {
+                                        "type": "integer",
+                                        "example": 25
+                                    },
+                                    "status_aktif": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Gubukan berhasil dibuat"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/penjual/gubukans/{gubukan}": {
+            "get": {
+                "tags": [
+                    "Penjual - Gubukan"
+                ],
+                "summary": "Detail 1 gubukan",
+                "operationId": "f4ae4c420f9b9b9ccff8d07da6e12550",
+                "parameters": [
+                    {
+                        "name": "gubukan",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detail gubukan"
+                    },
+                    "404": {
+                        "description": "Tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Penjual - Gubukan"
+                ],
+                "summary": "Update gubukan",
+                "operationId": "a2762dcb17fb5c0167acefbe8f27399a",
+                "parameters": [
+                    {
+                        "name": "gubukan",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nama_gubukan",
+                                    "harga_gubukan",
+                                    "kapasitas_orang"
+                                ],
+                                "properties": {
+                                    "nama_gubukan": {
+                                        "type": "string"
+                                    },
+                                    "harga_gubukan": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "kapasitas_orang": {
+                                        "type": "integer"
+                                    },
+                                    "status_aktif": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Gubukan berhasil diupdate"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Penjual - Gubukan"
+                ],
+                "summary": "Hapus gubukan",
+                "description": "Aman dihapus meski sudah pernah dipakai di pesanan lama (gubukan_id di pesanan itu otomatis jadi NULL, pesanannya tidak ikut terhapus).",
+                "operationId": "4510e43516647cb940531ecf49e6780b",
+                "parameters": [
+                    {
+                        "name": "gubukan",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Gubukan berhasil dihapus"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/penjual/laporan": {
+            "get": {
+                "tags": [
+                    "Penjual - Laporan"
+                ],
+                "summary": "Laporan penjualan untuk rentang tanggal tertentu",
+                "operationId": "c7de391fddb0a16bc338920e6192c285",
+                "parameters": [
+                    {
+                        "name": "tgl_awal",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        },
+                        "example": "2026-07-01"
+                    },
+                    {
+                        "name": "tgl_akhir",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        },
+                        "example": "2026-07-31"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ringkasan + detail pesanan pada periode tersebut"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/penjual/lauks": {
+            "get": {
+                "tags": [
+                    "Penjual - Lauk"
+                ],
+                "summary": "Daftar semua lauk",
+                "operationId": "941d3e94bc8edd10c7bad5f942b3530f",
+                "responses": {
+                    "200": {
+                        "description": "Daftar lauk (paginated)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Penjual - Lauk"
+                ],
+                "summary": "Tambah lauk baru",
+                "operationId": "31f1ff5d242118051bcc9113ac7f645e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nama_lauk"
+                                ],
+                                "properties": {
+                                    "nama_lauk": {
+                                        "type": "string",
+                                        "example": "Ayam Bakar"
+                                    },
+                                    "keterangan": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "status_aktif": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Lauk berhasil dibuat"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/penjual/lauks/{lauk}": {
+            "get": {
+                "tags": [
+                    "Penjual - Lauk"
+                ],
+                "summary": "Detail 1 lauk",
+                "operationId": "c7cbcefb9e1f704b1c9d39f4c9287d8e",
+                "parameters": [
+                    {
+                        "name": "lauk",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detail lauk"
+                    },
+                    "404": {
+                        "description": "Tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Penjual - Lauk"
+                ],
+                "summary": "Update lauk",
+                "operationId": "bc3501c6a0343447ae9ea7690038993c",
+                "parameters": [
+                    {
+                        "name": "lauk",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nama_lauk"
+                                ],
+                                "properties": {
+                                    "nama_lauk": {
+                                        "type": "string"
+                                    },
+                                    "keterangan": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "status_aktif": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Lauk berhasil diupdate"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Penjual - Lauk"
+                ],
+                "summary": "Hapus lauk",
+                "description": "Ditolak (422) kalau lauk ini sudah pernah dipilih di pesanan.",
+                "operationId": "950df8c7373393ec47c22be69054e433",
+                "parameters": [
+                    {
+                        "name": "lauk",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lauk berhasil dihapus"
+                    },
+                    "422": {
+                        "description": "Sudah pernah dipilih di pesanan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/penjual/pakets": {
+            "get": {
+                "tags": [
+                    "Penjual - Paket"
+                ],
+                "summary": "Daftar semua paket (dikelola Penjual)",
+                "operationId": "670418c80814221ca310565d2564346a",
+                "responses": {
+                    "200": {
+                        "description": "Daftar paket (paginated)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Penjual - Paket"
+                ],
+                "summary": "Tambah paket baru",
+                "operationId": "bc2b278b314c13dbe7c8f674e61980f4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nm_paket",
+                                    "harga_paket",
+                                    "jumlah_lauk_pilihan"
+                                ],
+                                "properties": {
+                                    "nm_paket": {
+                                        "type": "string",
+                                        "example": "Prasmanan"
+                                    },
+                                    "harga_paket": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 50000
+                                    },
+                                    "jumlah_lauk_pilihan": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "deskripsi": {
+                                        "type": "string",
+                                        "example": "Pilih 5 dari 10 lauk",
+                                        "nullable": true
+                                    },
+                                    "status_aktif": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Paket berhasil dibuat"
+                    },
+                    "422": {
+                        "description": "Validasi gagal (mis. nama paket sudah dipakai)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/penjual/pakets/{paket}": {
+            "get": {
+                "tags": [
+                    "Penjual - Paket"
+                ],
+                "summary": "Detail 1 paket",
+                "operationId": "e290cdf6ae85e202550b6a3bbfdf118a",
+                "parameters": [
+                    {
+                        "name": "paket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detail paket"
+                    },
+                    "404": {
+                        "description": "Paket tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Penjual - Paket"
+                ],
+                "summary": "Update paket",
+                "operationId": "5f26ffbfd4e911edafa9785b7ad1dc55",
+                "parameters": [
+                    {
+                        "name": "paket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nm_paket",
+                                    "harga_paket",
+                                    "jumlah_lauk_pilihan"
+                                ],
+                                "properties": {
+                                    "nm_paket": {
+                                        "type": "string",
+                                        "example": "Prasmanan"
+                                    },
+                                    "harga_paket": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 55000
+                                    },
+                                    "jumlah_lauk_pilihan": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "deskripsi": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "status_aktif": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Paket berhasil diupdate"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Penjual - Paket"
+                ],
+                "summary": "Hapus paket",
+                "description": "Ditolak (422) kalau paket ini sudah pernah dipesan — nonaktifkan lewat status_aktif sebagai gantinya.",
+                "operationId": "2299382a544a4b93ad2df59231940a90",
+                "parameters": [
+                    {
+                        "name": "paket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paket berhasil dihapus"
+                    },
+                    "422": {
+                        "description": "Paket sudah pernah dipesan, tidak bisa dihapus"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/penjual/pesanan": {
+            "get": {
+                "tags": [
+                    "Penjual - Pesanan"
+                ],
+                "summary": "Daftar semua pesanan (bisa difilter status)",
+                "operationId": "fd252ff24c1d74d3e8fc82caf82589e6",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter berdasarkan status_pesanan",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "menunggu_validasi",
+                                "disetujui",
+                                "ditolak",
+                                "batal",
+                                "selesai"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Daftar pesanan (paginated)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/penjual/pesanan/{pesanan}/validasi": {
+            "patch": {
+                "tags": [
+                    "Penjual - Pesanan"
+                ],
+                "summary": "Setujui atau tolak pesanan yang masuk",
+                "operationId": "7ddfe09cd077b54b890f521692bc65aa",
+                "parameters": [
+                    {
+                        "name": "pesanan",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status_pesanan"
+                                ],
+                                "properties": {
+                                    "status_pesanan": {
+                                        "type": "string",
+                                        "enum": [
+                                            "disetujui",
+                                            "ditolak"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Status berhasil diupdate"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/penjual/pesanan/{pesanan}/produksi": {
+            "patch": {
+                "tags": [
+                    "Penjual - Pesanan"
+                ],
+                "summary": "Update status dapur/produksi pesanan",
+                "operationId": "ed8d5a2800a0640f9664b7549cdc9ea7",
+                "parameters": [
+                    {
+                        "name": "pesanan",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status_produksi"
+                                ],
+                                "properties": {
+                                    "status_produksi": {
+                                        "type": "string",
+                                        "enum": [
+                                            "belum_diproses",
+                                            "diproses",
+                                            "selesai"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Status berhasil diupdate"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/reviews": {
+            "get": {
+                "tags": [
+                    "Review"
+                ],
+                "summary": "Daftar review/testimoni publik (tidak perlu login)",
+                "operationId": "346169ce6ab0c633530a7cedc1a25fab",
+                "responses": {
+                    "200": {
+                        "description": "Daftar review (paginated)"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Login dulu lewat /login, lalu isi token yang didapat di sini (tanpa kata \"Bearer\").",
+                "bearerFormat": "Sanctum Token",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Pelanggan - Pesanan",
+            "description": "Pelanggan - Pesanan"
+        },
+        {
+            "name": "Pelanggan - Review",
+            "description": "Pelanggan - Review"
+        },
+        {
+            "name": "Pembayaran",
+            "description": "Pembayaran"
+        },
+        {
+            "name": "Penjual - Capacity Setting",
+            "description": "Penjual - Capacity Setting"
+        },
+        {
+            "name": "Penjual - Gubukan",
+            "description": "Penjual - Gubukan"
+        },
+        {
+            "name": "Penjual - Laporan",
+            "description": "Penjual - Laporan"
+        },
+        {
+            "name": "Penjual - Lauk",
+            "description": "Penjual - Lauk"
+        },
+        {
+            "name": "Penjual - Paket",
+            "description": "Penjual - Paket"
+        },
+        {
+            "name": "Penjual - Pesanan",
+            "description": "Penjual - Pesanan"
+        },
+        {
+            "name": "Review",
+            "description": "Review"
+        }
+    ]
+}

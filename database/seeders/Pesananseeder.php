@@ -14,7 +14,7 @@ class PesananSeeder extends Seeder
     public function run(): void
     {
         $pelanggan = User::where('email', 'budi@example.test')->first();
-        $paketStandar = Paket::where('nm_paket', 'Paket Standar')->first();
+        $paketStandar = Paket::where('nm_paket', 'Prasmanan')->first();
         $gubukan = Gubukan::first();
 
         if (! $pelanggan || ! $paketStandar) {

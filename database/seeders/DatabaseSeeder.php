@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             Gubukanseeder::class,          // master gubukan
             Capacityseeder::class,  // pengaturan kapasitas
             Pesananseeder::class,          // contoh transaksi, butuh semua di atas sudah ada
+            ReviewSeeder::class,           // review/ulasan pelanggan
         ]);
     }
 }

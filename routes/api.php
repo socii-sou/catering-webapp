@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Pelanggan\PesananController as PelangganPesananController;
 use App\Http\Controllers\Pelanggan\ReviewController as PelangganReviewController;
 use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\Penjual\CapacitySettingController;
 use App\Http\Controllers\Penjual\GubukanController;
 use App\Http\Controllers\Penjual\LaporanController;
 use App\Http\Controllers\Penjual\LaukController;
@@ -12,21 +13,46 @@ use App\Http\Controllers\Penjual\PesananController as PenjualPesananController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
-
+/*
+|--------------------------------------------------------------------------
+| Auth (publik, tidak perlu login)
+|--------------------------------------------------------------------------
+*/
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+/*
+|--------------------------------------------------------------------------
+| Publik lainnya (tidak perlu login)
+|--------------------------------------------------------------------------
+*/
 Route::get('/reviews', [ReviewController::class, 'index']);
 
-
+/*
+|--------------------------------------------------------------------------
+| Webhook Midtrans
+|--------------------------------------------------------------------------
+| Sengaja di luar middleware auth:sanctum, karena yang memanggil endpoint
+| ini adalah server Midtrans, bukan user yang login.
+*/
 Route::post('/webhook/midtrans', [PembayaranController::class, 'webhook']);
 
+/*
+|--------------------------------------------------------------------------
+| Rute yang wajib login (siapapun rolenya)
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
     Route::post('/pesanan/{pesanan}/bayar', [PembayaranController::class, 'createSnapToken']);
 
+    /*
+    |----------------------------------------------------------------------
+    | Khusus role Pelanggan
+    |----------------------------------------------------------------------
+    */
     Route::middleware('role:pelanggan')->prefix('pelanggan')->group(function () {
         Route::get('/pesanan', [PelangganPesananController::class, 'index']);
         Route::get('/pesanan/{pesanan}', [PelangganPesananController::class, 'show']);
@@ -34,7 +60,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/pesanan/{pesanan}/review', [PelangganReviewController::class, 'store']);
     });
 
-    Route::middleware('role:penjual')->prefix('penjual')->group(function () {
+    /*
+    |----------------------------------------------------------------------
+    | Khusus role Penjual
+    |----------------------------------------------------------------------
+    */
+    
+});
+
+Route::prefix('penjual')->group(function () {
         Route::get('/pesanan', [PenjualPesananController::class, 'index']);
         Route::patch('/pesanan/{pesanan}/validasi', [PenjualPesananController::class, 'validasi']);
         Route::patch('/pesanan/{pesanan}/produksi', [PenjualPesananController::class, 'updateProduksi']);
@@ -43,5 +77,5 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('pakets', PaketController::class);
         Route::apiResource('lauks', LaukController::class);
         Route::apiResource('gubukans', GubukanController::class);
+        Route::apiResource('capacity-settings', CapacitySettingController::class);
     });
-});

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Lauk extends Model
@@ -12,6 +13,7 @@ class Lauk extends Model
 
     protected $fillable = [
         'nama_lauk',
+        'kategori_lauk_id',
         'keterangan',
         'status_aktif',
     ];
@@ -21,6 +23,17 @@ class Lauk extends Model
         return [
             'status_aktif' => 'boolean',
         ];
+    }
+
+    /*
+    |--------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------
+    */
+
+    public function kategoriLauk(): BelongsTo
+    {
+        return $this->belongsTo(KategoriLauk::class);
     }
 
     public function pesananPaketLauks(): HasMany

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Paket extends Model
@@ -12,6 +13,7 @@ class Paket extends Model
 
     protected $fillable = [
         'nm_paket',
+        'kategori_produk_id',
         'harga_paket',
         'jumlah_lauk_pilihan',
         'deskripsi',
@@ -27,8 +29,24 @@ class Paket extends Model
         ];
     }
 
-    public function pesananPakets(): HasMany
+    /*
+    |--------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------
+    */
+
+    public function kategoriProduk(): BelongsTo
+    {
+        return $this->belongsTo(KategoriProduk::class);
+    }
+
+    public function pesananPaket(): HasMany
     {
         return $this->hasMany(PesananPaket::class);
+    }
+
+    public function kategoriKuota(): HasMany
+    {
+        return $this->hasMany(PaketKategoriKuota::class);
     }
 }

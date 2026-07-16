@@ -10,26 +10,26 @@ class PaketSeeder extends Seeder
     public function run(): void
     {
         Paket::create([
-            'nm_paket' => 'Paket Hemat',
+            'nm_paket' => 'Nasi Kotak',
             'harga_paket' => 35000,
             'jumlah_lauk_pilihan' => 3,
-            'deskripsi' => 'Paket ekonomis, pilih 3 dari 10 lauk.',
+            'deskripsi' => 'Solusi praktis untuk rapat kantor, seminar, atau konsumsi panitia dengan cita rasa Nusantara yang konsisten.',
             'status_aktif' => true,
         ]);
 
         Paket::create([
-            'nm_paket' => 'Paket Standar',
+            'nm_paket' => 'Prasmanan',
             'harga_paket' => 50000,
             'jumlah_lauk_pilihan' => 5,
-            'deskripsi' => 'Paket favorit, pilih 5 dari 10 lauk.',
+            'deskripsi' => 'Pilihan ideal untuk perhelatan besar seperti pernikahan, khitanan, atau gathering tahunan perusahaan dengan menu lengkap.',
             'status_aktif' => true,
         ]);
 
         Paket::create([
-            'nm_paket' => 'Paket Premium',
+            'nm_paket' => 'Tumpeng',
             'harga_paket' => 75000,
             'jumlah_lauk_pilihan' => 7,
-            'deskripsi' => 'Paket lengkap, pilih 7 dari 10 lauk.',
+            'deskripsi' => 'Sajian ikonik untuk momen sakral seperti peresmian kantor, syukuran rumah, atau ulang tahun instansi.',
             'status_aktif' => true,
         ]);
     }
