@@ -32,19 +32,19 @@
         <!-- Main Content Area -->
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
 
-            <!-- Single Hero Image with Floating Compact Headline Overlay Card (Bottom-Right) -->
-            <section class="relative w-full h-[360px] sm:h-[440px] lg:h-[480px] overflow-hidden rounded-3xl ambient-shadow mb-16">
-                <!-- Hero Photo -->
-                <img src="{{ $heroImage }}" alt="{{ $paket->nm_paket }}" class="w-full h-full object-cover">
+            <!-- Single Hero Image Section with Ultra Compact Fully-Rounded Headline Card (Bottom-Left) -->
+            <section class="relative w-full overflow-hidden rounded-3xl ambient-shadow mb-16" style="height: 440px; min-height: 440px; position: relative;">
+                <!-- Hero Background Image -->
+                <img src="{{ $heroImage }}" alt="{{ $paket->nm_paket }}" class="w-full h-full object-cover" style="width: 100%; height: 100%; object-fit: cover;">
                 
-                <!-- Bottom gradient overlay for visual depth -->
-                <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
+                <!-- Bottom gradient overlay for contrast -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" style="position: absolute; inset: 0;"></div>
 
-                <!-- Floating Headline Card (Bottom-Right, Compact Width, Rounded Corners) -->
-                <div class="absolute bottom-6 right-6 left-6 sm:left-auto max-w-xs sm:max-w-sm bg-[#EAEFE2]/95 backdrop-blur-md p-5 sm:p-6 rounded-3xl shadow-2xl border border-white/80 z-20">
-                    <span class="text-[10px] font-bold text-[#4F6B38] uppercase tracking-widest block mb-1">EKSKLUSIF NUSANTARA</span>
-                    <h1 class="text-2xl sm:text-3xl font-bold font-serif text-gray-900 mb-2 leading-tight">{{ $paket->nm_paket }}</h1>
-                    <p class="text-xs text-gray-700 font-light leading-relaxed">
+                <!-- Ultra Compact Headline Card (Fully Rounded 28px Corners, Extra Ringkas Width ~270px-280px, Bottom-Left) -->
+                <div class="absolute bottom-5 left-5 right-5 sm:right-auto sm:w-[270px] lg:w-[280px] p-4 sm:p-4.5 rounded-[28px] shadow-2xl border border-white/80 z-20" style="position: absolute; bottom: 20px; left: 20px; background-color: rgba(234, 239, 226, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+                    <span class="text-[9px] font-bold text-[#4F6B38] uppercase tracking-widest block mb-0.5">EKSKLUSIF NUSANTARA</span>
+                    <h1 class="text-xl sm:text-2xl font-bold font-serif text-gray-900 mb-1 leading-tight">{{ $paket->nm_paket }}</h1>
+                    <p class="text-[11px] text-gray-700 font-light leading-relaxed">
                         {{ $paketDeskripsi }}
                     </p>
                 </div>
