@@ -51,3 +51,13 @@ Route::middleware('auth')->group(function () {
         }
     })->middleware('role:pelanggan')->name('web.pesanan.store');
 });
+
+Route::get('/paket/{id}', function ($id) {
+    $paket = \App\Models\Paket::findOrFail($id);
+    $lauks = \App\Models\Lauk::where('status_aktif', true)->get();
+    $myOrders = auth()->check() ? auth()->user()->pesanans()->with(['pesananPaket.paket', 'pembayarans', 'pengiriman'])->latest()->get() : collect();
+    $gubukans = \App\Models\Gubukan::where('status_aktif', true)->get();
+
+    return view('detail', compact('paket', 'lauks', 'myOrders', 'gubukans'));
+})->name('paket.show');
+

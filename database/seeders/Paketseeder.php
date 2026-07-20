@@ -13,7 +13,7 @@ class PaketSeeder extends Seeder
             'nm_paket' => 'Nasi Kotak',
             'harga_paket' => 35000,
             'jumlah_lauk_pilihan' => 3,
-            'deskripsi' => 'Solusi praktis untuk rapat kantor, seminar, atau konsumsi panitia dengan cita rasa Nusantara yang konsisten.',
+            'deskripsi' => 'Solusi praktis untuk rapat kantor, seminar, atau konsumsi panitia dengan cita rasa Nusantara yang konsisten dan higienis.',
             'status_aktif' => true,
         ]);
 
