@@ -206,10 +206,10 @@
                         <!-- Action Buttons -->
                         <td class="py-4 px-4 text-right">
                             <div class="flex items-center justify-end gap-3 text-xs">
-                                <!-- Action 1: Validasi Pembayaran -->
-                                <button type="button" onclick="openValidasiPembayaranModal({{ $order->id }}, '{{ $paymentPillText }}')" class="font-bold text-green-700 hover:text-green-900 hover:underline cursor-pointer">
+                                <!-- Action 1: Validasi Pembayaran Page -->
+                                <a href="{{ route('penjual.orders.validasi', $order->id) }}" class="font-bold text-green-700 hover:text-green-900 hover:underline cursor-pointer">
                                     Validasi Pembayaran
-                                </button>
+                                </a>
 
                                 <!-- Action 2: Update Status -->
                                 <button type="button" onclick="openUpdateStatusOrderModal({{ $order->id }}, '{{ $statusRaw }}', '{{ $prodStatus }}', '{{ $shipStatus }}')" class="font-bold text-[#2D5A27] hover:text-green-900 hover:underline cursor-pointer">

@@ -63,19 +63,9 @@
                     <span>Orders</span>
                 </a>
 
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-xs text-gray-700 hover:bg-black/5 hover:text-[#2D5A27] transition-all">
-                    <span class="text-base">💳</span>
-                    <span>Payments</span>
-                </a>
-
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-xs text-gray-700 hover:bg-black/5 hover:text-[#2D5A27] transition-all">
+                <a href="{{ route('penjual.reports') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs transition-all shadow-xs {{ request()->is('penjual/reports*') ? 'bg-[#2D5A27] text-white shadow-md' : 'text-gray-700 hover:bg-black/5 hover:text-[#2D5A27]' }}">
                     <span class="text-base">📈</span>
                     <span>Reports</span>
-                </a>
-
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-xs text-gray-700 hover:bg-black/5 hover:text-[#2D5A27] transition-all">
-                    <span class="text-base">⚙️</span>
-                    <span>Settings</span>
                 </a>
             </nav>
         </div>

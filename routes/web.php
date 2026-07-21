@@ -239,6 +239,69 @@ Route::get('/penjual/orders', function () {
     ));
 })->middleware(['auth'])->name('penjual.orders');
 
+Route::get('/penjual/orders/{pesanan}/validasi', function (\App\Models\Pesanan $pesanan) {
+    $pesanan->load([
+        'pesananPaket.paket',
+        'pesananPaket.lauks.lauk',
+        'gubukan',
+        'pembayarans',
+        'pengiriman',
+        'user'
+    ]);
+
+    return view('penjual.validasi', compact('pesanan'));
+})->middleware(['auth'])->name('penjual.orders.validasi');
+
+Route::post('/penjual/orders/{pesanan}/validasi-action', function (\App\Models\Pesanan $pesanan, \Illuminate\Http\Request $request) {
+    $action = $request->input('action');
+
+    if ($action === 'approve') {
+        $pesanan->pembayarans()->firstOrCreate(
+            ['pesanan_id' => $pesanan->id],
+            [
+                'tgl_bayar' => now(),
+                'jml_bayar' => $pesanan->total_harga * 0.5,
+                'metode_bayar' => 'bank_transfer',
+                'status_bayar' => 'diverifikasi'
+            ]
+        )->update(['status_bayar' => 'diverifikasi']);
+
+        $pesanan->update(['status_pesanan' => 'disetujui']);
+
+        return redirect()->back()->with('success', 'Pembayaran DP 50% berhasil divalidasi dan pesanan telah disetujui!');
+    } elseif ($action === 'reject') {
+        $pesanan->pembayarans()->update(['status_bayar' => 'ditolak']);
+        $pesanan->update(['status_pesanan' => 'ditolak']);
+
+        return redirect()->back()->with('error', 'Pembayaran telah ditolak.');
+    }
+
+    return redirect()->back();
+})->middleware(['auth'])->name('penjual.orders.validasi.action');
+
+Route::get('/penjual/reports', function () {
+    $transactions = \App\Models\Pesanan::with(['user', 'pesananPaket.paket', 'pembayarans', 'pengiriman'])
+        ->latest('created_at')
+        ->get();
+
+    $totalSalesSum = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'ditolak'])->sum('total_harga');
+    $totalOrdersCount = $transactions->count();
+    $avgOrderValue = $totalOrdersCount > 0 ? round($totalSalesSum / $totalOrdersCount) : 0;
+
+    $popularPaket = \App\Models\Paket::withCount('pesananPaket')->orderBy('pesanan_paket_count', 'desc')->first();
+    $popularPaketName = $popularPaket ? $popularPaket->nm_paket : 'Royal Wedding Buffet';
+
+    return view('penjual.reports', compact(
+        'transactions',
+        'totalSalesSum',
+        'totalOrdersCount',
+        'avgOrderValue',
+        'popularPaketName'
+    ));
+})->middleware(['auth'])->name('penjual.reports');
+
+
+
 
 
 

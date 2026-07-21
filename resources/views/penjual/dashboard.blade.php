@@ -255,7 +255,7 @@
                         <!-- Actions -->
                         <td class="py-4 px-4 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <a href="{{ route('pesanan.show', $order->id) }}" class="p-1.5 text-gray-500 hover:text-[#2D5A27] transition-colors" title="View Detail">
+                                <a href="{{ route('penjual.orders.validasi', $order->id) }}" class="p-1.5 text-gray-500 hover:text-[#2D5A27] transition-colors" title="View Detail / Validasi">
                                     👁️
                                 </a>
                                 <button type="button" onclick="openSellerStatusModal({{ $order->id }}, '{{ $order->status_pesanan }}', '{{ $order->status_produksi }}', '{{ $shipStatus }}')" class="p-1.5 text-gray-500 hover:text-amber-600 transition-colors cursor-pointer" title="Edit Status Timeline">
