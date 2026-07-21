@@ -64,6 +64,12 @@ class PesananController extends Controller
             'status_pesanan' => ['required', 'in:disetujui,ditolak'],
         ]);
 
+        if ($request->status_pesanan === 'disetujui' && ! $pesanan->pembayarans()->exists()) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'status_pesanan' => ['Pesanan belum dapat dikonfirmasi karena pelanggan belum melakukan pembayaran DP 50%.'],
+            ]);
+        }
+
         $pesanan->update(['status_pesanan' => $request->status_pesanan]);
 
         return new PesananResource($pesanan->fresh());
@@ -98,6 +104,77 @@ class PesananController extends Controller
         ]);
 
         $pesanan->update(['status_produksi' => $request->status_produksi]);
+
+        return new PesananResource($pesanan->fresh());
+    }
+
+    public function updatePengiriman(Request $request, Pesanan $pesanan)
+    {
+        $this->authorize('updateStatus', $pesanan);
+
+        $request->validate([
+            'status_pengiriman' => ['required', 'in:belum_dikirim,dikirim,sampai'],
+        ]);
+
+        $pengiriman = $pesanan->pengiriman()->firstOrCreate(
+            ['pesanan_id' => $pesanan->id],
+            ['alamat_tujuan' => $pesanan->alamat_pengiriman]
+        );
+
+        $pengiriman->update([
+            'status_pengiriman' => $request->status_pengiriman,
+            'waktu_berangkat' => $request->status_pengiriman === 'dikirim' ? now() : $pengiriman->waktu_berangkat,
+            'waktu_tiba' => $request->status_pengiriman === 'sampai' ? now() : $pengiriman->waktu_tiba,
+        ]);
+
+        if ($request->status_pengiriman === 'sampai') {
+            $pesanan->update(['status_pesanan' => 'selesai']);
+        }
+
+        return new PesananResource($pesanan->fresh());
+    }
+
+    public function updatePembayaran(Request $request, Pesanan $pesanan)
+    {
+        $this->authorize('updateStatus', $pesanan);
+
+        $request->validate([
+            'status_bayar' => ['required', 'in:dikonfirmasi,lunas,menunggu_dp'],
+        ]);
+
+        $statusBayar = $request->status_bayar;
+
+        if ($statusBayar === 'dikonfirmasi') {
+            $pesanan->pembayarans()->firstOrCreate(
+                ['pesanan_id' => $pesanan->id],
+                [
+                    'tgl_bayar' => now(),
+                    'jml_bayar' => $pesanan->total_harga * 0.5,
+                    'metode_bayar' => 'bank_transfer',
+                    'status_bayar' => 'diverifikasi'
+                ]
+            )->update(['status_bayar' => 'diverifikasi']);
+
+            $pesanan->update(['status_pesanan' => 'disetujui']);
+        } elseif ($statusBayar === 'lunas') {
+            $pembayaran = $pesanan->pembayarans()->firstOrCreate(
+                ['pesanan_id' => $pesanan->id],
+                [
+                    'tgl_bayar' => now(),
+                    'jml_bayar' => $pesanan->total_harga,
+                    'metode_bayar' => 'bank_transfer',
+                    'status_bayar' => 'lunas'
+                ]
+            );
+            $pembayaran->update([
+                'jml_bayar' => $pesanan->total_harga,
+                'status_bayar' => 'lunas'
+            ]);
+            $pesanan->update(['status_pesanan' => 'disetujui']);
+        } else {
+            $pesanan->pembayarans()->update(['status_bayar' => 'menunggu_verifikasi']);
+            $pesanan->update(['status_pesanan' => 'menunggu_validasi']);
+        }
 
         return new PesananResource($pesanan->fresh());
     }

@@ -3,15 +3,18 @@
 <!-- Hero Bento Section (Large Main Image with Frosted Card & 2 Right Stacked Images) -->
 <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-8">
     <!-- Left Main Hero Image with Overlaid Frosted Card (Span 7) -->
-    <div class="lg:col-span-7 relative h-[250px] sm:h-[280px] lg:h-[300px] overflow-hidden rounded-3xl ambient-shadow">
-        <img src="{{ $heroImage }}" alt="Nasi Tumpeng Nusantara" class="w-full h-full object-cover">
-        
+    <div class="lg:col-span-7 relative h-[250px] sm:h-[280px] lg:h-full overflow-hidden rounded-3xl ambient-shadow">
+        <img src="{{ $heroImage }}" alt="Nasi Tumpeng Nusantara" class="absolute inset-0 w-full h-full object-cover">
+
         <!-- Frosted Headline Card Overlaid on Image -->
         <div class="absolute bottom-4 left-4 right-4 sm:right-auto max-w-md bg-[#EAEFE2]/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl shadow-xl border border-white/80 z-20">
-            <span class="px-2.5 py-0.5 rounded-full bg-[#3B420C] text-white text-[9px] font-bold uppercase tracking-widest inline-block mb-1.5">EKSKLUSIF NUSANTARA</span>
+            <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                <span class="px-2.5 py-0.5 rounded-full bg-[#3B420C] text-white text-[9px] font-bold uppercase tracking-widest inline-block">EKSKLUSIF NUSANTARA</span>
+                <span class="px-2.5 py-0.5 rounded-full bg-[#2D5A27] text-white text-[9px] font-bold uppercase tracking-widest inline-block">Porsi 15 - 20 Orang</span>
+            </div>
             <h1 class="text-xl sm:text-2xl font-bold font-serif text-gray-900 mb-1 leading-tight">Nasi Tumpeng Nusantara</h1>
             <p class="text-xs text-gray-700 font-light leading-relaxed">
-                Sajian ikonik untuk perayaan spesial, lengkap dengan nasi kuning kerucut dan lauk pilihan autentik.
+                Sajian ikonik porsi 15 - 20 orang untuk perayaan spesial, lengkap dengan nasi kuning kerucut dan lauk pilihan autentik.
             </p>
         </div>
     </div>
@@ -21,7 +24,7 @@
         <div class="overflow-hidden rounded-2xl ambient-shadow h-[120px] sm:h-[135px] lg:h-[145px]">
             <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600" alt="Tumpeng Tampah Platter" class="w-full h-full object-cover">
         </div>
-        <div class="overflow-hidden rounded-2xl ambient-shadow flex-1 min-h-[120px]">
+        <div class="overflow-hidden rounded-2xl ambient-shadow h-[120px] sm:h-[135px] lg:h-[145px]">
             <img src="https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=600" alt="Tumpeng Dining Setup" class="w-full h-full object-cover">
         </div>
     </div>
@@ -29,19 +32,19 @@
 
 <!-- Two Column Layout: Main Content + Sticky Booking Sidebar -->
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-    
+
     <!-- Left Column: Configurator & Information (Span 8) -->
     <div class="lg:col-span-8 space-y-6">
-        
+
         <!-- Informasi Menu Standar Banner (Top Box in Mockup) -->
         <div class="p-5 bg-[#F1F6EC] rounded-2xl border border-[#D5E5CD] flex items-start gap-4 shadow-sm">
             <div class="w-7 h-7 rounded-full bg-[#2D5A27]/10 flex items-center justify-center font-bold text-[#2D5A27] shrink-0 mt-0.5 text-xs">
                 ℹ️
             </div>
             <div class="space-y-1.5">
-                <h4 class="font-bold text-gray-900 text-sm sm:text-base font-serif">Informasi Menu Standar</h4>
+                <h4 class="font-bold text-gray-900 text-sm sm:text-base font-serif">Informasi Menu Standar (Porsi 15 - 20 Orang)</h4>
                 <p class="text-xs text-gray-700 font-light leading-relaxed">
-                    Setiap paket Tumpeng sudah termasuk <strong class="font-semibold text-gray-900">Nasi Kuning</strong>, <strong class="font-semibold text-gray-900">Perkedel</strong>, <strong class="font-semibold text-gray-900">Telur Dadar Rawis</strong>, <strong class="font-semibold text-gray-900">Orek Tempe</strong>, <strong class="font-semibold text-gray-900">Sambal Goreng Kentang Ati</strong>, dan <strong class="font-semibold text-gray-900">Sayuran</strong>.
+                    Setiap 1 paket Tumpeng (porsi 15 - 20 orang) sudah termasuk <strong class="font-semibold text-gray-900">Nasi Kuning</strong>, <strong class="font-semibold text-gray-900">Perkedel</strong>, <strong class="font-semibold text-gray-900">Telur Dadar Rawis</strong>, <strong class="font-semibold text-gray-900">Orek Tempe</strong>, <strong class="font-semibold text-gray-900">Sambal Goreng Kentang Ati</strong>, dan <strong class="font-semibold text-gray-900">Sayuran</strong>.
                 </p>
             </div>
         </div>
@@ -90,10 +93,10 @@
                 @endphp
 
                 @foreach($tumpengProteins as $pItem)
-                    <div onclick="selectTumpengProtein(this)" 
+                    <div onclick="selectTumpengProtein(this)"
                          data-lauk-id="{{ $pItem['id'] }}"
                          class="tumpeng-protein-card bg-white rounded-2xl border @if($pItem['checked']) border-2 border-[#2D5A27] active-card @else border-gray-200 @endif overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer select-none relative flex flex-col">
-                        
+
                         <input type="radio" name="lauk_tumpeng_protein" value="{{ $pItem['id'] }}" @if($pItem['checked']) checked @endif class="hidden lauk-radio">
 
                         <!-- Full Image Top -->
@@ -139,12 +142,16 @@
 
                 <!-- Quantity Stepper (Container matching mockup) -->
                 <div class="space-y-1.5">
-                    <label class="block text-[11px] font-semibold text-gray-700">Quantity</label>
+                    <div class="flex justify-between items-center text-[11px] font-semibold text-gray-700">
+                        <span>Quantity (Paket Tumpeng)</span>
+                        <span class="text-[10px] text-[#2D5A27] font-bold">15 - 20 orang / paket</span>
+                    </div>
                     <div class="flex items-center justify-between bg-[#F4F7EE] border border-gray-200 rounded-xl p-1.5 px-3">
                         <button type="button" onclick="decrementPax()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white hover:bg-gray-100 text-gray-700 font-bold transition-colors cursor-pointer text-sm shadow-xs">-</button>
                         <input type="number" id="detailJumlahPax" name="jumlah_pax" min="1" value="1" required oninput="calculateDetailPrice()" class="w-16 text-center font-bold text-base bg-transparent border-none focus:outline-none">
                         <button type="button" onclick="incrementPax()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white hover:bg-gray-100 text-gray-700 font-bold transition-colors cursor-pointer text-sm shadow-xs">+</button>
                     </div>
+                    <p class="text-[10px] text-gray-500 font-light text-center italic">*1 Paket Tumpeng disajikan untuk 15 - 20 porsi / orang</p>
                 </div>
 
                 <!-- Pricing Breakdown Card -->
@@ -192,12 +199,12 @@
         document.querySelectorAll('.tumpeng-protein-card').forEach(c => {
             c.classList.remove('border-2', 'border-[#2D5A27]', 'active-card');
             c.classList.add('border-gray-200');
-            
+
             const icon = c.querySelector('.check-box-icon');
             if (icon) {
                 icon.className = "check-box-icon absolute top-3 right-3 w-6 h-6 rounded-full bg-white/90 border border-gray-300 text-transparent flex items-center justify-center text-xs font-bold shadow-sm";
             }
-            
+
             const radio = c.querySelector('.lauk-radio');
             if (radio) radio.checked = false;
         });

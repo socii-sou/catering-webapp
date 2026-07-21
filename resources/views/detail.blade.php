@@ -246,9 +246,10 @@
                     const paxInput = document.getElementById('detailJumlahPax');
                     if (paxInput && Number(paxInput.value) < 100) {
                         paxInput.value = 100;
-                        if (typeof calculateDetailPrice === 'function') calculateDetailPrice();
                     }
                 }
+
+                if (typeof calculateDetailPrice === 'function') calculateDetailPrice();
             }
 
             // Nasi Kotak Lauk Card Toggle
@@ -308,20 +309,50 @@
                 const pax = Number(paxInput.value) || 0;
                 if (inputJml) inputJml.value = pax;
 
-                const subtotal = pax * currentUnitPrice;
-                const formatted = 'Rp ' + subtotal.toLocaleString('id-ID');
+                // Gubukan price mapping
+                const gubukanPrices = {
+                    1: 15000, // Bakso
+                    2: 10000, // Batagor
+                    3: 10000, // Empek-empek
+                    4: 15000, // Zuppa Soup
+                    5: 15000  // Dimsum
+                };
+
+                let totalGubukanPricePerPax = 0;
+                const activeGubukanCards = document.querySelectorAll('.prasmanan-gubukan-card.active-card');
+                activeGubukanCards.forEach(card => {
+                    const gubId = Number(card.getAttribute('data-gubukan-id'));
+                    if (gubukanPrices[gubId]) {
+                        totalGubukanPricePerPax += gubukanPrices[gubId];
+                    }
+                });
+
+                const paketSubtotal = pax * currentUnitPrice;
+                const gubukanSubtotal = pax * totalGubukanPricePerPax;
+                const grandTotal = paketSubtotal + gubukanSubtotal;
 
                 const summaryLabel = document.getElementById('summaryHargaPerPax');
                 if (summaryLabel) summaryLabel.innerText = 'Rp ' + currentUnitPrice.toLocaleString('id-ID');
 
                 const subtotalLabel = document.getElementById('detailSubtotal');
-                if (subtotalLabel) subtotalLabel.innerText = formatted;
+                if (subtotalLabel) subtotalLabel.innerText = 'Rp ' + paketSubtotal.toLocaleString('id-ID');
+
+                const gubukanRow = document.getElementById('summaryGubukanRow');
+                const gubukanVal = document.getElementById('summaryGubukanValue');
+                if (gubukanRow && gubukanVal) {
+                    if (gubukanSubtotal > 0) {
+                        gubukanRow.classList.remove('hidden');
+                        gubukanVal.innerText = 'Rp ' + gubukanSubtotal.toLocaleString('id-ID');
+                    } else {
+                        gubukanRow.classList.add('hidden');
+                    }
+                }
 
                 const totalLabel = document.getElementById('detailTotal');
-                if (totalLabel) totalLabel.innerText = formatted;
+                if (totalLabel) totalLabel.innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
             }
 
-            // AJAX Submit
+            // Submit Detail Order -> Redirect to Checkout
             function submitDetailOrder(event) {
                 event.preventDefault();
 
@@ -342,55 +373,15 @@
                     return;
                 }
 
-                const submitBtn = document.getElementById('detailSubmitBtn');
-                const spinner = document.getElementById('detailSpinner');
-                if (submitBtn) submitBtn.disabled = true;
-                if (spinner) spinner.classList.remove('hidden');
-                
-                const errBanner = document.getElementById('detailErrorBanner');
-                if (errBanner) errBanner.classList.add('hidden');
+                let url = '{{ route("checkout") }}?paket_id={{ $paket->id }}'
+                    + '&jumlah_pax=' + encodeURIComponent(paxInput)
+                    + '&tgl_acara=' + encodeURIComponent(tglAcara)
+                    + '&lauk_ids=' + encodeURIComponent(selectedLaukIds.join(','));
+                if (gubukanId) {
+                    url += '&gubukan_id=' + encodeURIComponent(gubukanId);
+                }
 
-                const payload = {
-                    gubukan_id: gubukanId,
-                    tgl_acara: tglAcara,
-                    jumlah_pax: Number(paxInput),
-                    items: [
-                        {
-                            paket_id: {{ $paket->id }},
-                            jml_paket: Number(paxInput),
-                            lauk_ids: selectedLaukIds
-                        }
-                    ]
-                };
-
-                fetch('{{ route("web.pesanan.store") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(response => {
-                    return response.json().then(data => {
-                        if (!response.ok) {
-                            throw new Error(data.message || 'Terjadi kesalahan sistem.');
-                        }
-                        return data;
-                    });
-                })
-                .then(data => {
-                    const overlay = document.getElementById('successOverlay');
-                    if (overlay) overlay.classList.remove('hidden');
-                })
-                .catch(error => {
-                    showDetailError(error.message);
-                })
-                .finally(() => {
-                    if (submitBtn) submitBtn.disabled = false;
-                    if (spinner) spinner.classList.add('hidden');
-                });
+                window.location.href = url;
             }
 
             function showDetailError(message) {

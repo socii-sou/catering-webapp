@@ -1,13 +1,14 @@
 <!-- ================= NASI KOTAK DETAIL PAGE ================= -->
 
-<!-- Hero Bento Section (Compact Bento Grid with Overlaid Card & 2 Stacked Right Photos) -->
+<!-- Hero Bento Section (Large Main Image with Frosted Card & 2 Right Stacked Images) -->
 <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-8">
-    <!-- Left Main Image with Overlaid Frosted Card (Span 7) -->
-    <div class="lg:col-span-7 relative h-[120px] sm:h-[150px] lg:h-[100px] overflow-hidden rounded-3xl ambient-shadow">
-        <img src="{{ $heroImage }}" alt="Paket {{ $paket->nm_paket }}" class="w-full h-full object-cover">
+    <!-- Left Main Hero Image with Overlaid Frosted Card (Span 7) -->
+    <div class="lg:col-span-7 relative h-[250px] sm:h-[280px] lg:h-full overflow-hidden rounded-3xl ambient-shadow">
+        <img src="{{ $heroImage }}" alt="Paket {{ $paket->nm_paket }}" class="absolute inset-0 w-full h-full object-cover">
+
         <!-- Frosted Headline Card Overlaid on Image -->
-        <div class="absolute bottom-4 left-4 right-4 sm:right-auto max-w-sm bg-[#EAEFE2]/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/80 z-20">
-            <span class="text-[9px] font-bold text-[#4F6B38] uppercase tracking-widest block mb-0.5">EKSKLUSIF NUSANTARA</span>
+        <div class="absolute bottom-4 left-4 right-4 sm:right-auto max-w-md bg-[#EAEFE2]/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl shadow-xl border border-white/80 z-20">
+            <span class="px-2.5 py-0.5 rounded-full bg-[#3B420C] text-white text-[9px] font-bold uppercase tracking-widest inline-block mb-1.5">EKSKLUSIF NUSANTARA</span>
             <h1 class="text-xl sm:text-2xl font-bold font-serif text-gray-900 mb-1 leading-tight">Paket {{ $paket->nm_paket }}</h1>
             <p class="text-xs text-gray-700 font-light leading-relaxed">
                 {{ $paketDeskripsi }}
@@ -17,10 +18,10 @@
 
     <!-- Right Column (Span 5) - 2 Stacked Images -->
     <div class="lg:col-span-5 flex flex-col gap-3">
-        <div class="overflow-hidden rounded-2xl ambient-shadow h-[120px] sm:h-[150px] lg:h-[130px]">
+        <div class="overflow-hidden rounded-2xl ambient-shadow h-[120px] sm:h-[135px] lg:h-[145px]">
             <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600" alt="Nasi Kotak Spread" class="w-full h-full object-cover">
         </div>
-        <div class="overflow-hidden rounded-2xl ambient-shadow flex-1 h-[120px] sm:h-[150px] lg:h-[130px]">
+        <div class="overflow-hidden rounded-2xl ambient-shadow h-[120px] sm:h-[135px] lg:h-[145px]">
             <img src="https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=600" alt="Corporate Feast" class="w-full h-full object-cover">
         </div>
     </div>

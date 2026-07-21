@@ -169,9 +169,14 @@
             if (calcTotal) calcTotal.innerText = 'Rp ' + total.toLocaleString('id-ID');
         }
 
-        // 5. AJAX SUBMIT ORDER
+        // 5. SUBMIT ORDER -> REDIRECT TO CHECKOUT
         function submitOrder(event) {
             event.preventDefault();
+
+            @guest
+                openLoginModal();
+                return;
+            @endguest
 
             if (selectedLaukIds.length !== currentPackage.maxLauk) {
                 showFormError(`Anda harus memilih tepat ${currentPackage.maxLauk} lauk untuk paket ini.`);
@@ -181,64 +186,21 @@
             const paxInput = document.getElementById('jumlahPaxInput').value;
             const tglAcara = document.getElementById('tglAcaraInput').value;
             const gubukanId = document.getElementById('gubukanSelect').value;
-            const catatan = document.getElementById('catatanTextarea').value;
 
             if (gubukanId && Number(paxInput) < 100) {
                 showFormError('Minimal pemesanan paket dengan Gubukan adalah 100 porsi.');
                 return;
             }
 
-            const submitBtn = document.getElementById('submitBtn');
-            const spinner = document.getElementById('submitSpinner');
-            if (submitBtn) submitBtn.disabled = true;
-            if (spinner) spinner.classList.remove('hidden');
-            document.getElementById('errorBanner').classList.add('hidden');
+            let url = '{{ route("checkout") }}?paket_id=' + currentPackage.id
+                + '&jumlah_pax=' + encodeURIComponent(paxInput)
+                + '&tgl_acara=' + encodeURIComponent(tglAcara)
+                + '&lauk_ids=' + encodeURIComponent(selectedLaukIds.join(','));
+            if (gubukanId) {
+                url += '&gubukan_id=' + encodeURIComponent(gubukanId);
+            }
 
-            const payload = {
-                gubukan_id: gubukanId ? Number(gubukanId) : null,
-                tgl_acara: tglAcara,
-                jumlah_pax: Number(paxInput),
-                catatan: catatan,
-                items: [
-                    {
-                        paket_id: currentPackage.id,
-                        jml_paket: Number(paxInput),
-                        lauk_ids: selectedLaukIds
-                    }
-                ]
-            };
-
-            fetch('{{ route("web.pesanan.store") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(response => {
-                return response.json().then(data => {
-                    if (!response.ok) {
-                        throw new Error(data.message || 'Terjadi kesalahan sistem.');
-                    }
-                    return data;
-                });
-            })
-            .then(data => {
-                closeBookingModal();
-                const overlay = document.getElementById('successOverlay');
-                if (overlay) {
-                    overlay.classList.remove('hidden');
-                }
-            })
-            .catch(error => {
-                showFormError(error.message);
-            })
-            .finally(() => {
-                if (submitBtn) submitBtn.disabled = false;
-                if (spinner) spinner.classList.add('hidden');
-            });
+            window.location.href = url;
         }
 
         function showFormError(message) {

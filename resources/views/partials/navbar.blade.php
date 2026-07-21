@@ -18,16 +18,21 @@
         <!-- Auth Buttons & Actions -->
         <div class="flex items-center space-x-4">
             @auth
-                <button onclick="openOrdersModal()" class="text-gray-600 hover:text-brand-green text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer">
+                @php
+                    $activeOrdersCount = isset($myOrders) 
+                        ? $myOrders->reject(fn($o) => in_array(strtolower($o->status_pesanan), ['batal', 'dibatalkan', 'ditolak']))->count()
+                        : Auth::user()->pesanans()->whereNotIn('status_pesanan', ['batal', 'dibatalkan', 'ditolak'])->count();
+                @endphp
+                <a href="{{ route('pesanan.index') }}" class="text-gray-600 hover:text-brand-green text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer">
                     <!-- Shopping Bag Icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                     </svg>
                     My Orders
-                    @if(isset($myOrders) && $myOrders->count() > 0)
-                        <span class="bg-brand-green text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ $myOrders->count() }}</span>
+                    @if($activeOrdersCount > 0)
+                        <span class="bg-brand-green text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ $activeOrdersCount }}</span>
                     @endif
-                </button>
+                </a>
                 
                 <div class="h-4 w-px bg-gray-300 hidden sm:block"></div>
 

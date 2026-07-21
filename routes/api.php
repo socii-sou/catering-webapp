@@ -72,6 +72,8 @@ Route::prefix('penjual')->group(function () {
         Route::get('/pesanan', [PenjualPesananController::class, 'index']);
         Route::patch('/pesanan/{pesanan}/validasi', [PenjualPesananController::class, 'validasi']);
         Route::patch('/pesanan/{pesanan}/produksi', [PenjualPesananController::class, 'updateProduksi']);
+        Route::patch('/pesanan/{pesanan}/pengiriman', [PenjualPesananController::class, 'updatePengiriman']);
+        Route::patch('/pesanan/{pesanan}/pembayaran', [PenjualPesananController::class, 'updatePembayaran']);
         Route::get('/laporan', [LaporanController::class, 'index']);
 
         Route::apiResource('pakets', PaketController::class);

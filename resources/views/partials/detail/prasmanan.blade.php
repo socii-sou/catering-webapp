@@ -241,11 +241,11 @@
 
             @php
                 $gubukanItems = [
-                    ['id' => 1, 'name' => 'Bakso', 'image' => 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400'],
-                    ['id' => 2, 'name' => 'Batagor', 'image' => 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&q=80&w=400'],
-                    ['id' => 3, 'name' => 'Empek-empek', 'image' => 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&q=80&w=400'],
-                    ['id' => 4, 'name' => 'Zuppa Soup', 'image' => 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=400'],
-                    ['id' => 5, 'name' => 'Dimsum', 'image' => 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&q=80&w=400'],
+                    ['id' => 1, 'name' => 'Bakso', 'harga' => 15000, 'image' => 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400'],
+                    ['id' => 2, 'name' => 'Batagor', 'harga' => 10000, 'image' => 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&q=80&w=400'],
+                    ['id' => 3, 'name' => 'Empek-empek', 'harga' => 10000, 'image' => 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&q=80&w=400'],
+                    ['id' => 4, 'name' => 'Zuppa Soup', 'harga' => 15000, 'image' => 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=400'],
+                    ['id' => 5, 'name' => 'Dimsum', 'harga' => 15000, 'image' => 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&q=80&w=400'],
                 ];
             @endphp
 
@@ -260,7 +260,10 @@
                             <img src="{{ $item['image'] }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover">
                         </div>
                         <div class="flex items-center justify-between px-1.5 pb-1">
-                            <span class="text-xs font-bold text-gray-900">{{ $item['name'] }}</span>
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-gray-900">{{ $item['name'] }}</span>
+                                <span class="text-[10px] text-gray-500 font-medium">Rp {{ number_format($item['harga'], 0, ',', '.') }}</span>
+                            </div>
                             <div class="gubukan-checkbox-icon w-4.5 h-4.5 rounded border border-gray-300 bg-white flex items-center justify-center text-[10px] font-bold">
                                 <input type="checkbox" name="gubukan_ids[]" value="{{ $gubukanId }}" class="hidden gubukan-input" onchange="event.stopPropagation()">
                             </div>
@@ -311,15 +314,23 @@
                 <div class="pt-3 border-t border-gray-100 space-y-2 text-xs">
                     <div class="flex justify-between text-gray-600 font-light">
                         <span>Harga per pax</span>
-                        <span id="summaryHargaPerPax">Rp 65.000</span>
+                        <span id="summaryHargaPerPax">Rp {{ number_format($hargaAwal, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="flex justify-between text-gray-600 font-light">
+                        <span>Subtotal Paket</span>
+                        <span id="detailSubtotal">Rp {{ number_format($hargaAwal * 20, 0, ',', '.') }}</span>
+                    </div>
+                    <div id="summaryGubukanRow" class="hidden flex justify-between text-gray-600 font-light">
+                        <span>Tambahan Gubukan</span>
+                        <span id="summaryGubukanValue" class="text-gray-900 font-medium">Rp 0</span>
                     </div>
                     <div class="flex justify-between text-gray-600 font-light">
                         <span>Biaya Layanan</span>
                         <span class="text-green-700 font-medium">Gratis</span>
                     </div>
                     <div class="border-t border-gray-200 pt-2.5 flex justify-between items-center">
-                        <span class="text-sm font-bold text-gray-900">Subtotal</span>
-                        <span id="detailTotal" class="text-base font-extrabold text-gray-900">Rp 1.300.000</span>
+                        <span class="text-sm font-bold text-gray-900">Total Estimasi</span>
+                        <span id="detailTotal" class="text-base font-extrabold text-[#2D5A27]">Rp {{ number_format($hargaAwal * 20, 0, ',', '.') }}</span>
                     </div>
                 </div>
 

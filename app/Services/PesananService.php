@@ -86,7 +86,7 @@ class PesananService
             }
 
             if ($pesanan->gubukan_id) {
-                $totalHarga += $pesanan->gubukan->harga_gubukan;
+                $totalHarga += ($pesanan->gubukan->harga_gubukan * $pesanan->jumlah_pax);
             }
 
             $pesanan->update(['total_harga' => $totalHarga]);
