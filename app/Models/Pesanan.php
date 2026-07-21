@@ -17,6 +17,9 @@ class Pesanan extends Model
 
     protected $fillable = [
         'user_id',
+        'nama_acara',
+        'tipe_acara',
+        'alamat_pengiriman',
         'gubukan_id',
         'tgl_pesan',
         'tgl_acara',
@@ -24,6 +27,7 @@ class Pesanan extends Model
         'status_pesanan',
         'status_produksi',
         'catatan',
+        'biaya_pengiriman',
         'total_harga',
     ];
 
@@ -33,6 +37,7 @@ class Pesanan extends Model
             'tgl_pesan' => 'date',
             'tgl_acara' => 'date',
             'jumlah_pax' => 'integer',
+            'biaya_pengiriman' => 'decimal:2',
             'total_harga' => 'decimal:2',
         ];
     }

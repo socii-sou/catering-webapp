@@ -26,6 +26,8 @@ class ReviewSeeder extends Seeder
                 
                 if (count($laukIds) === $paketStandar->jumlah_lauk_pilihan) {
                     $orderBudi = app(PesananService::class)->store($budi, [
+                        'nama_acara' => 'Lunch Meeting Budi',
+                        'alamat_pengiriman' => 'Jl. Sudirman No. 45, Jakarta Selatan',
                         'tgl_acara' => now()->addDays(5)->toDateString(),
                         'jumlah_pax' => 50,
                         'items' => [
@@ -73,6 +75,8 @@ class ReviewSeeder extends Seeder
             
             if (count($laukIdsPremium) === $paketPremium->jumlah_lauk_pilihan) {
                 $orderAnita = app(PesananService::class)->store($anita, [
+                    'nama_acara' => 'Pernikahan Anita',
+                    'alamat_pengiriman' => 'Jl. Kebayoran Baru No. 12, Jakarta Selatan',
                     'tgl_acara' => now()->addDays(10)->toDateString(),
                     'jumlah_pax' => 100,
                     'items' => [

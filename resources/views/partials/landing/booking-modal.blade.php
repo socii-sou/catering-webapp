@@ -85,7 +85,7 @@
                     </div>
 
                     <!-- Gubukan Stall Selection -->
-                    <div>
+                    <div id="gubukanSelectionContainer">
                         <label for="gubukanSelect" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
                             Stall Gubukan Tambahan (Opsional)
                         </label>

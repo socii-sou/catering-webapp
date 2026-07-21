@@ -14,13 +14,18 @@ class PesananResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'nama_acara' => $this->nama_acara,
+            'tipe_acara' => $this->tipe_acara,
+            'alamat_pengiriman' => $this->alamat_pengiriman,
             'tgl_pesan' => $this->tgl_pesan,
             'tgl_acara' => $this->tgl_acara,
             'jumlah_pax' => $this->jumlah_pax,
             'status_pesanan' => $this->status_pesanan,
             'status_produksi' => $this->status_produksi,
             'catatan' => $this->catatan,
-            'total_harga' => (float) $this->total_harga,
+            'subtotal' => (float) $this->total_harga,
+            'biaya_pengiriman' => (float) $this->biaya_pengiriman,
+            'total_keseluruhan' => (float) $this->total_harga + (float) $this->biaya_pengiriman,
 
             // Relasi ini cuma muncul di response kalau memang di-eager-load
             // duluan di controller (pakai ->with([...]) atau ->load([...])).

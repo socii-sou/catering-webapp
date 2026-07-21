@@ -183,6 +183,11 @@
             const gubukanId = document.getElementById('gubukanSelect').value;
             const catatan = document.getElementById('catatanTextarea').value;
 
+            if (gubukanId && Number(paxInput) < 100) {
+                showFormError('Minimal pemesanan paket dengan Gubukan adalah 100 porsi.');
+                return;
+            }
+
             const submitBtn = document.getElementById('submitBtn');
             const spinner = document.getElementById('submitSpinner');
             if (submitBtn) submitBtn.disabled = true;

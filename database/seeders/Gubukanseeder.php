@@ -9,25 +9,19 @@ class GubukanSeeder extends Seeder
 {
     public function run(): void
     {
-        Gubukan::create([
-            'nama_gubukan' => 'Gubukan Kecil',
-            'harga_gubukan' => 150000,
-            'kapasitas_orang' => 10,
-            'status_aktif' => true,
-        ]);
+        $items = [
+            ['nama_gubukan' => 'Bakso', 'harga_gubukan' => 15000, 'kapasitas_orang' => 50, 'status_aktif' => true],
+            ['nama_gubukan' => 'Batagor', 'harga_gubukan' => 15000, 'kapasitas_orang' => 50, 'status_aktif' => true],
+            ['nama_gubukan' => 'Empek-empek', 'harga_gubukan' => 18000, 'kapasitas_orang' => 50, 'status_aktif' => true],
+            ['nama_gubukan' => 'Zuppa Soup', 'harga_gubukan' => 20000, 'kapasitas_orang' => 50, 'status_aktif' => true],
+            ['nama_gubukan' => 'Dimsum', 'harga_gubukan' => 15000, 'kapasitas_orang' => 50, 'status_aktif' => true],
+        ];
 
-        Gubukan::create([
-            'nama_gubukan' => 'Gubukan Sedang',
-            'harga_gubukan' => 250000,
-            'kapasitas_orang' => 25,
-            'status_aktif' => true,
-        ]);
-
-        Gubukan::create([
-            'nama_gubukan' => 'Gubukan Besar',
-            'harga_gubukan' => 400000,
-            'kapasitas_orang' => 50,
-            'status_aktif' => true,
-        ]);
+        foreach ($items as $item) {
+            Gubukan::updateOrCreate(
+                ['nama_gubukan' => $item['nama_gubukan']],
+                $item
+            );
+        }
     }
 }   

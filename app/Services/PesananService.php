@@ -18,10 +18,13 @@ class PesananService
      *
      * Format $data:
      * [
-     *   'gubukan_id' => ?int,
-     *   'tgl_acara'  => 'Y-m-d',
-     *   'jumlah_pax' => int,
-     *   'catatan'    => ?string,
+     *   'nama_acara'  => string,
+     *   'tipe_acara'  => ?string,
+     *   'alamat_pengiriman' => string,
+     *   'gubukan_id'  => ?int,
+     *   'tgl_acara'   => 'Y-m-d',
+     *   'jumlah_pax'  => int,
+     *   'catatan'     => ?string,
      *   'items' => [
      *       ['paket_id' => int, 'jml_paket' => int, 'lauk_ids' => [int, ...]],
      *       ...
@@ -35,23 +38,34 @@ class PesananService
         return DB::transaction(function () use ($user, $data) {
             $pesanan = Pesanan::create([
                 'user_id' => $user->id,
-                'gubukan_id' => $data['gubukan_id'] ?? null,
+                'nama_acara' => $data['nama_acara'] ?? 'Acara Pelanggan',
+                'tipe_acara' => $data['tipe_acara'] ?? null,
+                'alamat_pengiriman' => $data['alamat_pengiriman'] ?? ($user->alamat ?? ''),
+                'gubukan_id' => is_array($data['gubukan_id'] ?? null) 
+                    ? ($data['gubukan_id'][0] ?? null) 
+                    : ($data['gubukan_id'] ?? (is_array($data['gubukan_ids'] ?? null) ? ($data['gubukan_ids'][0] ?? null) : null)),
                 'tgl_pesan' => now()->toDateString(),
                 'tgl_acara' => $data['tgl_acara'],
                 'jumlah_pax' => $data['jumlah_pax'],
                 'status_pesanan' => 'menunggu_validasi',
                 'status_produksi' => 'belum_diproses',
                 'catatan' => $data['catatan'] ?? null,
+                'biaya_pengiriman' => 0, // flat/gratis untuk MVP
                 'total_harga' => 0, // dihitung ulang di bawah, setelah semua item tersimpan
             ]);
 
             $totalHarga = 0;
+            $adaPaketPendukungGubukan = false;
 
             foreach ($data['items'] as $item) {
-                $paket = Paket::with('kategoriKuota')->findOrFail($item['paket_id']);
+                $paket = Paket::with(['kategoriKuota', 'kategoriProduk'])->findOrFail($item['paket_id']);
                 $laukIds = $item['lauk_ids'] ?? [];
 
                 $this->validasiPilihanLauk($paket, $laukIds);
+
+                if ($paket->kategoriProduk?->mendukung_gubukan) {
+                    $adaPaketPendukungGubukan = true;
+                }
 
                 $pesananPaket = $pesanan->pesananPaket()->create([
                     'paket_id' => $paket->id,
@@ -63,6 +77,12 @@ class PesananService
                 }
 
                 $totalHarga += $paket->harga_paket * $item['jml_paket'];
+            }
+
+            if ($pesanan->gubukan_id && ! $adaPaketPendukungGubukan) {
+                throw ValidationException::withMessages([
+                    'gubukan_id' => 'Gubukan hanya bisa dipesan kalau pesanan ini berisi minimal 1 paket dari kategori yang mendukung gubukan (mis. Prasmanan).',
+                ]);
             }
 
             if ($pesanan->gubukan_id) {

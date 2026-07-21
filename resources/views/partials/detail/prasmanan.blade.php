@@ -227,6 +227,49 @@
             </div>
         </div>
 
+        <!-- 3. Pilihan Gubukan (Opsional) Section -->
+        <div class="space-y-4 pt-2">
+            <div class="flex items-center space-x-3">
+                <div class="w-7 h-7 rounded-full bg-[#3B420C] text-white font-serif font-bold flex items-center justify-center text-xs shrink-0">
+                    3
+                </div>
+                <h2 class="text-xl font-bold font-serif text-gray-900">Pilihan Gubukan (Opsional)</h2>
+            </div>
+            <p class="text-xs text-gray-500 font-light leading-relaxed">
+                Tambahkan menu gubukan favorit untuk melengkapi acara Anda. Pilihan ini bersifat opsional dan dapat dipilih lebih dari satu. <strong class="text-[#2D5A27]">(Minimal pemesanan Gubukan adalah 100 porsi)</strong>.
+            </p>
+
+            @php
+                $gubukanItems = [
+                    ['id' => 1, 'name' => 'Bakso', 'image' => 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400'],
+                    ['id' => 2, 'name' => 'Batagor', 'image' => 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&q=80&w=400'],
+                    ['id' => 3, 'name' => 'Empek-empek', 'image' => 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&q=80&w=400'],
+                    ['id' => 4, 'name' => 'Zuppa Soup', 'image' => 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=400'],
+                    ['id' => 5, 'name' => 'Dimsum', 'image' => 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&q=80&w=400'],
+                ];
+            @endphp
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                @foreach($gubukanItems as $item)
+                    @php
+                        $dbGubukan = isset($gubukans) ? ($gubukans->firstWhere('nama_gubukan', $item['name']) ?? $gubukans->firstWhere('id', $item['id'])) : null;
+                        $gubukanId = $dbGubukan ? $dbGubukan->id : $item['id'];
+                    @endphp
+                    <div onclick="togglePrasmananGubukan(this)" data-gubukan-id="{{ $gubukanId }}" class="prasmanan-gubukan-card bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer select-none p-2 relative">
+                        <div class="h-28 sm:h-32 rounded-xl overflow-hidden mb-2 relative">
+                            <img src="{{ $item['image'] }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex items-center justify-between px-1.5 pb-1">
+                            <span class="text-xs font-bold text-gray-900">{{ $item['name'] }}</span>
+                            <div class="gubukan-checkbox-icon w-4.5 h-4.5 rounded border border-gray-300 bg-white flex items-center justify-center text-[10px] font-bold">
+                                <input type="checkbox" name="gubukan_ids[]" value="{{ $gubukanId }}" class="hidden gubukan-input" onchange="event.stopPropagation()">
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
     </div>
 
     <!-- Right Column: Sticky Sidebar (Span 4) -->
