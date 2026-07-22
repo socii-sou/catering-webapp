@@ -18,6 +18,10 @@
             <span>+</span>
             <span>Tambah Lauk Baru</span>
         </button>
+        <button type="button" onclick="openCreateGubukanModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-5 rounded-xl shadow-md text-xs flex items-center gap-2 transition-all cursor-pointer">
+            <span>+</span>
+            <span>Tambah Gubukan Baru</span>
+        </button>
     </div>
 </div>
 
@@ -70,8 +74,9 @@
         <div class="flex items-center gap-3 w-full md:w-auto">
             <select id="categoryFilter" onchange="filterTable()" class="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 focus:outline-none cursor-pointer">
                 <option value="Prasmanan">Prasmanan</option>
-                <option value="Bento">Nasi Box / Bento</option>
+                <option value="Nasi Kotak">Nasi Kotak</option>
                 <option value="Tumpeng">Tumpeng</option>
+                <option value="Gubukan">Gubukan</option>
                 <option value="Lauk">Lauk Pauk</option>
             </select>
 
@@ -82,6 +87,9 @@
                 </button>
                 <button type="button" id="tabLaukBtn" onclick="switchTab('lauk')" class="px-4 py-2 rounded-lg font-bold transition-all text-gray-600 hover:text-gray-900 cursor-pointer">
                     Lauk Pauk
+                </button>
+                <button type="button" id="tabGubukanBtn" onclick="switchTab('gubukan')" class="px-4 py-2 rounded-lg font-bold transition-all text-gray-600 hover:text-gray-900 cursor-pointer">
+                    Gubukan / Pondokan
                 </button>
             </div>
         </div>
@@ -105,17 +113,10 @@
                 @forelse($pakets as $index => $paket)
                     @php
                         $sku = 'NS-' . str_pad($paket->id, 3, '0', STR_PAD_LEFT);
-                        $catName = 'Prasmanan';
-                        $catBg = 'bg-[#FDF0ED] text-[#8A3017]';
-                        $imgUrl = 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=300';
                         $priceUnit = ' / pax';
 
-                        if(str_contains(strtolower($paket->nm_paket), 'wedding')) {
-                            $catName = 'Paket Pernikahan';
-                            $catBg = 'bg-[#EBF5E8] text-[#2D5A27]';
-                            $imgUrl = 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=300';
-                        } elseif(str_contains(strtolower($paket->nm_paket), 'bento') || str_contains(strtolower($paket->nm_paket), 'box')) {
-                            $catName = 'Nasi Box / Bento';
+                        if(str_contains(strtolower($paket->nm_paket), 'bento') || str_contains(strtolower($paket->nm_paket), 'box') || str_contains(strtolower($paket->nm_paket), 'kotak')) {
+                            $catName = 'Nasi Kotak';
                             $catBg = 'bg-amber-100 text-amber-800';
                             $priceUnit = ' / box';
                             $imgUrl = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=300';
@@ -123,6 +124,10 @@
                             $catName = 'Tumpeng';
                             $catBg = 'bg-emerald-100 text-emerald-800';
                             $imgUrl = 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=300';
+                        } else {
+                            $catName = 'Prasmanan';
+                            $catBg = 'bg-[#FDF0ED] text-[#8A3017]';
+                            $imgUrl = 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=300';
                         }
                     @endphp
                     <tr class="hover:bg-gray-50 transition-colors paket-row" data-name="{{ strtolower($paket->nm_paket) }}" data-cat="{{ strtolower($catName) }}">
@@ -250,6 +255,71 @@
         </table>
     </div>
 
+    <!-- GUBUKAN TABLE (Hidden by default, shown on tab click) -->
+    <div id="gubukanTableContainer" class="overflow-x-auto hidden">
+        <table class="w-full text-left text-xs">
+            <thead>
+                <tr class="bg-[#F8F9F3] text-gray-400 font-bold uppercase tracking-wider text-[10px]">
+                    <th class="py-3 px-4 rounded-l-xl">GAMBAR</th>
+                    <th class="py-3 px-4">NAMA GUBUKAN</th>
+                    <th class="py-3 px-4">HARGA SEWA</th>
+                    <th class="py-3 px-4">KAPASITAS</th>
+                    <th class="py-3 px-4">STATUS</th>
+                    <th class="py-3 px-4 text-right rounded-r-xl">AKSI</th>
+                </tr>
+            </thead>
+            <tbody id="gubukanTableBody" class="divide-y divide-gray-100 font-medium">
+                @forelse($gubukans as $gubukan)
+                    <tr class="hover:bg-gray-50 transition-colors gubukan-row" data-name="{{ strtolower($gubukan->nama_gubukan) }}">
+                        <td class="py-4 px-4">
+                            <div class="w-12 h-12 rounded-xl bg-[#EAEFE2] text-[#2D5A27] font-bold flex items-center justify-center text-lg border border-gray-200">
+                                🛖
+                            </div>
+                        </td>
+                        <td class="py-4 px-4 font-bold text-gray-900">
+                            {{ $gubukan->nama_gubukan }}
+                        </td>
+                        <td class="py-4 px-4 font-serif font-bold text-gray-900">
+                            Rp {{ number_format($gubukan->harga_gubukan, 0, ',', '.') }}
+                        </td>
+                        <td class="py-4 px-4 text-gray-500 font-light">
+                            {{ $gubukan->kapasitas_orang }} Orang
+                        </td>
+                        <td class="py-4 px-4">
+                            @if($gubukan->status_aktif)
+                                <span class="flex items-center gap-1.5 text-green-600 font-bold text-xs">
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                    <span>Aktif</span>
+                                </span>
+                            @else
+                                <span class="flex items-center gap-1.5 text-gray-400 font-medium text-xs">
+                                    <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                                    <span>Tidak Aktif</span>
+                                </span>
+                            @endif
+                        </td>
+                        <td class="py-4 px-4 text-right">
+                            <div class="flex items-center justify-end gap-3 text-base">
+                                <button type="button" onclick="openEditGubukanModal({{ json_encode($gubukan) }})" class="text-gray-400 hover:text-[#2D5A27] transition-colors cursor-pointer" title="Edit Gubukan">
+                                    ✏️
+                                </button>
+                                <button type="button" onclick="deleteGubukan({{ $gubukan->id }})" class="text-gray-400 hover:text-red-600 transition-colors cursor-pointer" title="Hapus Gubukan">
+                                    🗑️
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-gray-400 font-light">
+                            Belum ada pilihan pondokan/gubukan.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
     <!-- PAGINATION FOOTER -->
     <div class="pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 font-medium">
         <div>
@@ -353,6 +423,50 @@
         </form>
     </div>
 </div>
+
+<!-- CREATE / EDIT GUBUKAN MODAL -->
+<div id="gubukanModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-5 ambient-shadow border border-gray-100 animate-fade-in">
+        <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+            <h3 id="gubukanModalTitle" class="text-xl font-bold font-serif text-gray-900">Tambah Gubukan Baru</h3>
+            <button onclick="closeGubukanModal()" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
+        </div>
+
+        <form id="gubukanForm" onsubmit="saveGubukan(event)" class="space-y-4 text-xs">
+            <input type="hidden" id="gubukanId">
+
+            <div class="space-y-1.5">
+                <label class="font-bold text-gray-700 block">Nama Gubukan / Pondokan</label>
+                <input type="text" id="nama_gubukan" required placeholder="misal: Gubukan Kambing Guling" class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 font-medium focus:bg-white focus:outline-none focus:border-[#2D5A27]">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1.5">
+                    <label class="font-bold text-gray-700 block">Harga Sewa (Rp)</label>
+                    <input type="number" id="harga_gubukan" required placeholder="250000" class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 font-medium focus:bg-white focus:outline-none focus:border-[#2D5A27]">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="font-bold text-gray-700 block">Kapasitas Orang</label>
+                    <input type="number" id="kapasitas_orang" required placeholder="50" class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 font-medium focus:bg-white focus:outline-none focus:border-[#2D5A27]">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-2">
+                <input type="checkbox" id="status_aktif_gubukan" checked class="w-4 h-4 text-[#2D5A27] rounded-md border-gray-300 focus:ring-0">
+                <label for="status_aktif_gubukan" class="font-bold text-gray-700">Aktifkan Gubukan ini</label>
+            </div>
+
+            <div class="pt-3 flex gap-2">
+                <button type="submit" id="submitGubukanBtn" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 rounded-xl transition-all cursor-pointer shadow-md">
+                    Simpan Gubukan
+                </button>
+                <button type="button" onclick="closeGubukanModal()" class="px-4 py-3.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-all cursor-pointer">
+                    Batal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -363,19 +477,29 @@
         activeTab = tab;
         const paketContainer = document.getElementById('paketTableContainer');
         const laukContainer = document.getElementById('laukTableContainer');
+        const gubukanContainer = document.getElementById('gubukanTableContainer');
+        
         const tabPaketBtn = document.getElementById('tabPaketBtn');
         const tabLaukBtn = document.getElementById('tabLaukBtn');
+        const tabGubukanBtn = document.getElementById('tabGubukanBtn');
+
+        paketContainer.classList.add('hidden');
+        laukContainer.classList.add('hidden');
+        if (gubukanContainer) gubukanContainer.classList.add('hidden');
+
+        tabPaketBtn.className = "px-4 py-2 rounded-lg font-bold transition-all text-gray-600 hover:text-gray-900 cursor-pointer";
+        tabLaukBtn.className = "px-4 py-2 rounded-lg font-bold transition-all text-gray-600 hover:text-gray-900 cursor-pointer";
+        if (tabGubukanBtn) tabGubukanBtn.className = "px-4 py-2 rounded-lg font-bold transition-all text-gray-600 hover:text-gray-900 cursor-pointer";
 
         if (tab === 'paket') {
             paketContainer.classList.remove('hidden');
-            laukContainer.classList.add('hidden');
             tabPaketBtn.className = "px-4 py-2 rounded-lg font-bold transition-all bg-[#2D5A27] text-white shadow-xs cursor-pointer";
-            tabLaukBtn.className = "px-4 py-2 rounded-lg font-bold transition-all text-gray-600 hover:text-gray-900 cursor-pointer";
-        } else {
-            paketContainer.classList.add('hidden');
+        } else if (tab === 'lauk') {
             laukContainer.classList.remove('hidden');
-            tabPaketBtn.className = "px-4 py-2 rounded-lg font-bold transition-all text-gray-600 hover:text-gray-900 cursor-pointer";
             tabLaukBtn.className = "px-4 py-2 rounded-lg font-bold transition-all bg-[#3B420C] text-white shadow-xs cursor-pointer";
+        } else if (tab === 'gubukan') {
+            if (gubukanContainer) gubukanContainer.classList.remove('hidden');
+            if (tabGubukanBtn) tabGubukanBtn.className = "px-4 py-2 rounded-lg font-bold transition-all bg-amber-600 text-white shadow-xs cursor-pointer";
         }
     }
 
@@ -383,17 +507,36 @@
         const query = document.getElementById('searchInput').value.toLowerCase();
         const catFilter = document.getElementById('categoryFilter').value.toLowerCase();
 
+        if (catFilter === 'gubukan') {
+            switchTab('gubukan');
+        } else if (catFilter === 'lauk') {
+            switchTab('lauk');
+        } else {
+            switchTab('paket');
+        }
+
         const paketRows = document.querySelectorAll('.paket-row');
         paketRows.forEach(row => {
             const name = row.getAttribute('data-name') || '';
             const cat = row.getAttribute('data-cat') || '';
             const matchName = name.includes(query);
-            const matchCat = catFilter === 'all' || cat.includes(catFilter) || name.includes(catFilter);
+            let matchCat = false;
+            if (catFilter === 'nasi kotak') {
+                matchCat = cat.includes('nasi kotak') || cat.includes('bento') || cat.includes('box');
+            } else {
+                matchCat = cat.includes(catFilter);
+            }
             row.style.display = (matchName && matchCat) ? '' : 'none';
         });
 
         const laukRows = document.querySelectorAll('.lauk-row');
         laukRows.forEach(row => {
+            const name = row.getAttribute('data-name') || '';
+            row.style.display = name.includes(query) ? '' : 'none';
+        });
+
+        const gubukanRows = document.querySelectorAll('.gubukan-row');
+        gubukanRows.forEach(row => {
             const name = row.getAttribute('data-name') || '';
             row.style.display = name.includes(query) ? '' : 'none';
         });
@@ -556,6 +699,86 @@
             }
         } catch(err) {
             alert('Gagal menghapus lauk.');
+        }
+    }
+
+    // GUBUKAN MODAL ACTIONS
+    function openCreateGubukanModal() {
+        document.getElementById('gubukanId').value = '';
+        document.getElementById('gubukanModalTitle').innerText = 'Tambah Gubukan Baru';
+        document.getElementById('nama_gubukan').value = '';
+        document.getElementById('harga_gubukan').value = '';
+        document.getElementById('kapasitas_orang').value = '';
+        document.getElementById('status_aktif_gubukan').checked = true;
+        document.getElementById('gubukanModal').classList.remove('hidden');
+    }
+
+    function openEditGubukanModal(gubukan) {
+        document.getElementById('gubukanId').value = gubukan.id;
+        document.getElementById('gubukanModalTitle').innerText = 'Edit Gubukan / Pondokan';
+        document.getElementById('nama_gubukan').value = gubukan.nama_gubukan;
+        document.getElementById('harga_gubukan').value = Math.round(gubukan.harga_gubukan);
+        document.getElementById('kapasitas_orang').value = gubukan.kapasitas_orang;
+        document.getElementById('status_aktif_gubukan').checked = gubukan.status_aktif == 1;
+        document.getElementById('gubukanModal').classList.remove('hidden');
+    }
+
+    function closeGubukanModal() {
+        document.getElementById('gubukanModal').classList.add('hidden');
+    }
+
+    async function saveGubukan(e) {
+        e.preventDefault();
+        const gubukanId = document.getElementById('gubukanId').value;
+        const payload = {
+            nama_gubukan: document.getElementById('nama_gubukan').value,
+            harga_gubukan: Number(document.getElementById('harga_gubukan').value),
+            kapasitas_orang: Number(document.getElementById('kapasitas_orang').value),
+            status_aktif: document.getElementById('status_aktif_gubukan').checked ? 1 : 0
+        };
+
+        const url = gubukanId ? `/api/penjual/gubukans/${gubukanId}` : '/api/penjual/gubukans';
+        const method = gubukanId ? 'PUT' : 'POST';
+
+        try {
+            const res = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                window.location.reload();
+            } else {
+                const errData = await res.json();
+                alert(errData.message || 'Gagal menyimpan gubukan.');
+            }
+        } catch(err) {
+            alert('Terjadi kesalahan jaringan.');
+        }
+    }
+
+    async function deleteGubukan(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus gubukan ini?')) return;
+        try {
+            const res = await fetch(`/api/penjual/gubukans/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                window.location.reload();
+            } else {
+                alert(data.message || 'Gubukan tidak dapat dihapus.');
+            }
+        } catch(err) {
+            alert('Gagal menghapus gubukan.');
         }
     }
 </script>

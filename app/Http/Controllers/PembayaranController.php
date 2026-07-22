@@ -98,8 +98,8 @@ class PembayaranController extends Controller
         $pembayaran = Pembayaran::where('transaction_id', $orderId)->firstOrFail();
 
         $statusBayar = match (true) {
-            $transactionStatus === 'capture' && $fraudStatus === 'accept' => 'lunas',
-            $transactionStatus === 'settlement' => 'lunas',
+            $transactionStatus === 'capture' && $fraudStatus === 'accept' => ($pembayaran->jenis_pembayaran === 'dp' ? 'diverifikasi' : 'lunas'),
+            $transactionStatus === 'settlement' => ($pembayaran->jenis_pembayaran === 'dp' ? 'diverifikasi' : 'lunas'),
             in_array($transactionStatus, ['deny', 'cancel', 'expire']) => 'gagal',
             $transactionStatus === 'pending' => 'pending',
             default => $pembayaran->status_bayar,
@@ -107,10 +107,14 @@ class PembayaranController extends Controller
 
         $pembayaran->update(['status_bayar' => $statusBayar]);
 
-        if ($statusBayar === 'lunas' && $pembayaran->pesanan) {
+        if ($pembayaran->pesanan) {
             $pesanan = $pembayaran->pesanan;
-            if (in_array($pesanan->status_pesanan, ['menunggu_validasi', 'pending'])) {
-                $pesanan->update(['status_pesanan' => 'dikonfirmasi']);
+            if ($statusBayar === 'lunas') {
+                $pesanan->update(['status_pesanan' => 'selesai']);
+            } elseif ($statusBayar === 'diverifikasi') {
+                if (in_array($pesanan->status_pesanan, ['menunggu_validasi', 'pending'])) {
+                    $pesanan->update(['status_pesanan' => 'dikonfirmasi']);
+                }
             }
         }
 

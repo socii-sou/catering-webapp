@@ -70,69 +70,63 @@
     <!-- LEFT COLUMN (SPAN 8) -->
     <div class="lg:col-span-8 space-y-8">
         
-        <!-- CARD 1: PAYMENT VALIDATION -->
+        <!-- CARD 1: DETAIL PEMBAYARAN -->
+        @php
+            $pembayaran = $pesanan->pembayarans()->latest()->first();
+            $hasPaidDp = $pesanan->pembayarans()
+                ->whereIn('status_bayar', ['diverifikasi', 'lunas'])
+                ->exists();
+        @endphp
         <div class="bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E5DC] shadow-xs space-y-6">
             <div class="flex items-center justify-between pb-4 border-b border-gray-100">
                 <div class="flex items-center gap-2">
                     <span class="text-xl">🛡️</span>
-                    <h2 class="text-xl font-bold font-serif text-gray-900">Payment Validation</h2>
+                    <h2 class="text-xl font-bold font-serif text-gray-900">Detail Pembayaran DP</h2>
                 </div>
                 <span class="text-xs font-bold text-[#8A3017] uppercase tracking-wider font-mono">
                     IDR {{ number_format($pesanan->total_harga * 0.5, 0, ',', '.') }} (50% DP)
                 </span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                <!-- Left Sub-Box: Uploaded Transfer Proof -->
-                <div class="space-y-2">
-                    <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase block">UPLOADED TRANSFER PROOF</span>
-                    <div class="relative rounded-2xl overflow-hidden border border-gray-200 group shadow-xs">
-                        <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=400" alt="Transfer Proof Receipt" class="w-full h-72 object-cover">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <span class="text-white text-xs font-bold bg-black/60 px-3 py-1.5 rounded-full">🔍 View Full Image</span>
+            <div class="space-y-4 text-xs">
+                <!-- Status Banner -->
+                @if($hasPaidDp)
+                    <div class="p-4 bg-green-50 text-green-850 rounded-2xl border border-green-200 flex items-center gap-3">
+                        <span class="text-2xl">✅</span>
+                        <div>
+                            <span class="font-bold text-xs block text-green-900">Uang Muka (DP) Terbayar</span>
+                            <span class="text-[10px] text-green-600 font-light block">Pembayaran DP 50% berhasil diverifikasi otomatis oleh sistem.</span>
                         </div>
                     </div>
-                </div>
+                @else
+                    <div class="p-4 bg-red-50 text-red-850 rounded-2xl border border-red-200 flex items-center gap-3">
+                        <span class="text-2xl">⚠️</span>
+                        <div>
+                            <span class="font-bold text-xs block text-red-900">Uang Muka (DP) Belum Dibayar</span>
+                            <span class="text-[10px] text-red-600 font-light block">Pelanggan belum melakukan transaksi pembayaran DP.</span>
+                        </div>
+                    </div>
+                @endif
 
-                <!-- Right Sub-Box: Bank & Sender Details -->
-                <div class="space-y-4 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <!-- Bank Name -->
                     <div class="p-3.5 bg-[#F8F9F3] rounded-2xl border border-gray-100 space-y-1">
-                        <span class="text-[10px] font-bold text-gray-400 uppercase block">Bank Name</span>
-                        <span class="font-bold text-gray-900 text-xs block">Bank Central Asia (BCA)</span>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase block">Metode Pembayaran</span>
+                        <span class="font-bold text-gray-900 text-xs block">
+                            {{ $pembayaran ? ($pembayaran->metode_bayar === 'bank_transfer' ? 'Transfer Bank (Manual)' : 'Midtrans Snap Gateway') : 'Belum Ditentukan' }}
+                        </span>
                     </div>
 
                     <!-- Sender Name -->
                     <div class="p-3.5 bg-[#F8F9F3] rounded-2xl border border-gray-100 space-y-1">
-                        <span class="text-[10px] font-bold text-gray-400 uppercase block">Sender Name</span>
-                        <span class="font-bold text-gray-900 text-xs block">{{ $pesanan->user->name ?? 'Amanda Rizky' }}</span>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase block">Nama Pelanggan</span>
+                        <span class="font-bold text-gray-900 text-xs block">{{ $pesanan->user->name ?? '-' }}</span>
                     </div>
 
                     <!-- Transaction Date -->
                     <div class="p-3.5 bg-[#F8F9F3] rounded-2xl border border-gray-100 space-y-1">
-                        <span class="text-[10px] font-bold text-gray-400 uppercase block">Transaction Date</span>
-                        <span class="font-bold text-gray-900 text-xs block">{{ \Carbon\Carbon::parse($pesanan->created_at)->format('M d, Y \a\t h:i A') }}</span>
-                    </div>
-
-                    <!-- Action Buttons: Approve vs Reject -->
-                    <div class="pt-2 space-y-2.5">
-                        <form action="{{ route('penjual.orders.validasi.action', $pesanan->id) }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="action" value="approve">
-                            <button type="submit" class="w-full bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold py-3.5 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer">
-                                <span>✓</span>
-                                <span>Validasi Pembayaran</span>
-                            </button>
-                        </form>
-
-                        <form action="{{ route('penjual.orders.validasi.action', $pesanan->id) }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="action" value="reject">
-                            <button type="submit" class="w-full border-2 border-red-600 text-red-600 hover:bg-red-50 font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer">
-                                <span>✕</span>
-                                <span>Tolak Pembayaran</span>
-                            </button>
-                        </form>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase block">Tanggal Acara</span>
+                        <span class="font-bold text-gray-900 text-xs block">{{ \Carbon\Carbon::parse($pesanan->tgl_acara)->format('M d, Y') }}</span>
                     </div>
                 </div>
             </div>

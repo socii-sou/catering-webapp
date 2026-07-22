@@ -11,10 +11,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     $pakets = Paket::where('status_aktif', true)->get();
-    $reviews = Review::with('user')->latest()->take(6)->get();
+    $reviews = Review::with('user')->whereNotNull('ulasan')->where('ulasan', '!=', '')->latest()->take(6)->get();
     $lauks = Lauk::where('status_aktif', true)->get();
     $gubukans = Gubukan::where('status_aktif', true)->get();
-    $myOrders = auth()->check() ? auth()->user()->pesanans()->with(['pesananPaket.paket', 'pembayarans', 'pengiriman'])->latest()->get() : collect();
+    $myOrders = auth()->check() ? auth()->user()->pesanans()->with(['pesananPaket.paket', 'pembayarans', 'pengiriman', 'review'])->latest()->get() : collect();
 
     return view('welcome', compact('pakets', 'reviews', 'lauks', 'gubukans', 'myOrders'));
 });
@@ -39,20 +39,27 @@ Route::middleware('auth')->group(function () {
                 $buktiPath = $request->file('bukti_bayar')->store('bukti_bayar', 'public');
             }
 
-            // Otomatis catat data pembayaran DP (50%) untuk pesanan web
-            $pesanan->pembayarans()->create([
-                'tgl_bayar' => now(),
-                'jml_bayar' => $pesanan->total_harga * 0.5,
-                'metode_bayar' => 'bank_transfer',
-                'status_bayar' => 'diverifikasi',
-                'bukti_bayar' => $buktiPath,
-            ]);
+            $metodeChoice = $request->input('metode_pembayaran_choice', 'midtrans');
 
-            $pesanan->update(['status_pesanan' => 'dikonfirmasi']);
+            if ($metodeChoice === 'manual') {
+                $pesanan->pembayarans()->create([
+                    'tgl_bayar' => now(),
+                    'jml_bayar' => $pesanan->total_harga * 0.5,
+                    'metode_bayar' => 'bank_transfer',
+                    'status_bayar' => 'diverifikasi',
+                    'bukti_bayar' => $buktiPath,
+                ]);
+
+                $pesanan->update(['status_pesanan' => 'dikonfirmasi']);
+                $message = 'Pesanan Anda berhasil dibuat dan pembayaran DP telah diverifikasi secara otomatis!';
+            } else {
+                $pesanan->update(['status_pesanan' => 'menunggu_validasi']);
+                $message = 'Pesanan Anda berhasil dibuat! Silakan lanjutkan pembayaran.';
+            }
 
             return response()->json([
                 'success' => true,
-                'message' => 'Pesanan Anda berhasil dibuat dan pembayaran DP 50% telah tercatat!',
+                'message' => $message,
                 'pesanan' => $pesanan
             ]);
         } catch (\App\Exceptions\KapasitasTerlampauiException $e) {
@@ -72,7 +79,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/paket/{id}', function ($id) {
     $paket = \App\Models\Paket::findOrFail($id);
     $lauks = \App\Models\Lauk::where('status_aktif', true)->get();
-    $myOrders = auth()->check() ? auth()->user()->pesanans()->with(['pesananPaket.paket', 'pembayarans', 'pengiriman'])->latest()->get() : collect();
+    $myOrders = auth()->check() ? auth()->user()->pesanans()->with(['pesananPaket.paket', 'pembayarans', 'pengiriman', 'review'])->latest()->get() : collect();
     $gubukans = \App\Models\Gubukan::where('status_aktif', true)->get();
 
     return view('detail', compact('paket', 'lauks', 'myOrders', 'gubukans'));
@@ -92,7 +99,7 @@ Route::get('/checkout', function (\Illuminate\Http\Request $request) {
     $gubukanId = $request->query('gubukan_id');
     $selectedGubukan = $gubukanId ? \App\Models\Gubukan::find($gubukanId) : null;
 
-    $myOrders = auth()->check() ? auth()->user()->pesanans()->with(['pesananPaket.paket', 'pembayarans', 'pengiriman'])->latest()->get() : collect();
+    $myOrders = auth()->check() ? auth()->user()->pesanans()->with(['pesananPaket.paket', 'pembayarans', 'pengiriman', 'review'])->latest()->get() : collect();
 
     return view('checkout', compact(
         'paket',
@@ -122,7 +129,7 @@ Route::get('/pembayaran', function (\Illuminate\Http\Request $request) {
     $alamatPengiriman = $request->query('alamat_pengiriman', '');
     $catatan = $request->query('catatan', '');
 
-    $myOrders = auth()->check() ? auth()->user()->pesanans()->with(['pesananPaket.paket', 'pembayarans', 'pengiriman'])->latest()->get() : collect();
+    $myOrders = auth()->check() ? auth()->user()->pesanans()->with(['pesananPaket.paket', 'pembayarans', 'pengiriman', 'review'])->latest()->get() : collect();
 
     return view('pembayaran', compact(
         'paket',
@@ -139,7 +146,7 @@ Route::get('/pembayaran', function (\Illuminate\Http\Request $request) {
 
 Route::get('/pesanan', function () {
     $myOrders = auth()->user()->pesanans()
-        ->with(['pesananPaket.paket', 'pesananPaket.lauks.lauk', 'gubukan', 'pembayarans', 'pengiriman'])
+        ->with(['pesananPaket.paket', 'pesananPaket.lauks.lauk', 'gubukan', 'pembayarans', 'pengiriman', 'review'])
         ->latest('tgl_pesan')
         ->get();
 
@@ -176,13 +183,40 @@ Route::get('/pesanan/{pesanan}', function (\App\Models\Pesanan $pesanan) {
         'gubukan',
         'pembayarans',
         'pengiriman',
-        'user'
+        'user',
+        'review'
     ]);
 
     $myOrders = auth()->user()->pesanans()->latest()->get();
 
     return view('pesanan_detail', compact('pesanan', 'myOrders'));
 })->middleware('auth')->name('pesanan.show');
+
+Route::post('/pesanan/{pesanan}/review', function (\App\Models\Pesanan $pesanan, \Illuminate\Http\Request $request) {
+    if ($pesanan->user_id !== auth()->id() || $pesanan->status_pesanan !== 'selesai') {
+        abort(403, 'Aksi tidak diizinkan.');
+    }
+
+    $request->validate([
+        'rating' => ['required', 'integer', 'min:1', 'max:5'],
+        'ulasan' => ['nullable', 'string', 'max:1000'],
+    ]);
+
+    // Make sure we only allow 1 review per order
+    if ($pesanan->review()->exists()) {
+        return redirect()->back()->with('error', 'Pesanan ini sudah pernah direview sebelumnya.');
+    }
+
+    $pesanan->review()->create([
+        'user_id' => auth()->id(),
+        'rating' => $request->rating,
+        'ulasan' => $request->ulasan,
+    ]);
+
+    return redirect()->back()->with('success', 'Ulasan Anda berhasil dikirim. Terima kasih banyak!');
+})->middleware('auth')->name('pesanan.review.store');
+
+Route::post('/pesanan/{pesanan}/bayar', [\App\Http\Controllers\PembayaranController::class, 'createSnapToken'])->middleware('auth')->name('pesanan.bayar');
 
 Route::get('/penjual/dashboard', function () {
     $totalOrdersCount = \App\Models\Pesanan::count();
@@ -212,6 +246,7 @@ Route::get('/penjual/dashboard', function () {
 Route::get('/penjual/packages', function () {
     $pakets = \App\Models\Paket::latest()->get();
     $lauks = \App\Models\Lauk::latest()->get();
+    $gubukans = \App\Models\Gubukan::latest()->get();
 
     $totalPaketsCount = $pakets->count();
     $activePaketsCount = $pakets->where('status_aktif', true)->count();
@@ -221,6 +256,7 @@ Route::get('/penjual/packages', function () {
     return view('penjual.packages', compact(
         'pakets',
         'lauks',
+        'gubukans',
         'totalPaketsCount',
         'activePaketsCount',
         'inactivePaketsCount',

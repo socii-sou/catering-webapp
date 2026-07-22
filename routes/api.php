@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Katalog\GubukanController as KatalogGubukanController;
+use App\Http\Controllers\Katalog\KategoriController;
+use App\Http\Controllers\Katalog\PaketController as KatalogPaketController;
 use App\Http\Controllers\Pelanggan\PesananController as PelangganPesananController;
 use App\Http\Controllers\Pelanggan\ReviewController as PelangganReviewController;
 use App\Http\Controllers\PembayaranController;
@@ -30,6 +33,19 @@ Route::get('/reviews', [ReviewController::class, 'index']);
 
 /*
 |--------------------------------------------------------------------------
+| Katalog (publik) -- browsing produk sebelum pelanggan login/checkout
+|--------------------------------------------------------------------------
+*/
+Route::prefix('katalog')->group(function () {
+    Route::get('/kategori-produk', [KategoriController::class, 'kategoriProduk']);
+    Route::get('/kategori-lauk', [KategoriController::class, 'kategoriLauk']);
+    Route::get('/pakets', [KatalogPaketController::class, 'index']);
+    Route::get('/pakets/{paket}', [KatalogPaketController::class, 'show']);
+    Route::get('/gubukans', [KatalogGubukanController::class, 'index']);
+});
+
+/*
+|--------------------------------------------------------------------------
 | Webhook Midtrans
 |--------------------------------------------------------------------------
 | Sengaja di luar middleware auth:sanctum, karena yang memanggil endpoint
@@ -42,7 +58,7 @@ Route::post('/webhook/midtrans', [PembayaranController::class, 'webhook']);
 | Rute yang wajib login (siapapun rolenya)
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum,web')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
@@ -57,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/pesanan', [PelangganPesananController::class, 'index']);
         Route::get('/pesanan/{pesanan}', [PelangganPesananController::class, 'show']);
         Route::post('/pesanan', [PelangganPesananController::class, 'store']);
+        Route::patch('/pesanan/{pesanan}/konfirmasi-selesai', [PelangganPesananController::class, 'konfirmasiSelesai']);
         Route::post('/pesanan/{pesanan}/review', [PelangganReviewController::class, 'store']);
     });
 
@@ -65,15 +82,10 @@ Route::middleware('auth:sanctum')->group(function () {
     | Khusus role Penjual
     |----------------------------------------------------------------------
     */
-    
-});
-
-Route::prefix('penjual')->group(function () {
+    Route::middleware('role:penjual')->prefix('penjual')->group(function () {
         Route::get('/pesanan', [PenjualPesananController::class, 'index']);
         Route::patch('/pesanan/{pesanan}/validasi', [PenjualPesananController::class, 'validasi']);
         Route::patch('/pesanan/{pesanan}/produksi', [PenjualPesananController::class, 'updateProduksi']);
-        Route::patch('/pesanan/{pesanan}/pengiriman', [PenjualPesananController::class, 'updatePengiriman']);
-        Route::patch('/pesanan/{pesanan}/pembayaran', [PenjualPesananController::class, 'updatePembayaran']);
         Route::get('/laporan', [LaporanController::class, 'index']);
 
         Route::apiResource('pakets', PaketController::class);
@@ -81,3 +93,4 @@ Route::prefix('penjual')->group(function () {
         Route::apiResource('gubukans', GubukanController::class);
         Route::apiResource('capacity-settings', CapacitySettingController::class);
     });
+});

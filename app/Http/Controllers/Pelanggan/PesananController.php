@@ -119,4 +119,25 @@ class PesananController extends Controller
 
         return response()->json(new PesananResource($pesanan), 201);
     }
+
+    #[OA\Patch(
+        path: '/api/pelanggan/pesanan/{pesanan}/konfirmasi-selesai',
+        summary: 'Konfirmasi pesanan sudah diterima -- ini yang membuka akses untuk kasih review',
+        description: 'Hanya bisa dipanggil kalau status_pesanan sedang "disetujui". Setelah ini status_pesanan berubah jadi "selesai", dan endpoint POST .../review baru bisa dipakai.',
+        tags: ['Pelanggan - Pesanan'],
+        security: [['bearerAuth' => []]],
+        parameters: [new OA\Parameter(name: 'pesanan', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        responses: [
+            new OA\Response(response: 200, description: 'Pesanan berhasil ditandai selesai'),
+            new OA\Response(response: 403, description: 'Bukan pemilik pesanan, atau status pesanan belum "disetujui"'),
+        ]
+    )]
+    public function konfirmasiSelesai(Request $request, Pesanan $pesanan)
+    {
+        $this->authorize('confirmSelesai', $pesanan);
+
+        $pesanan->update(['status_pesanan' => 'selesai']);
+
+        return new PesananResource($pesanan->fresh());
+    }
 }

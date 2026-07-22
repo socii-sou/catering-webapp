@@ -15,6 +15,20 @@
 @section('content')
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
+    <!-- ALERT NOTIFICATIONS -->
+    @if(session('success'))
+        <div class="p-4 rounded-2xl bg-green-50 border border-green-200 text-green-800 text-xs font-bold flex items-center gap-2">
+            <span>✅</span>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-xs font-bold flex items-center gap-2">
+            <span>⚠️</span>
+            <span>{{ session('error') }}</span>
+        </div>
+    @endif
+
     <!-- BREADCRUMBS -->
     <nav class="flex text-xs text-gray-500 font-medium space-x-2">
         <a href="/" class="hover:text-gray-900 transition-colors">Beranda</a>
@@ -362,10 +376,26 @@
                     </p>
                 </div>
 
-                <!-- Pelunasan Action Button -->
-                <a href="https://wa.me/6281389025947?text=Halo%20RASACI%20Kitchen,%20saya%20ingin%20melakukan%20pelunasan%20sisa%20pembayaran%20untuk%20Order%20%23ORD-{{ str_pad($pesanan->id, 5, '0', STR_PAD_LEFT) }}" target="_blank" class="w-full bg-[#3B420C] hover:bg-[#2C3109] text-white font-bold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 text-xs cursor-pointer">
-                    <span>Selesaikan Pelunasan</span>
-                </a>
+                <!-- Pelunasan / Selesai / Review Action Button -->
+                @if($statusRaw === 'disetujui')
+                    <form action="{{ route('pesanan.selesai', $pesanan->id) }}" method="POST" class="w-full">
+                        @csrf
+                        <button type="submit" class="w-full bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 text-xs cursor-pointer">
+                            <span>✓</span>
+                            <span>Konfirmasi Pesanan Selesai</span>
+                        </button>
+                    </form>
+                @elseif($statusRaw === 'selesai' && !$pesanan->review)
+                    <a href="{{ route('pesanan.review.create', $pesanan->id) }}" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 text-xs cursor-pointer text-center">
+                        <span>⭐</span>
+                        <span>Berikan Ulasan Anda</span>
+                    </a>
+                @elseif($statusRaw !== 'selesai' && $statusRaw !== 'batal' && $statusRaw !== 'ditolak')
+                    <button id="btnPelunasan" onclick="payPelunasan({{ $pesanan->id }})" class="w-full bg-[#3B420C] hover:bg-[#2C3109] text-white font-bold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 text-xs cursor-pointer">
+                        <span id="pelunasanSpinner" class="hidden">⏳</span>
+                        <span>Selesaikan Pelunasan</span>
+                    </button>
+                @endif
 
                 <p class="text-[10px] text-gray-400 text-center font-light">
                     Secure payment powered by Midtrans / Bank Transfer
@@ -386,6 +416,78 @@
                     </a>
                 </div>
             </div>
+
+            @if($pesanan->status_pesanan === 'selesai')
+                <!-- Card 3: Ulasan & Review Card -->
+                <div class="bg-white border border-[#E5E5DC] rounded-3xl p-5 space-y-4 shadow-sm text-xs">
+                    <div class="flex items-center gap-2 pb-2 border-b border-gray-100">
+                        <span class="text-xl">⭐</span>
+                        <h4 class="font-bold text-gray-900">Ulasan & Rating Catering</h4>
+                    </div>
+
+                    @if($pesanan->review)
+                        <!-- Display Review -->
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-1">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= $pesanan->review->rating)
+                                        <span class="text-amber-400 text-lg">★</span>
+                                    @else
+                                        <span class="text-gray-200 text-lg">★</span>
+                                    @endif
+                                @endfor
+                            </div>
+                            <p class="text-gray-750 italic leading-relaxed bg-[#F8F9F3] p-3 rounded-2xl border border-gray-100">
+                                "{{ $pesanan->review->ulasan ?? 'Tidak ada ulasan tertulis.' }}"
+                            </p>
+                            <span class="text-[10px] text-gray-400 block font-light">Dikirim pada {{ $pesanan->review->created_at->format('d M Y, H:i') }}</span>
+                        </div>
+                    @else
+                        <!-- Form Review -->
+                        <form action="{{ route('pesanan.review.store', $pesanan->id) }}" method="POST" class="space-y-3">
+                            @csrf
+                            <div class="space-y-1.5">
+                                <label class="font-bold text-gray-700 block">Rating</label>
+                                <div class="flex items-center gap-2">
+                                    <div class="star-rating flex flex-row-reverse justify-end gap-1">
+                                        <input type="radio" id="star5" name="rating" value="5" class="hidden" required />
+                                        <label for="star5" class="text-2xl text-gray-300 hover:text-amber-400 cursor-pointer transition-colors select-none">★</label>
+                                        
+                                        <input type="radio" id="star4" name="rating" value="4" class="hidden" />
+                                        <label for="star4" class="text-2xl text-gray-300 hover:text-amber-400 cursor-pointer transition-colors select-none">★</label>
+                                        
+                                        <input type="radio" id="star3" name="rating" value="3" class="hidden" />
+                                        <label for="star3" class="text-2xl text-gray-300 hover:text-amber-400 cursor-pointer transition-colors select-none">★</label>
+                                        
+                                        <input type="radio" id="star2" name="rating" value="2" class="hidden" />
+                                        <label for="star2" class="text-2xl text-gray-300 hover:text-amber-400 cursor-pointer transition-colors select-none">★</label>
+                                        
+                                        <input type="radio" id="star1" name="rating" value="1" class="hidden" />
+                                        <label for="star1" class="text-2xl text-gray-300 hover:text-amber-400 cursor-pointer transition-colors select-none">★</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <style>
+                                .star-rating input:checked ~ label,
+                                .star-rating label:hover,
+                                .star-rating label:hover ~ label {
+                                    color: #fbbf24;
+                                }
+                            </style>
+
+                            <div class="space-y-1.5">
+                                <label class="font-bold text-gray-700 block">Ulasan / Masukan</label>
+                                <textarea name="ulasan" rows="3" placeholder="Tuliskan masukan Anda tentang rasa masakan atau pelayanan kami..." class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:border-[#2D5A27] resize-none leading-relaxed" required></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold py-3 rounded-xl transition-all shadow-sm cursor-pointer text-center text-xs">
+                                Kirim Ulasan
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            @endif
 
         </div>
 
@@ -422,5 +524,67 @@
             .bindPopup("<b>Alamat Pengiriman</b><br>{{ Str::limit($pesanan->alamat_pengiriman, 50) }}")
             .openPopup();
     });
+
+    function payPelunasan(pesananId) {
+        const btn = document.getElementById('btnPelunasan');
+        const spinner = document.getElementById('pelunasanSpinner');
+        const originalText = btn ? btn.innerText : '';
+        
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = 'Loading...';
+        }
+        if (spinner) spinner.classList.remove('hidden');
+
+        fetch(`/pesanan/${pesananId}/bayar`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                jenis_pembayaran: 'pelunasan'
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || 'Gagal memulai pelunasan.'); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (window.snap) {
+                window.snap.pay(data.snap_token, {
+                    onSuccess: function(result) {
+                        window.location.href = `/pesanan/${pesananId}/review`;
+                    },
+                    onPending: function(result) {
+                        alert("Pembayaran pelunasan pending. Silakan selesaikan pembayaran Anda.");
+                        window.location.reload();
+                    },
+                    onError: function(result) {
+                        alert("Pembayaran gagal!");
+                        window.location.reload();
+                    },
+                    onClose: function() {
+                        window.location.reload();
+                    }
+                });
+            } else {
+                alert("Midtrans Snap tidak termuat.");
+            }
+        })
+        .catch(error => {
+            alert(error.message);
+        })
+        .finally(() => {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+            if (spinner) spinner.classList.add('hidden');
+        });
+    }
 </script>
 @endsection

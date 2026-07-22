@@ -175,7 +175,7 @@
                 btn.disabled = true;
                 btn.innerText = 'Loading...';
 
-                fetch(`/api/pesanan/${pesananId}/bayar`, {
+                fetch(`/pesanan/${pesananId}/bayar`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -183,7 +183,7 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
-                        jumlah_bayar: totalHarga
+                        jenis_pembayaran: 'dp'
                     })
                 })
                 .then(response => {

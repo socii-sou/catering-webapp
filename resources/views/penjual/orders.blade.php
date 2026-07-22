@@ -208,7 +208,7 @@
                             <div class="flex items-center justify-end gap-3 text-xs">
                                 <!-- Action 1: Validasi Pembayaran Page -->
                                 <a href="{{ route('penjual.orders.validasi', $order->id) }}" class="font-bold text-green-700 hover:text-green-900 hover:underline cursor-pointer">
-                                    Validasi Pembayaran
+                                    Detail Pembayaran
                                 </a>
 
                                 <!-- Action 2: Update Status -->

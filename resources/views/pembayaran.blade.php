@@ -390,9 +390,8 @@
         </div>
     </div>
 </div>
-@endsection
-
 @section('scripts')
+<script src="{{ config('services.midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
 <script>
     let selectedPaymentMethod = 'midtrans';
 
@@ -549,6 +548,7 @@
         }
         formData.append('tgl_acara', @json($tglAcara));
         formData.append('jumlah_pax', Number(@json($jumlahPax)));
+        formData.append('metode_pembayaran_choice', selectedPaymentMethod);
 
         formData.append('items[0][paket_id]', @json($paket->id));
         formData.append('items[0][jml_paket]', Number(@json($jumlahPax)));
@@ -584,7 +584,7 @@
             const pesananId = data.pesanan.id;
 
             if (selectedPaymentMethod === 'midtrans') {
-                fetch(`/api/pesanan/${pesananId}/bayar`, {
+                fetch(`/pesanan/${pesananId}/bayar`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

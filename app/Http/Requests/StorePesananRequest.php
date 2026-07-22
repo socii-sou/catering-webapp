@@ -25,6 +25,7 @@ class StorePesananRequest extends FormRequest
             'jumlah_pax' => ['required', 'integer', 'min:1'],
             'catatan' => ['nullable', 'string', 'max:1000'],
             'bukti_bayar' => ['nullable', 'file', 'mimes:jpeg,jpg,png,pdf', 'max:5120'],
+            'metode_pembayaran_choice' => ['nullable', 'string', 'in:midtrans,manual'],
 
             'items' => ['required', 'array', 'min:1'],
             'items.*.paket_id' => ['required', 'exists:pakets,id'],

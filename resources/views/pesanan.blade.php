@@ -107,9 +107,28 @@
                     </div>
 
                     @if($status === 'selesai')
-                        <a href="{{ route('pesanan.show', $order->id) }}" class="px-5 py-2.5 bg-[#EAEFE2] hover:bg-[#DCECD8] text-[#2D5A27] font-bold text-xs rounded-xl shadow-xs border border-[#D2E6CE] transition-all cursor-pointer whitespace-nowrap">
-                            Lihat Detail
-                        </a>
+                        <div class="flex items-center gap-2">
+                            @if(!$order->review)
+                                <a href="{{ route('pesanan.review.create', $order->id) }}" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer whitespace-nowrap">
+                                    Beri Ulasan
+                                </a>
+                            @endif
+                            <a href="{{ route('pesanan.show', $order->id) }}" class="px-5 py-2.5 bg-[#EAEFE2] hover:bg-[#DCECD8] text-[#2D5A27] font-bold text-xs rounded-xl shadow-xs border border-[#D2E6CE] transition-all cursor-pointer whitespace-nowrap">
+                                Lihat Detail
+                            </a>
+                        </div>
+                    @elseif($status === 'disetujui')
+                        <div class="flex items-center gap-2">
+                            <form action="{{ route('pesanan.selesai', $order->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="px-5 py-2.5 bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer whitespace-nowrap">
+                                    Selesai
+                                </button>
+                            </form>
+                            <a href="{{ route('pesanan.show', $order->id) }}" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs rounded-xl border border-gray-200 transition-all cursor-pointer whitespace-nowrap">
+                                Detail Pesanan
+                            </a>
+                        </div>
                     @elseif($status === 'batal' || $status === 'dibatalkan' || $status === 'ditolak')
                         <a href="{{ route('pesanan.show', $order->id) }}" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs rounded-xl border border-gray-200 transition-all cursor-pointer whitespace-nowrap">
                             Detail Pesanan
