@@ -93,6 +93,18 @@ class PesananService
 
             return $pesanan->fresh(['pesananPaket.paket', 'pesananPaket.lauks.lauk', 'gubukan']);
         });
+
+        // Kirim Notifikasi Email ke Pelanggan
+        try {
+            if ($user->email) {
+                \Illuminate\Support\Facades\Mail::to($user->email)
+                    ->send(new \App\Mail\PesananDibuatMail($pesanan));
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal mengirim email notifikasi pesanan #' . $pesanan->id . ': ' . $e->getMessage());
+        }
+
+        return $pesanan;
     }
 
     /**
@@ -109,9 +121,15 @@ class PesananService
     protected function validasiPilihanLauk(Paket $paket, array $laukIds): void
     {
         if ($paket->kategoriKuota->isEmpty()) {
-            if (count($laukIds) !== $paket->jumlah_lauk_pilihan) {
+            if (empty($laukIds)) {
                 throw ValidationException::withMessages([
-                    'items' => "Paket \"{$paket->nm_paket}\" harus memilih tepat {$paket->jumlah_lauk_pilihan} lauk.",
+                    'items' => "Paket \"{$paket->nm_paket}\" minimal harus memilih 1 lauk.",
+                ]);
+            }
+
+            if (count($laukIds) > $paket->jumlah_lauk_pilihan) {
+                throw ValidationException::withMessages([
+                    'items' => "Paket \"{$paket->nm_paket}\" maksimal hanya boleh memilih {$paket->jumlah_lauk_pilihan} lauk.",
                 ]);
             }
 
@@ -124,11 +142,11 @@ class PesananService
         foreach ($paket->kategoriKuota as $kuota) {
             $terpilih = $jumlahPerKategori->get($kuota->kategori_lauk_id, 0);
 
-            if ($terpilih !== $kuota->jumlah_pilihan) {
+            if ($terpilih > $kuota->jumlah_pilihan) {
                 $namaKategori = $kuota->kategoriLauk->nama_kategori ?? "kategori #{$kuota->kategori_lauk_id}";
 
                 throw ValidationException::withMessages([
-                    'items' => "Paket \"{$paket->nm_paket}\" harus memilih tepat {$kuota->jumlah_pilihan} lauk dari kategori \"{$namaKategori}\" (saat ini dipilih {$terpilih}).",
+                    'items' => "Paket \"{$paket->nm_paket}\" maksimal hanya boleh memilih {$kuota->jumlah_pilihan} lauk dari kategori \"{$namaKategori}\" (saat ini dipilih {$terpilih}).",
                 ]);
             }
         }

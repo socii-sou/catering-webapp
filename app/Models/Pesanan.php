@@ -77,4 +77,29 @@ class Pesanan extends Model
     {
         return $this->hasOne(Review::class);
     }
+
+    /*
+    |--------------------------------------------------------------------
+    | Accessor
+    |--------------------------------------------------------------------
+    */
+
+    /**
+     * Total yang sudah benar-benar terbayar (cuma hitung pembayaran yang
+     * statusnya sudah lunas, DP maupun pelunasan digabung).
+     */
+    public function totalDibayar(): float
+    {
+        return (float) $this->pembayarans()->where('status_bayar', 'lunas')->sum('jml_bayar');
+    }
+
+    /**
+     * Sisa yang masih perlu dibayar sampai pesanan ini lunas total.
+     */
+    public function sisaTagihan(): float
+    {
+        $totalKeseluruhan = (float) $this->total_harga + (float) $this->biaya_pengiriman;
+
+        return max($totalKeseluruhan - $this->totalDibayar(), 0);
+    }
 }

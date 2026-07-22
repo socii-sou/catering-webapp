@@ -267,7 +267,7 @@
                     selectedLaukIds = selectedLaukIds.filter(id => id !== Number(checkbox.value));
                 } else {
                     if (selectedLaukIds.length >= limit) {
-                        alert(`Anda hanya boleh memilih maksimal ${limit} lauk untuk paket ini.`);
+                        openLaukLimitModal(limit);
                         return;
                     }
                     checkbox.checked = true;

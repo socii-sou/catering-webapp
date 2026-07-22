@@ -24,6 +24,7 @@ class StorePesananRequest extends FormRequest
             'tgl_acara' => ['required', 'date', 'after_or_equal:tomorrow'],
             'jumlah_pax' => ['required', 'integer', 'min:1'],
             'catatan' => ['nullable', 'string', 'max:1000'],
+            'bukti_bayar' => ['nullable', 'file', 'mimes:jpeg,jpg,png,pdf', 'max:5120'],
 
             'items' => ['required', 'array', 'min:1'],
             'items.*.paket_id' => ['required', 'exists:pakets,id'],

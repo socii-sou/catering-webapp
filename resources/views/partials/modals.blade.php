@@ -168,24 +168,33 @@
 
                                 @php
                                     $pembayaranTerakhir = $order->pembayarans->last();
-                                    $statusBayar = $pembayaranTerakhir ? $pembayaranTerakhir->status_bayar : 'belum_bayar';
+                                    $statusBayar = $pembayaranTerakhir ? strtolower($pembayaranTerakhir->status_bayar) : 'belum_bayar';
                                     
                                     $bayarLabels = [
                                         'belum_bayar' => 'Belum Dibayar',
                                         'pending' => 'Menunggu Pembayaran',
+                                        'menunggu_verifikasi' => 'Menunggu Verifikasi',
+                                        'diverifikasi' => 'Terverifikasi (DP)',
                                         'lunas' => 'Lunas',
-                                        'gagal' => 'Gagal',
+                                        'gagal' => 'Gagal Pembayaran',
+                                        'ditolak' => 'Pembayaran Ditolak',
                                     ];
                                     $bayarColors = [
                                         'belum_bayar' => 'bg-red-50 text-red-600 border-red-200',
                                         'pending' => 'bg-orange-50 text-orange-600 border-orange-200',
-                                        'lunas' => 'bg-green-50 text-green-600 border-green-200',
-                                        'gagal' => 'bg-red-100 text-red-700 border-red-300',
+                                        'menunggu_verifikasi' => 'bg-yellow-50 text-yellow-700 border-yellow-200',
+                                        'diverifikasi' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                        'lunas' => 'bg-green-50 text-green-700 border-green-200',
+                                        'gagal' => 'bg-rose-50 text-rose-700 border-rose-200',
+                                        'ditolak' => 'bg-red-100 text-red-700 border-red-300',
                                     ];
+
+                                    $labelBayar = $bayarLabels[$statusBayar] ?? ucfirst(str_replace('_', ' ', $statusBayar));
+                                    $colorBayar = $bayarColors[$statusBayar] ?? 'bg-gray-50 text-gray-700 border-gray-200';
                                 @endphp
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[10px] font-bold px-2 py-1 rounded border {{ $bayarColors[$statusBayar] }}">
-                                        💳 {{ $bayarLabels[$statusBayar] }}
+                                    <span class="text-[10px] font-bold px-2 py-1 rounded border {{ $colorBayar }}">
+                                        💳 {{ $labelBayar }}
                                     </span>
                                     
                                     @if($statusBayar === 'belum_bayar' && $order->status_pesanan === 'disetujui')
@@ -211,3 +220,54 @@
         </div>
     </div>
 </div>
+
+<!-- WARNING/ALERT MODAL FOR LAUK LIMIT -->
+<div id="laukLimitModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#FDFDF6] rounded-[32px] shadow-2xl border border-stone-200/50 w-full max-w-sm overflow-hidden transform scale-95 opacity-0 transition-all duration-300 flex flex-col relative p-8 text-center space-y-6">
+        <!-- Close Button (Icon) -->
+        <button onclick="closeLaukLimitModal()" class="absolute top-4 right-5 text-gray-400 hover:text-gray-600 text-2xl font-semibold cursor-pointer">&times;</button>
+        
+        <!-- Warning Icon -->
+        <div class="w-16 h-16 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-3xl font-bold mx-auto">
+            ⚠️
+        </div>
+        
+        <!-- Title and Message -->
+        <div class="space-y-2">
+            <h3 class="text-xl font-bold font-serif text-gray-900">Batas Maksimal Lauk</h3>
+            <p id="laukLimitMessage" class="text-xs text-gray-500 font-light leading-relaxed">
+                Anda hanya boleh memilih maksimal 3 lauk untuk paket ini.
+            </p>
+        </div>
+        
+        <!-- Action Button -->
+        <button onclick="closeLaukLimitModal()" class="w-full bg-[#3B420C] hover:bg-[#2C3109] text-white font-bold py-3.5 rounded-xl shadow-md transition-all text-xs uppercase tracking-wider cursor-pointer">
+            Mengerti
+        </button>
+    </div>
+</div>
+
+<script>
+    function openLaukLimitModal(limit) {
+        const modal = document.getElementById('laukLimitModal');
+        if (!modal) return;
+        const msg = document.getElementById('laukLimitMessage');
+        if (msg) {
+            msg.textContent = `Anda hanya boleh memilih maksimal ${limit} lauk untuk paket ini.`;
+        }
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.firstElementChild.classList.remove('scale-95', 'opacity-0');
+        }, 10);
+    }
+
+    function closeLaukLimitModal() {
+        const modal = document.getElementById('laukLimitModal');
+        if (!modal) return;
+        modal.firstElementChild.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+</script>
+

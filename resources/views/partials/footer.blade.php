@@ -25,10 +25,10 @@
             <div class="md:col-span-2">
                 <h4 class="font-bold text-gray-900 mb-4 text-xs uppercase tracking-widest">SUPPORT</h4>
                 <ul class="space-y-2.5 font-light text-xs text-gray-600">
-                    <li><a href="https://wa.me/6281234567890" target="_blank" class="hover:text-brand-green transition-colors">Contact</a></li>
+                    <li><a href="https://wa.me/6281389025947" target="_blank" class="hover:text-brand-green transition-colors">Contact</a></li>
                     <li><a href="#" class="hover:text-brand-green transition-colors">Privacy Policy</a></li>
                     <li><a href="#" class="hover:text-brand-green transition-colors">Terms of Service</a></li>
-                    <li><a href="#" class="hover:text-brand-green transition-colors">Help Center</a></li>
+                    <li><a href="https://wa.me/6281389025947?text=Halo%20RASACI%20Catering,%20saya%20butuh%20bantuan%20Help%20Center." target="_blank" class="hover:text-brand-green transition-colors">Help Center</a></li>
                 </ul>
             </div>
 

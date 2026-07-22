@@ -15,7 +15,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                     </svg>
                 </a>
-                <a href="https://wa.me/6281234567890?text=Halo%20Rasaci%20Catering,%20saya%20ingin%20berkonsultasi%20mengenai%20layanan%20catering." target="_blank" class="inline-flex items-center justify-center bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-sm font-medium px-8 py-3.5 rounded-lg transition-all text-center">
+                <a href="https://wa.me/6281389025947?text=Halo%20Rasaci%20Catering,%20saya%20ingin%20berkonsultasi%20mengenai%20layanan%20catering." target="_blank" class="inline-flex items-center justify-center bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-sm font-medium px-8 py-3.5 rounded-lg transition-all text-center">
                     Konsultasi Gratis
                 </a>
             </div>

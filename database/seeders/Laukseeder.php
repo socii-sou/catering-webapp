@@ -23,10 +23,10 @@ class LaukSeeder extends Seeder
         ];
 
         foreach ($lauks as $nama) {
-            Lauk::create([
-                'nama_lauk' => $nama,
-                'status_aktif' => true,
-            ]);
+            Lauk::firstOrCreate(
+                ['nama_lauk' => $nama],
+                ['status_aktif' => true]
+            );
         }
     }
 }

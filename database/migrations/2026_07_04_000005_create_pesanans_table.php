@@ -21,8 +21,7 @@ return new class extends Migration
             $table->date('tgl_pesan');
             $table->date('tgl_acara'); // dipakai utk cek kapasitas
             $table->unsignedInteger('jumlah_pax');
-            $table->enum('status_pesanan', ['menunggu_validasi','disetujui','ditolak','batal','selesai'])
-                ->default('menunggu_validasi');
+            $table->string('status_pesanan')->default('menunggu_validasi');
             $table->enum('status_produksi', ['belum_diproses','diproses','selesai'])
                 ->default('belum_diproses');
             $table->text('catatan')->nullable();

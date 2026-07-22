@@ -119,7 +119,7 @@
     </div>
 
     <!-- Right Column: Sticky Booking Sidebar (Matching Tumpeng Mockup) -->
-    <aside class="lg:col-span-4 lg:sticky lg:top-24 space-y-4">
+    <aside class="lg:col-span-4 lg:sticky lg:top-24 space-y-4 z-10">
         <div class="bg-white rounded-3xl overflow-hidden ambient-shadow border border-[#E5E5DC] p-5 space-y-5">
             <div>
                 <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">MULAI DARI</span>
@@ -137,7 +137,7 @@
                 <!-- Delivery Date -->
                 <div class="space-y-1.5">
                     <label for="detailTglAcara" class="block text-[11px] font-semibold text-gray-700">Delivery Date</label>
-                    <input type="date" id="detailTglAcara" name="tgl_acara" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2D5A27] text-xs bg-[#F9FAF4]">
+                    <input type="date" id="detailTglAcara" name="tgl_acara" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2D5A27] text-xs bg-[#F9FAF4] cursor-pointer relative z-20">
                 </div>
 
                 <!-- Quantity Stepper (Container matching mockup) -->

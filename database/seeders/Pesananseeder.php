@@ -13,27 +13,19 @@ class PesananSeeder extends Seeder
     public function run(): void
     {
         $pelanggan = User::where('email', 'budi@example.test')->first();
-        $paketStandar = Paket::where('nm_paket', 'Paket Standar')->first();
+        $paket = Paket::first();
 
-        if (! $pelanggan || ! $paketStandar) {
-            return; // jalankan UserSeeder & PaketSeeder dulu
+        if (! $pelanggan || ! $paket) {
+            return;
         }
 
-        $laukIds = Lauk::inRandomOrder()->limit($paketStandar->jumlah_lauk_pilihan)->pluck('id')->toArray();
+        $limitLauk = $paket->jumlah_lauk_pilihan > 0 ? $paket->jumlah_lauk_pilihan : 3;
+        $laukIds = Lauk::inRandomOrder()->limit($limitLauk)->pluck('id')->toArray();
 
-        if (count($laukIds) < $paketStandar->jumlah_lauk_pilihan) {
-            return; // jalankan LaukSeeder dulu
+        if (empty($laukIds)) {
+            return;
         }
 
-        // Sengaja pakai PesananService (bukan Pesanan::create langsung) supaya
-        // data contoh ini melewati validasi kapasitas & perhitungan total harga
-        // yang sama persis dengan yang dipakai controller asli.
-        //
-        // Catatan: TIDAK menyertakan gubukan_id di sini, karena "Paket Standar"
-        // dari PaketSeeder generik belum dikaitkan ke kategori produk manapun
-        // (kategori_produk_id masih NULL) -- jadi otomatis dianggap tidak
-        // mendukung gubukan. Kalau mau contoh pesanan dengan gubukan, jalankan
-        // PrasmananSeeder dulu lalu pakai salah satu paket dari situ.
         app(PesananService::class)->store($pelanggan, [
             'nama_acara' => 'Meeting Kantor Bulanan',
             'tipe_acara' => 'Rapat Kantor',
@@ -43,7 +35,7 @@ class PesananSeeder extends Seeder
             'catatan' => 'Pesanan contoh dari seeder untuk testing.',
             'items' => [
                 [
-                    'paket_id' => $paketStandar->id,
+                    'paket_id' => $paket->id,
                     'jml_paket' => 50,
                     'lauk_ids' => $laukIds,
                 ],

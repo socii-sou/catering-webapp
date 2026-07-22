@@ -246,7 +246,12 @@
         <!-- Page-specific scripts -->
         @yield('scripts')
 
-        <!-- Inject Midtrans Snap JS for real transactions if needed -->
-        <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+        <!-- Dynamic Midtrans Snap JS (Sandbox / Production) -->
+        @php
+            $snapJsUrl = config('services.midtrans.is_production')
+                ? 'https://app.midtrans.com/snap/snap.js'
+                : 'https://app.sandbox.midtrans.com/snap/snap.js';
+        @endphp
+        <script type="text/javascript" src="{{ $snapJsUrl }}" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
     </body>
 </html>

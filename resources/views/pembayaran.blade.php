@@ -76,146 +76,8 @@
     <form id="pembayaranForm" onsubmit="submitKonfirmasiPesanan(event)" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         @csrf
 
-        <!-- LEFT COLUMN: BANK TRANSFER & PROOF UPLOAD (Span 7) -->
-        <div class="lg:col-span-7 space-y-6">
-
-            <!-- Card 1: Instruksi Transfer Bank -->
-            <div class="bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E5DC] shadow-xs space-y-5">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center text-base">
-                        🏦
-                    </div>
-                    <h2 class="text-xl font-bold font-serif text-gray-900">Instruksi Transfer Bank</h2>
-                </div>
-
-                <p class="text-xs text-gray-600 leading-relaxed">
-                    Silakan lakukan transfer ke salah satu rekening resmi RASACI CATERING di bawah ini untuk mengkonfirmasi pesanan Anda.
-                </p>
-
-                <!-- Bank Cards Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                    <!-- Bank BCA -->
-                    <div class="bg-[#F8F9F3] border border-[#E5E8DD] rounded-2xl p-4 space-y-2 relative group hover:border-[#2D5A27] transition-all">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">BANK CENTRAL ASIA (BCA)</span>
-                            <button type="button" onclick="copyToClipboard('8832109200', this)" class="text-gray-400 hover:text-[#2D5A27] p-1 transition-colors cursor-pointer" title="Salin Nomor Rekening">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="text-lg font-extrabold text-gray-900 tracking-wider font-mono">
-                            8832 1092 00
-                        </div>
-                        <div class="text-xs text-gray-500 font-medium">
-                            a.n. RASACI CATERING
-                        </div>
-                    </div>
-
-                    <!-- Bank BNI -->
-                    <div class="bg-[#F8F9F3] border border-[#E5E8DD] rounded-2xl p-4 space-y-2 relative group hover:border-[#2D5A27] transition-all">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">BANK NEGARA INDONESIA (BNI)</span>
-                            <button type="button" onclick="copyToClipboard('120001229982', this)" class="text-gray-400 hover:text-[#2D5A27] p-1 transition-colors cursor-pointer" title="Salin Nomor Rekening">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="text-lg font-extrabold text-gray-900 tracking-wider font-mono">
-                            1200 0122 9982
-                        </div>
-                        <div class="text-xs text-gray-500 font-medium">
-                            a.n. RASACI CATERING
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Operational Notice -->
-                <div class="p-4 bg-[#EBF5E8] rounded-2xl border border-[#D2E6CE] flex items-start gap-3 text-xs text-[#2D5A27]">
-                    <span class="text-base leading-none">ℹ️</span>
-                    <p class="leading-relaxed">
-                        Transfer sebelum jam 16:00 WIB agar pesanan dapat segera diproses untuk jadwal pengiriman besok.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Card 2: Pembayaran DP (50%) & File Upload -->
-            <div class="bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E5DC] shadow-xs space-y-6">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div class="space-y-1">
-                        <h2 class="text-xl font-bold font-serif text-gray-900">Pembayaran DP (50%)</h2>
-                        <p class="text-xs text-gray-500">Segera unggah bukti transfer untuk verifikasi instan.</p>
-                    </div>
-
-                    <!-- Highlight Box TOTAL DP DIBAYAR -->
-                    <div class="bg-[#FDF0ED] border border-[#F7D6CD] rounded-2xl px-5 py-3 text-right">
-                        <div class="text-[10px] font-bold text-[#A84325] uppercase tracking-wider">TOTAL DP DIBAYAR</div>
-                        <div class="text-2xl font-black text-[#8A3017] font-serif">Rp {{ number_format($dpTotal, 0, ',', '.') }}</div>
-                    </div>
-                </div>
-
-                <!-- Proof of Payment Upload Box -->
-                <div class="space-y-2">
-                    <label class="block text-xs font-bold text-gray-800">Bukti Pembayaran DP</label>
-                    <div id="dropZone" onclick="triggerFileSelect()" class="border-2 border-dashed border-gray-300 hover:border-[#2D5A27] rounded-3xl p-8 text-center transition-all bg-[#FAFBF7] cursor-pointer group space-y-3">
-                        <div class="w-12 h-12 rounded-full bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center mx-auto text-xl shadow-xs group-hover:scale-110 transition-transform">
-                            ☁️
-                        </div>
-                        <div class="space-y-1">
-                            <p class="text-xs font-bold text-gray-800">
-                                Klik untuk unggah <span class="font-normal text-gray-500">atau seret file ke sini</span>
-                            </p>
-                            <p class="text-[11px] text-gray-400">
-                                Maksimal 5MB (JPG, PNG, PDF)
-                            </p>
-                        </div>
-                        <input type="file" id="bukti_bayar_input" name="bukti_bayar" accept="image/*,.pdf" class="hidden" onchange="handleFileSelect(event)">
-                    </div>
-
-                    <!-- File Preview Area -->
-                    <div id="filePreview" class="hidden bg-[#F4F7EE] border border-[#D2E6CE] rounded-2xl p-4 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <span class="text-xl">📄</span>
-                            <div>
-                                <p id="fileName" class="text-xs font-bold text-gray-900 truncate max-w-xs"></p>
-                                <p id="fileSize" class="text-[10px] text-gray-500"></p>
-                            </div>
-                        </div>
-                        <button type="button" onclick="removeFile()" class="text-gray-400 hover:text-red-600 text-sm p-1 transition-colors">
-                            ✕
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bottom Badges -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                <div class="flex items-center gap-3.5 bg-white border border-[#E5E5DC] rounded-2xl p-4 shadow-xs">
-                    <div class="w-10 h-10 rounded-full bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center text-lg shrink-0">
-                        🛡️
-                    </div>
-                    <div>
-                        <h4 class="text-xs font-bold text-gray-900">Aman & Terpercaya</h4>
-                        <p class="text-[11px] text-gray-500 font-light">Enkripsi data 256-bit</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-3.5 bg-white border border-[#E5E5DC] rounded-2xl p-4 shadow-xs">
-                    <div class="w-10 h-10 rounded-full bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center text-lg shrink-0">
-                        🎧
-                    </div>
-                    <div>
-                        <h4 class="text-xs font-bold text-gray-900">Layanan Pelanggan</h4>
-                        <p class="text-[11px] text-gray-500 font-light">Siap membantu 24/7</p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- RIGHT COLUMN: STICKY ORDER SUMMARY (Span 5) -->
-        <div class="lg:col-span-5 sticky top-24 space-y-5">
+        <!-- LEFT COLUMN: RINGKASAN PESANAN (Span 5) -->
+        <div class="lg:col-span-5 lg:sticky lg:top-24 space-y-6">
             <div class="bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E5DC] shadow-sm space-y-5">
                 <h3 class="text-xl font-bold font-serif text-gray-900">Ringkasan Pesanan</h3>
 
@@ -270,10 +132,221 @@
                         <span class="text-base font-extrabold text-[#8A3017] font-serif">Rp {{ number_format($dpTotal, 0, ',', '.') }}</span>
                     </div>
                 </div>
+            </div>
 
+            <!-- WhatsApp Help Box -->
+            <div class="p-4 bg-[#EBF5E8] rounded-2xl border border-[#D2E6CE] flex items-center gap-3 text-xs text-[#2D5A27]">
+                <span class="text-lg">💬</span>
+                <div>
+                    <p class="font-light">Butuh bantuan transaksi?</p>
+                    <a href="https://wa.me/6281389025947?text=Halo%20RASACI%20Kitchen,%20saya%20butuh%20bantuan%20mengenai%20pembayaran" target="_blank" class="font-bold underline hover:text-[#1b3d17]">
+                        Hubungi WhatsApp Kitchen
+                    </a>
+                </div>
+            </div>
+
+            <!-- Trust Badges -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <div class="flex items-center gap-3.5 bg-white border border-[#E5E5DC] rounded-2xl p-4 shadow-xs">
+                    <div class="w-10 h-10 rounded-full bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center text-lg shrink-0">
+                        🛡️
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">Aman & Terpercaya</h4>
+                        <p class="text-[11px] text-gray-500 font-light">Enkripsi data 256-bit</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3.5 bg-white border border-[#E5E5DC] rounded-2xl p-4 shadow-xs">
+                    <div class="w-10 h-10 rounded-full bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center text-lg shrink-0">
+                        🎧
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">Layanan Pelanggan</h4>
+                        <p class="text-[11px] text-gray-500 font-light">Siap membantu 24/7</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: CHOOSE PAYMENT METHOD & SUBMIT (Span 7) -->
+        <div class="lg:col-span-7 space-y-6">
+
+            <!-- Card 0: Choose Payment Method -->
+            <div class="bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E5DC] shadow-xs space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center text-base">
+                        💳
+                    </div>
+                    <h2 class="text-xl font-bold font-serif text-gray-900">Pilih Metode Pembayaran</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Option 1: Midtrans QRIS & Instant VA -->
+                    <div onclick="switchPaymentMethod('midtrans')" id="methodCardMidtrans" class="payment-method-card bg-[#F4F7EE] border-2 border-[#2D5A27] rounded-2xl p-4 cursor-pointer flex flex-col justify-between transition-all">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold text-[#2D5A27] flex items-center gap-1.5">
+                                <span>📱</span> QRIS / Midtrans (Instan)
+                            </span>
+                            <input type="radio" id="pay_method_midtrans" name="metode_pembayaran_choice" value="midtrans" checked class="accent-[#2D5A27] pointer-events-none">
+                        </div>
+                        <p class="text-[11px] text-gray-600 font-light leading-relaxed">
+                            Scan QRIS via GoPay, OVO, ShopeePay, Dana, BCA Mobile & VA Bank. Verifikasi otomatis.
+                        </p>
+                    </div>
+
+                    <!-- Option 2: Transfer Bank Manual -->
+                    <div onclick="switchPaymentMethod('manual')" id="methodCardManual" class="payment-method-card bg-white border border-gray-200 rounded-2xl p-4 cursor-pointer flex flex-col justify-between hover:border-[#2D5A27] transition-all">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                                <span>🏦</span> Transfer Bank Manual
+                            </span>
+                            <input type="radio" id="pay_method_manual" name="metode_pembayaran_choice" value="manual" class="accent-[#2D5A27] pointer-events-none">
+                        </div>
+                        <p class="text-[11px] text-gray-600 font-light leading-relaxed">
+                            Transfer ke rekening BCA / BNI & unggah bukti transfer manual.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 1: Midtrans QRIS Info Banner -->
+            <div id="midtransInfoCard" class="bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E5DC] shadow-xs space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center text-base">
+                        ⚡
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-gray-900 font-serif">Pembayaran QRIS & Snap Midtrans</h3>
+                        <p class="text-xs text-gray-500">Generate QRIS instan dan bayar secara otomatis</p>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-[#EBF5E8]/60 rounded-2xl border border-[#D2E6CE] text-xs text-[#2D5A27] space-y-1.5">
+                    <p class="font-bold flex items-center gap-1">
+                        <span>✅</span> Verifikasi Langsung & Tanpa Upload Bukti
+                    </p>
+                    <p class="text-[11px] text-gray-600 font-light leading-relaxed">
+                        Saat tombol "KONFIRMASI PESANAN" diklik, popup QRIS akan otomatis muncul. Posisikan kamera m-Banking atau aplikasi E-Wallet Anda untuk scan.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card 2: Instruksi Transfer Bank Manual (Hidden by Default) -->
+            <div id="manualBankCard" class="hidden bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E5DC] shadow-xs space-y-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center text-base">
+                        🏦
+                    </div>
+                    <h2 class="text-xl font-bold font-serif text-gray-900">Instruksi Transfer Bank</h2>
+                </div>
+
+                <p class="text-xs text-gray-600 leading-relaxed">
+                    Silakan lakukan transfer ke salah satu rekening resmi RASACI CATERING di bawah ini untuk mengkonfirmasi pesanan Anda.
+                </p>
+
+                <!-- Bank Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                    <!-- Bank BCA -->
+                    <div class="bg-[#F8F9F3] border border-[#E5E8DD] rounded-2xl p-4 space-y-2 relative group hover:border-[#2D5A27] transition-all">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">BANK CENTRAL ASIA (BCA)</span>
+                            <button type="button" onclick="copyToClipboard('8832109200', this)" class="text-gray-400 hover:text-[#2D5A27] p-1 transition-colors cursor-pointer" title="Salin Nomor Rekening">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="text-lg font-extrabold text-gray-900 tracking-wider font-mono">
+                            8832 1092 00
+                        </div>
+                        <div class="text-xs text-gray-500 font-medium">
+                            a.n. RASACI CATERING
+                        </div>
+                    </div>
+
+                    <!-- Bank BNI -->
+                    <div class="bg-[#F8F9F3] border border-[#E5E8DD] rounded-2xl p-4 space-y-2 relative group hover:border-[#2D5A27] transition-all">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">BANK NEGARA INDONESIA (BNI)</span>
+                            <button type="button" onclick="copyToClipboard('120001229982', this)" class="text-gray-400 hover:text-[#2D5A27] p-1 transition-colors cursor-pointer" title="Salin Nomor Rekening">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="text-lg font-extrabold text-gray-900 tracking-wider font-mono">
+                            1200 0122 9982
+                        </div>
+                        <div class="text-xs text-gray-500 font-medium">
+                            a.n. RASACI CATERING
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operational Notice -->
+                <div class="p-4 bg-[#EBF5E8] rounded-2xl border border-[#D2E6CE] flex items-start gap-3 text-xs text-[#2D5A27]">
+                    <span class="text-base leading-none">ℹ️</span>
+                    <p class="leading-relaxed">
+                        Transfer sebelum jam 16:00 WIB agar pesanan dapat segera diproses untuk jadwal pengiriman besok.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card 3: Pembayaran DP (50%) & File Upload (Hidden by Default for Midtrans) -->
+            <div id="manualProofCard" class="hidden bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E5DC] shadow-xs space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <h2 class="text-xl font-bold font-serif text-gray-900">Pembayaran DP (50%)</h2>
+                        <p class="text-xs text-gray-500">Segera unggah bukti transfer untuk verifikasi manual.</p>
+                    </div>
+
+                    <!-- Highlight Box TOTAL DP DIBAYAR -->
+                    <div class="bg-[#FDF0ED] border border-[#F7D6CD] rounded-2xl px-5 py-3 text-right">
+                        <div class="text-[10px] font-bold text-[#A84325] uppercase tracking-wider">TOTAL DP DIBAYAR</div>
+                        <div class="text-2xl font-black text-[#8A3017] font-serif">Rp {{ number_format($dpTotal, 0, ',', '.') }}</div>
+                    </div>
+                </div>
+
+                <!-- Proof of Payment Upload Box -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-gray-800">Bukti Pembayaran DP</label>
+                    <div id="dropZone" onclick="triggerFileSelect()" class="border-2 border-dashed border-gray-300 hover:border-[#2D5A27] rounded-3xl p-8 text-center transition-all bg-[#FAFBF7] cursor-pointer group space-y-3">
+                        <div class="w-12 h-12 rounded-full bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center mx-auto text-xl shadow-xs group-hover:scale-110 transition-transform">
+                            ☁️
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-xs font-bold text-gray-800">
+                                Klik untuk unggah <span class="font-normal text-gray-500">atau seret file ke sini</span>
+                            </p>
+                            <p class="text-[11px] text-gray-400">
+                                Maksimal 5MB (JPG, PNG, PDF)
+                            </p>
+                        </div>
+                        <input type="file" id="bukti_bayar_input" name="bukti_bayar" accept="image/*,.pdf" class="hidden" onchange="handleFileSelect(event)">
+                    </div>
+
+                    <!-- File Preview Area -->
+                    <div id="filePreview" class="hidden bg-[#F4F7EE] border border-[#D2E6CE] rounded-2xl p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">📄</span>
+                            <div>
+                                <p id="fileName" class="text-xs font-bold text-gray-900 truncate max-w-xs"></p>
+                                <p id="fileSize" class="text-[10px] text-gray-500"></p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="removeFile()" class="text-gray-400 hover:text-red-600 text-sm p-1 transition-colors">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Action Card -->
+            <div class="bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E5DC] shadow-xs space-y-4">
                 <!-- Error Alert -->
-                <div id="pembayaranErrorBanner" class="hidden bg-red-50 border-l-4 border-red-500 p-3 rounded-lg">
-                    <p id="pembayaranErrorText" class="text-[11px] text-red-700 font-medium"></p>
+                <div id="pembayaranErrorBanner" class="hidden bg-red-50 border-l-4 border-red-500 p-3.5 rounded-xl">
+                    <p id="pembayaranErrorText" class="text-xs text-red-700 font-medium"></p>
                 </div>
 
                 <!-- Submit Button -->
@@ -285,17 +358,6 @@
                 <p class="text-[10px] text-gray-400 text-center font-light leading-relaxed">
                     Dengan mengklik Konfirmasi Pesanan, Anda menyetujui <a href="#" class="underline hover:text-gray-600">Syarat & Ketentuan</a> yang berlaku.
                 </p>
-            </div>
-
-            <!-- WhatsApp Help Box -->
-            <div class="p-4 bg-[#EBF5E8] rounded-2xl border border-[#D2E6CE] flex items-center gap-3 text-xs text-[#2D5A27]">
-                <span class="text-lg">💬</span>
-                <div>
-                    <p class="font-light">Butuh bantuan transaksi?</p>
-                    <a href="https://wa.me/6281234567890?text=Halo%20RASACI%20Kitchen,%20saya%20butuh%20bantuan%20mengenai%20pembayaran" target="_blank" class="font-bold underline hover:text-[#1b3d17]">
-                        Hubungi WhatsApp Kitchen
-                    </a>
-                </div>
             </div>
 
         </div>
@@ -332,6 +394,51 @@
 
 @section('scripts')
 <script>
+    let selectedPaymentMethod = 'midtrans';
+
+    function switchPaymentMethod(method) {
+        selectedPaymentMethod = method;
+
+        const cardMidtrans = document.getElementById('methodCardMidtrans');
+        const cardManual = document.getElementById('methodCardManual');
+        const radioMidtrans = document.getElementById('pay_method_midtrans');
+        const radioManual = document.getElementById('pay_method_manual');
+
+        const midtransInfo = document.getElementById('midtransInfoCard');
+        const manualBank = document.getElementById('manualBankCard');
+        const manualProof = document.getElementById('manualProofCard');
+
+        if (method === 'midtrans') {
+            if (radioMidtrans) radioMidtrans.checked = true;
+            if (radioManual) radioManual.checked = false;
+
+            if (cardMidtrans) {
+                cardMidtrans.className = "payment-method-card bg-[#F4F7EE] border-2 border-[#2D5A27] rounded-2xl p-4 cursor-pointer flex flex-col justify-between transition-all";
+            }
+            if (cardManual) {
+                cardManual.className = "payment-method-card bg-white border border-gray-200 rounded-2xl p-4 cursor-pointer flex flex-col justify-between hover:border-[#2D5A27] transition-all";
+            }
+
+            if (midtransInfo) midtransInfo.classList.remove('hidden');
+            if (manualBank) manualBank.classList.add('hidden');
+            if (manualProof) manualProof.classList.add('hidden');
+        } else {
+            if (radioMidtrans) radioMidtrans.checked = false;
+            if (radioManual) radioManual.checked = true;
+
+            if (cardMidtrans) {
+                cardMidtrans.className = "payment-method-card bg-white border border-gray-200 rounded-2xl p-4 cursor-pointer flex flex-col justify-between hover:border-[#2D5A27] transition-all";
+            }
+            if (cardManual) {
+                cardManual.className = "payment-method-card bg-[#F4F7EE] border-2 border-[#2D5A27] rounded-2xl p-4 cursor-pointer flex flex-col justify-between transition-all";
+            }
+
+            if (midtransInfo) midtransInfo.classList.add('hidden');
+            if (manualBank) manualBank.classList.remove('hidden');
+            if (manualProof) manualProof.classList.remove('hidden');
+        }
+    }
+
     function copyToClipboard(text, btn) {
         navigator.clipboard.writeText(text).then(() => {
             const originalHTML = btn.innerHTML;
@@ -406,7 +513,7 @@
         if (typeof toggleMyOrders === 'function') {
             toggleMyOrders();
         } else {
-            window.location.href = '/';
+            window.location.href = '/pesanan';
         }
     }
 
@@ -418,34 +525,52 @@
         const errBanner = document.getElementById('pembayaranErrorBanner');
         const errText = document.getElementById('pembayaranErrorText');
 
+        if (selectedPaymentMethod === 'manual') {
+            const fileInput = document.getElementById('bukti_bayar_input');
+            if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                if (errBanner && errText) {
+                    errText.innerText = 'Mohon unggah / lengkapi bukti pembayaran terlebih dahulu sebelum mengonfirmasi pesanan.';
+                    errBanner.classList.remove('hidden');
+                }
+                return;
+            }
+        }
+
         if (submitBtn) submitBtn.disabled = true;
         if (spinner) spinner.classList.remove('hidden');
         if (errBanner) errBanner.classList.add('hidden');
 
-        const payload = {
-            nama_acara: 'Acara Pelanggan',
-            alamat_pengiriman: @json($alamatPengiriman),
-            catatan: @json($catatan),
-            gubukan_id: @json($selectedGubukan ? $selectedGubukan->id : null),
-            tgl_acara: @json($tglAcara),
-            jumlah_pax: Number(@json($jumlahPax)),
-            items: [
-                {
-                    paket_id: @json($paket->id),
-                    jml_paket: Number(@json($jumlahPax)),
-                    lauk_ids: @json($laukIds)
-                }
-            ]
-        };
+        const formData = new FormData();
+        formData.append('nama_acara', 'Acara Pelanggan');
+        formData.append('alamat_pengiriman', @json($alamatPengiriman));
+        formData.append('catatan', @json($catatan));
+        if (@json($selectedGubukan ? $selectedGubukan->id : null)) {
+            formData.append('gubukan_id', @json($selectedGubukan ? $selectedGubukan->id : null));
+        }
+        formData.append('tgl_acara', @json($tglAcara));
+        formData.append('jumlah_pax', Number(@json($jumlahPax)));
+
+        formData.append('items[0][paket_id]', @json($paket->id));
+        formData.append('items[0][jml_paket]', Number(@json($jumlahPax)));
+        const laukIds = @json($laukIds);
+        laukIds.forEach((id, index) => {
+            formData.append(`items[0][lauk_ids][${index}]`, id);
+        });
+
+        if (selectedPaymentMethod === 'manual') {
+            const fileInput = document.getElementById('bukti_bayar_input');
+            if (fileInput && fileInput.files && fileInput.files[0]) {
+                formData.append('bukti_bayar', fileInput.files[0]);
+            }
+        }
 
         fetch('{{ route("web.pesanan.store") }}', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
-            body: JSON.stringify(payload)
+            body: formData
         })
         .then(response => {
             return response.json().then(data => {
@@ -456,8 +581,61 @@
             });
         })
         .then(data => {
-            const successModal = document.getElementById('pembayaranSuccessModal');
-            if (successModal) successModal.classList.remove('hidden');
+            const pesananId = data.pesanan.id;
+
+            if (selectedPaymentMethod === 'midtrans') {
+                fetch(`/api/pesanan/${pesananId}/bayar`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ jenis_pembayaran: 'dp' })
+                })
+                .then(res => res.json())
+                .then(snapData => {
+                    if (submitBtn) submitBtn.disabled = false;
+                    if (spinner) spinner.classList.add('hidden');
+
+                    if (snapData.snap_token && typeof window.snap !== 'undefined') {
+                        window.snap.pay(snapData.snap_token, {
+                            onSuccess: function(result) {
+                                const successModal = document.getElementById('pembayaranSuccessModal');
+                                if (successModal) successModal.classList.remove('hidden');
+                            },
+                            onPending: function(result) {
+                                const successModal = document.getElementById('pembayaranSuccessModal');
+                                if (successModal) successModal.classList.remove('hidden');
+                            },
+                            onError: function(result) {
+                                if (errBanner && errText) {
+                                    errText.innerText = 'Pembayaran gagal. Silakan coba lagi.';
+                                    errBanner.classList.remove('hidden');
+                                }
+                            },
+                            onClose: function() {
+                                const successModal = document.getElementById('pembayaranSuccessModal');
+                                if (successModal) successModal.classList.remove('hidden');
+                            }
+                        });
+                    } else {
+                        const successModal = document.getElementById('pembayaranSuccessModal');
+                        if (successModal) successModal.classList.remove('hidden');
+                    }
+                })
+                .catch(err => {
+                    if (submitBtn) submitBtn.disabled = false;
+                    if (spinner) spinner.classList.add('hidden');
+                    const successModal = document.getElementById('pembayaranSuccessModal');
+                    if (successModal) successModal.classList.remove('hidden');
+                });
+            } else {
+                if (submitBtn) submitBtn.disabled = false;
+                if (spinner) spinner.classList.add('hidden');
+                const successModal = document.getElementById('pembayaranSuccessModal');
+                if (successModal) successModal.classList.remove('hidden');
+            }
         })
         .catch(error => {
             if (submitBtn) submitBtn.disabled = false;

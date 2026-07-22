@@ -363,7 +363,7 @@
                 </div>
 
                 <!-- Pelunasan Action Button -->
-                <a href="https://wa.me/6281234567890?text=Halo%20RASACI%20Kitchen,%20saya%20ingin%20melakukan%20pelunasan%20sisa%20pembayaran%20untuk%20Order%20%23ORD-{{ str_pad($pesanan->id, 5, '0', STR_PAD_LEFT) }}" target="_blank" class="w-full bg-[#3B420C] hover:bg-[#2C3109] text-white font-bold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 text-xs cursor-pointer">
+                <a href="https://wa.me/6281389025947?text=Halo%20RASACI%20Kitchen,%20saya%20ingin%20melakukan%20pelunasan%20sisa%20pembayaran%20untuk%20Order%20%23ORD-{{ str_pad($pesanan->id, 5, '0', STR_PAD_LEFT) }}" target="_blank" class="w-full bg-[#3B420C] hover:bg-[#2C3109] text-white font-bold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 text-xs cursor-pointer">
                     <span>Selesaikan Pelunasan</span>
                 </a>
 
@@ -376,7 +376,7 @@
             <div class="bg-[#F8F9F3] border border-[#E5E8DD] rounded-3xl p-5 space-y-3 text-xs">
                 <h4 class="font-bold text-gray-900">Need help with this order?</h4>
                 <div class="space-y-2">
-                    <a href="https://wa.me/6281234567890?text=Halo%20RASACI%20Kitchen,%20saya%20butuh%20bantuan%20mengenai%20Order%20%23ORD-{{ str_pad($pesanan->id, 5, '0', STR_PAD_LEFT) }}" target="_blank" class="flex items-center gap-2 text-gray-700 hover:text-brand-green font-medium transition-colors">
+                    <a href="https://wa.me/6281389025947?text=Halo%20RASACI%20Kitchen,%20saya%20butuh%20bantuan%20mengenai%20Order%20%23ORD-{{ str_pad($pesanan->id, 5, '0', STR_PAD_LEFT) }}" target="_blank" class="flex items-center gap-2 text-gray-700 hover:text-brand-green font-medium transition-colors">
                         <span>💬</span>
                         <span>Chat with Support</span>
                     </a>
@@ -405,9 +405,10 @@
 
         const map = L.map('orderDetailMap').setView([defaultLat, defaultLng], 14);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
+        L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '&copy; Google Maps'
         }).addTo(map);
 
         const customIcon = L.divIcon({

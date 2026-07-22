@@ -9,6 +9,35 @@
     #checkoutMap {
         z-index: 1;
     }
+    .custom-pin-marker {
+        position: relative;
+        width: 32px;
+        height: 42px;
+    }
+    .custom-pin-marker svg {
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+    }
+    @keyframes pulse-ring {
+        0% {
+            transform: scale(0.5);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(1.8);
+            opacity: 0;
+        }
+    }
+    .pin-pulse {
+        position: absolute;
+        bottom: 2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 24px;
+        height: 12px;
+        background: rgba(45, 90, 39, 0.35);
+        border-radius: 50%;
+        animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
 </style>
 @endsection
 
@@ -70,26 +99,65 @@
 
             <!-- Card 1: Lokasi Pengiriman -->
             <div class="bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E5DC] shadow-xs space-y-5">
-                <div class="flex items-center gap-2.5">
-                    <span class="text-xl">📍</span>
-                    <h2 class="text-xl font-bold font-serif text-gray-900">Lokasi Pengiriman</h2>
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xl">📍</span>
+                        <h2 class="text-xl font-bold font-serif text-gray-900">Lokasi Pengiriman</h2>
+                    </div>
+                    <span class="text-[11px] bg-[#EBF5E8] text-[#2D5A27] font-semibold px-3 py-1 rounded-full border border-[#D2E6CE]">
+                        Peta Interaktif Google Maps Style
+                    </span>
                 </div>
 
                 <div class="space-y-2">
-                    <label for="alamat_pengiriman" class="block text-xs font-semibold text-gray-700">Alamat Lengkap</label>
+                    <label for="alamat_pengiriman" class="block text-xs font-semibold text-gray-700">Alamat Lengkap Pengiriman</label>
                     <textarea id="alamat_pengiriman" name="alamat_pengiriman" required rows="3"
                         class="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2D5A27] text-xs bg-[#F8F9F3] placeholder-gray-400 leading-relaxed"
-                        placeholder="Masukkan detail alamat pengiriman...">{{ old('alamat_pengiriman', auth()->user()->alamat ?? '') }}</textarea>
+                        placeholder="Detail alamat (nama jalan, nomor rumah, RT/RW, patokan)...">{{ old('alamat_pengiriman', auth()->user()->alamat ?? '') }}</textarea>
                 </div>
 
-                <!-- Interactive Map Container -->
-                <div class="space-y-2">
-                    <div id="checkoutMap" class="w-full h-60 sm:h-64 rounded-2xl border border-gray-200 overflow-hidden relative"></div>
-                    <div class="flex justify-end pt-1">
-                        <button type="button" onclick="getCurrentLocation()" class="px-4 py-2 bg-[#EAEFE2] hover:bg-[#DCECD8] text-[#2D5A27] font-semibold text-xs rounded-xl shadow-xs border border-[#D2E6CE] flex items-center gap-1.5 transition-all cursor-pointer">
-                            <span>🎯</span>
-                            <span>Gunakan Lokasi Saat Ini</span>
+                <!-- Interactive Map Section with Search & Geolocation Controls -->
+                <div class="space-y-3">
+                    <!-- Search Bar & Current Location Row -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                        <!-- Search Box Container with Dropdown Suggestions -->
+                        <div class="relative flex-1">
+                            <div class="relative flex items-center w-full">
+                                <svg class="w-4 h-4 text-gray-400 absolute left-3.5 pointer-events-none shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                <input type="text" id="mapSearchInput" onkeyup="handleSearchInputKey(event)"
+                                    placeholder="Cari lokasi, jalan, perumahan di Jabodetabek..."
+                                    class="w-full pl-10 pr-20 py-2.5 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2D5A27] text-xs bg-white shadow-2xs">
+                                <button type="button" onclick="searchLocationOnMap()" class="absolute right-1.5 px-3.5 py-1.5 bg-[#2D5A27] hover:bg-[#21441D] text-white text-xs font-semibold rounded-xl transition-all cursor-pointer shadow-2xs">
+                                    Cari
+                                </button>
+                            </div>
+                            
+                            <!-- Search Autocomplete Dropdown List -->
+                            <div id="searchSuggestions" class="hidden absolute top-full left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-2xl shadow-xl z-30 max-h-64 overflow-y-auto divide-y divide-gray-100">
+                            </div>
+                        </div>
+
+                        <!-- Current Location Button -->
+                        <button type="button" onclick="getCurrentLocation()" class="px-4 py-2.5 bg-[#EBF5E8] hover:bg-[#DCECD8] text-[#2D5A27] font-semibold text-xs rounded-2xl border border-[#D2E6CE] flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 shadow-2xs">
+                            <span class="text-sm">🎯</span>
+                            <span>Lokasi Saat Ini</span>
                         </button>
+                    </div>
+
+                    <!-- Map Container with Status Overlay -->
+                    <div class="relative rounded-2xl border border-gray-200 overflow-hidden shadow-xs">
+                        <div id="checkoutMap" class="w-full h-64 sm:h-72"></div>
+                        
+                        <!-- Floating Live Status Badge -->
+                        <div id="mapStatusOverlay" class="absolute bottom-3 left-3 right-3 z-10 bg-white/95 backdrop-blur-md px-3.5 py-2.5 rounded-2xl text-[11px] text-gray-700 font-medium border border-gray-200/90 shadow-md flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 truncate">
+                                <span class="text-sm shrink-0">📍</span>
+                                <span id="mapStatusText" class="truncate">Klik peta atau geser pin untuk menentukan titik pengiriman.</span>
+                            </div>
+                            <div id="mapLoader" class="hidden w-4 h-4 border-2 border-[#2D5A27] border-t-transparent rounded-full animate-spin shrink-0"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -252,21 +320,38 @@
         const mapContainer = document.getElementById('checkoutMap');
         if (!mapContainer) return;
 
-        map = L.map('checkoutMap').setView([defaultLat, defaultLng], 13);
+        map = L.map('checkoutMap', {
+            zoomControl: true,
+        }).setView([defaultLat, defaultLng], 14);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
+        // Google Maps Interactive Vector Style Tiles
+        L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '&copy; Google Maps'
         }).addTo(map);
 
-        const customIcon = L.divIcon({
-            className: 'custom-pin',
-            html: `<div style="background-color:#2D5A27; width:24px; height:24px; border-radius:50%; border:3px solid white; box-shadow:0 4px 10px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; color:white; font-size:10px;">📍</div>`,
-            iconSize: [24, 24],
-            iconAnchor: [12, 12]
+        const customPinIcon = L.divIcon({
+            className: 'custom-pin-container',
+            html: `
+                <div class="custom-pin-marker">
+                    <div class="pin-pulse"></div>
+                    <svg viewBox="0 0 384 512" fill="#2D5A27" width="32" height="42">
+                        <path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"/>
+                    </svg>
+                </div>
+            `,
+            iconSize: [32, 42],
+            iconAnchor: [16, 42],
+            popupAnchor: [0, -40]
         });
 
-        marker = L.marker([defaultLat, defaultLng], { draggable: true, icon: customIcon }).addTo(map);
+        marker = L.marker([defaultLat, defaultLng], {
+            draggable: true,
+            icon: customPinIcon
+        }).addTo(map);
+
+        marker.bindPopup("<b>Titik Lokasi Pengiriman</b><br>Geser pin ini untuk titik presisi.").openPopup();
 
         marker.on('dragend', function (e) {
             const coord = marker.getLatLng();
@@ -277,6 +362,145 @@
             marker.setLatLng(e.latlng);
             reverseGeocode(e.latlng.lat, e.latlng.lng);
         });
+
+        if (navigator.geolocation && !document.getElementById('alamat_pengiriman').value.trim()) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                map.setView([lat, lng], 16);
+                marker.setLatLng([lat, lng]);
+                reverseGeocode(lat, lng);
+            }, function () {});
+        }
+    }
+
+    let searchTimeout = null;
+
+    function handleSearchInputKey(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            searchLocationOnMap();
+            return;
+        }
+
+        const query = event.target.value.trim();
+        if (query.length < 3) {
+            hideSuggestions();
+            return;
+        }
+
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            fetchSuggestions(query);
+        }, 350);
+    }
+
+    function fetchSuggestions(query) {
+        updateMapStatus("Mencari rekomendasi lokasi di Indonesia...", true);
+
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=id&viewbox=106.3,-6.7,107.2,-5.9&bounded=0&limit=6&addressdetails=1`)
+            .then(res => res.json())
+            .then(results => {
+                const container = document.getElementById('searchSuggestions');
+                if (!container) return;
+
+                if (!results || results.length === 0) {
+                    container.innerHTML = `
+                        <div class="px-4 py-3 text-xs text-gray-500 text-center">
+                            Tidak ada rekomendasi lokasi ditemukan di Indonesia
+                        </div>
+                    `;
+                    container.classList.remove('hidden');
+                    updateMapStatus("💡 Tekan Enter atau klik Cari untuk mencari ulang.", false);
+                    return;
+                }
+
+                let html = '';
+                results.forEach((item) => {
+                    const title = item.name || (item.address && (item.address.road || item.address.suburb || item.address.village || item.address.city_district)) || item.display_name.split(',')[0];
+                    const subtitle = item.display_name;
+                    const lat = parseFloat(item.lat);
+                    const lon = parseFloat(item.lon);
+                    const safeDisplayName = item.display_name.replace(/'/g, "\\'");
+
+                    html += `
+                        <div onclick="selectLocationSuggestion(${lat}, ${lon}, '${safeDisplayName}')" 
+                             class="px-4 py-3 hover:bg-[#F4F7EE] cursor-pointer transition-colors flex items-start gap-2.5">
+                            <svg class="w-4 h-4 text-[#2D5A27] shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 384 512">
+                                <path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"/>
+                            </svg>
+                            <div class="overflow-hidden">
+                                <p class="text-xs font-bold text-gray-900 truncate">${title}</p>
+                                <p class="text-[11px] text-gray-500 truncate leading-tight">${subtitle}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+                container.classList.remove('hidden');
+                updateMapStatus("📍 Pilih lokasi dari daftar rekomendasi.", false);
+            })
+            .catch(() => {
+                hideSuggestions();
+            });
+    }
+
+    function selectLocationSuggestion(lat, lon, displayName) {
+        document.getElementById('mapSearchInput').value = displayName;
+        hideSuggestions();
+
+        map.setView([lat, lon], 16);
+        marker.setLatLng([lat, lon]);
+
+        const textarea = document.getElementById('alamat_pengiriman');
+        if (textarea) textarea.value = displayName;
+
+        updateMapStatus("📍 Lokasi dipilih: " + displayName.split(',')[0], false);
+    }
+
+    function hideSuggestions() {
+        const container = document.getElementById('searchSuggestions');
+        if (container) container.classList.add('hidden');
+    }
+
+    document.addEventListener('click', function (e) {
+        const searchInput = document.getElementById('mapSearchInput');
+        const suggestions = document.getElementById('searchSuggestions');
+        if (searchInput && suggestions && !searchInput.contains(e.target) && !suggestions.contains(e.target)) {
+            hideSuggestions();
+        }
+    });
+
+    function searchLocationOnMap() {
+        const query = document.getElementById('mapSearchInput').value.trim();
+        if (!query) return;
+
+        hideSuggestions();
+        updateMapStatus("Mencari lokasi '" + query + "'...", true);
+
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=id&viewbox=106.3,-6.7,107.2,-5.9&bounded=0&limit=1&addressdetails=1`)
+            .then(res => res.json())
+            .then(results => {
+                if (results && results.length > 0) {
+                    const lat = parseFloat(results[0].lat);
+                    const lon = parseFloat(results[0].lon);
+                    const displayName = results[0].display_name;
+
+                    map.setView([lat, lon], 16);
+                    marker.setLatLng([lat, lon]);
+
+                    const textarea = document.getElementById('alamat_pengiriman');
+                    if (textarea) textarea.value = displayName;
+
+                    updateMapStatus("📍 Lokasi ditemukan: " + displayName.split(',')[0], false);
+                } else {
+                    updateMapStatus("❌ Lokasi tidak ditemukan. Coba kata kunci lain.", false);
+                }
+            })
+            .catch(() => {
+                updateMapStatus("❌ Gagal mencari lokasi.", false);
+            });
     }
 
     function getCurrentLocation() {
@@ -285,6 +509,8 @@
             return;
         }
 
+        updateMapStatus("Mendeteksi GPS Anda...", true);
+
         navigator.geolocation.getCurrentPosition(
             function (position) {
                 const lat = position.coords.latitude;
@@ -292,23 +518,41 @@
                 map.setView([lat, lng], 16);
                 marker.setLatLng([lat, lng]);
                 reverseGeocode(lat, lng);
+                updateMapStatus("🎯 Berhasil mendapatkan lokasi GPS Anda!", false);
             },
             function (error) {
-                alert('Gagal mengambil lokasi presisi Anda. Pastikan izin lokasi diaktifkan.');
+                updateMapStatus("⚠️ Gagal mengambil GPS. Pastikan izin lokasi diaktifkan.", false);
             }
         );
     }
 
     function reverseGeocode(lat, lng) {
+        updateMapStatus("Mengambil nama alamat...", true);
+
         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
             .then(res => res.json())
             .then(data => {
                 if (data && data.display_name) {
                     const textarea = document.getElementById('alamat_pengiriman');
                     if (textarea) textarea.value = data.display_name;
+                    updateMapStatus("📍 Alamat diperbarui: " + (data.address.road || data.address.suburb || data.display_name.split(',')[0]), false);
+                } else {
+                    updateMapStatus("💡 Klik pada peta atau geser pin 📍 untuk menyesuaikan titik lokasi.", false);
                 }
             })
-            .catch(() => {});
+            .catch(() => {
+                updateMapStatus("💡 Klik pada peta atau geser pin 📍 untuk menyesuaikan titik lokasi.", false);
+            });
+    }
+
+    function updateMapStatus(text, isLoading) {
+        const statusText = document.getElementById('mapStatusText');
+        const loader = document.getElementById('mapLoader');
+        if (statusText) statusText.innerText = text;
+        if (loader) {
+            if (isLoading) loader.classList.remove('hidden');
+            else loader.classList.add('hidden');
+        }
     }
 
     function openMyOrdersDrawer() {

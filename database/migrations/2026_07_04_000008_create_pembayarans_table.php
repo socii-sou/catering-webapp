@@ -17,7 +17,7 @@ return new class extends Migration
             $table->dateTime('tgl_bayar');
             $table->decimal('jml_bayar', 12, 2);
             $table->string('metode_bayar');
-            $table->enum('status_bayar', ['pending','dp','lunas','gagal'])->default('pending');
+            $table->string('status_bayar')->default('pending');
             $table->string('bukti_bayar')->nullable(); // path di storage
             $table->timestamps();
         });

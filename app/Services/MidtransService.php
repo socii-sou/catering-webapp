@@ -24,8 +24,11 @@ class MidtransService
      * Minta Snap Token ke Midtrans, lalu simpan sebagai baris baru di tabel pembayarans.
      * order_id yang dikirim ke Midtrans disimpan di kolom transaction_id,
      * karena itu yang dipakai untuk mencocokkan saat webhook masuk.
+     *
+     * enabled_payments dibatasi cuma QRIS + Bank Transfer (Virtual Account) --
+     * tidak nampilin kartu kredit, Indomaret/Alfamart, akulaku, dsb.
      */
-    public function createSnapToken(Pesanan $pesanan, float $jumlahBayar): Pembayaran
+    public function createSnapToken(Pesanan $pesanan, float $jumlahBayar, string $jenisPembayaran): Pembayaran
     {
         $orderId = 'PESANAN-' . $pesanan->id . '-' . Str::upper(Str::random(6));
 
@@ -41,11 +44,21 @@ class MidtransService
                     'email' => $pesanan->user->email,
                     'phone' => $pesanan->user->no_telp,
                 ],
+                'enabled_payments' => [
+                    'gopay',       // trigger QRIS scan (desktop) / app redirect (mobile)
+                    'other_qris',  // QRIS generik (bisa discan e-wallet apa saja)
+                    'bca_va',
+                    'bni_va',
+                    'bri_va',
+                    'permata_va',
+                    'other_va',
+                ],
             ])
             ->throw()
             ->json();
 
         return $pesanan->pembayarans()->create([
+            'jenis_pembayaran' => $jenisPembayaran,
             'tgl_bayar' => now(),
             'jml_bayar' => $jumlahBayar,
             'metode_bayar' => 'midtrans',

@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
-@section('title', 'Package Management - RASACI Kitchen Management')
+@section('title', 'Kelola Paket & Lauk - Manajemen RASACI Dapur')
 
 @section('content')
 <!-- TOP HEADER BAR & ACTION BUTTON -->
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div>
-        <h1 class="text-3xl font-extrabold font-serif text-gray-900 tracking-tight">Package Management</h1>
-        <p class="text-xs text-gray-500 font-light mt-1">Configure and manage your catering offerings and seasonal bundles.</p>
+        <h1 class="text-3xl font-extrabold font-serif text-gray-900 tracking-tight">Kelola Paket & Lauk</h1>
+        <p class="text-xs text-gray-500 font-light mt-1">Konfigurasi dan kelola menu catering serta variasi lauk pauk Anda.</p>
     </div>
     <div class="flex items-center gap-2">
         <button type="button" onclick="openCreatePaketModal()" class="bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold py-3 px-5 rounded-xl shadow-md text-xs flex items-center gap-2 transition-all cursor-pointer">
@@ -25,7 +25,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
     <!-- Card 1: TOTAL PACKAGES -->
     <div class="bg-white rounded-3xl p-5 border border-[#E5E5DC] shadow-xs space-y-2 hover:shadow-md transition-all">
-        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">TOTAL PACKAGES</span>
+        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">TOTAL PAKET</span>
         <div class="text-3xl font-bold font-serif text-gray-900">
             {{ $totalPaketsCount > 0 ? $totalPaketsCount : 24 }}
         </div>
@@ -33,7 +33,7 @@
 
     <!-- Card 2: ACTIVE -->
     <div class="bg-white rounded-3xl p-5 border border-[#E5E5DC] shadow-xs space-y-2 hover:shadow-md transition-all">
-        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">ACTIVE</span>
+        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">AKTIF</span>
         <div class="text-3xl font-bold font-serif text-[#2D5A27]">
             {{ $activePaketsCount > 0 ? $activePaketsCount : 18 }}
         </div>
@@ -41,7 +41,7 @@
 
     <!-- Card 3: OUT OF STOCK -->
     <div class="bg-white rounded-3xl p-5 border border-[#E5E5DC] shadow-xs space-y-2 hover:shadow-md transition-all">
-        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">OUT OF STOCK</span>
+        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">STOK HABIS</span>
         <div class="text-3xl font-bold font-serif text-amber-600">
             {{ $outOfStockCount }}
         </div>
@@ -49,7 +49,7 @@
 
     <!-- Card 4: DRAFTS / INACTIVE -->
     <div class="bg-white rounded-3xl p-5 border border-[#E5E5DC] shadow-xs space-y-2 hover:shadow-md transition-all">
-        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">DRAFTS</span>
+        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">DRAF</span>
         <div class="text-3xl font-bold font-serif text-gray-500">
             {{ $inactivePaketsCount > 0 ? $inactivePaketsCount : 3 }}
         </div>
@@ -63,13 +63,12 @@
         <!-- Search Input -->
         <div class="relative flex-1 w-full">
             <span class="absolute inset-y-0 left-3.5 flex items-center text-gray-400 text-sm">🔍</span>
-            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search package name or category..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium focus:outline-none focus:border-[#2D5A27] shadow-2xs">
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari nama paket atau kategori..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium focus:outline-none focus:border-[#2D5A27] shadow-2xs">
         </div>
 
         <!-- Category Dropdown & Tab Toggle -->
         <div class="flex items-center gap-3 w-full md:w-auto">
             <select id="categoryFilter" onchange="filterTable()" class="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 focus:outline-none cursor-pointer">
-                <option value="ALL">All Categories</option>
                 <option value="Prasmanan">Prasmanan</option>
                 <option value="Bento">Nasi Box / Bento</option>
                 <option value="Tumpeng">Tumpeng</option>
@@ -79,7 +78,7 @@
             <!-- Tab Buttons -->
             <div class="bg-gray-200/70 p-1 rounded-xl flex gap-1 text-xs">
                 <button type="button" id="tabPaketBtn" onclick="switchTab('paket')" class="px-4 py-2 rounded-lg font-bold transition-all bg-[#2D5A27] text-white shadow-xs cursor-pointer">
-                    Catering Packages
+                    Paket Catering
                 </button>
                 <button type="button" id="tabLaukBtn" onclick="switchTab('lauk')" class="px-4 py-2 rounded-lg font-bold transition-all text-gray-600 hover:text-gray-900 cursor-pointer">
                     Lauk Pauk
@@ -89,38 +88,39 @@
     </div>
 
     <!-- CATERING PACKAGES TABLE -->
+    <!-- CATERING PACKAGES TABLE -->
     <div id="paketTableContainer" class="overflow-x-auto">
         <table class="w-full text-left text-xs">
             <thead>
                 <tr class="bg-[#F8F9F3] text-gray-400 font-bold uppercase tracking-wider text-[10px]">
-                    <th class="py-3 px-4 rounded-l-xl">IMAGE</th>
-                    <th class="py-3 px-4">NAME</th>
-                    <th class="py-3 px-4">CATEGORY</th>
-                    <th class="py-3 px-4">PRICE</th>
+                    <th class="py-3 px-4 rounded-l-xl">GAMBAR</th>
+                    <th class="py-3 px-4">NAMA PAKET</th>
+                    <th class="py-3 px-4">KATEGORI</th>
+                    <th class="py-3 px-4">HARGA</th>
                     <th class="py-3 px-4">STATUS</th>
-                    <th class="py-3 px-4 text-right rounded-r-xl">ACTION</th>
+                    <th class="py-3 px-4 text-right rounded-r-xl">AKSI</th>
                 </tr>
             </thead>
             <tbody id="paketTableBody" class="divide-y divide-gray-100 font-medium">
                 @forelse($pakets as $index => $paket)
                     @php
                         $sku = 'NS-' . str_pad($paket->id, 3, '0', STR_PAD_LEFT);
-                        $catName = 'Traditional Buffet';
+                        $catName = 'Prasmanan';
                         $catBg = 'bg-[#FDF0ED] text-[#8A3017]';
                         $imgUrl = 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=300';
                         $priceUnit = ' / pax';
 
                         if(str_contains(strtolower($paket->nm_paket), 'wedding')) {
-                            $catName = 'Wedding Bundles';
+                            $catName = 'Paket Pernikahan';
                             $catBg = 'bg-[#EBF5E8] text-[#2D5A27]';
                             $imgUrl = 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=300';
                         } elseif(str_contains(strtolower($paket->nm_paket), 'bento') || str_contains(strtolower($paket->nm_paket), 'box')) {
-                            $catName = 'Corporate Lunch';
+                            $catName = 'Nasi Box / Bento';
                             $catBg = 'bg-amber-100 text-amber-800';
                             $priceUnit = ' / box';
                             $imgUrl = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=300';
                         } elseif(str_contains(strtolower($paket->nm_paket), 'gala') || str_contains(strtolower($paket->nm_paket), 'tumpeng')) {
-                            $catName = 'Luxury Fine Dining';
+                            $catName = 'Tumpeng';
                             $catBg = 'bg-emerald-100 text-emerald-800';
                             $imgUrl = 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=300';
                         }
@@ -156,12 +156,12 @@
                             @if($paket->status_aktif)
                                 <span class="flex items-center gap-1.5 text-green-600 font-bold text-xs">
                                     <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                    <span>Active</span>
+                                    <span>Aktif</span>
                                 </span>
                             @else
                                 <span class="flex items-center gap-1.5 text-gray-400 font-medium text-xs">
                                     <span class="w-2 h-2 rounded-full bg-gray-300"></span>
-                                    <span>Inactive</span>
+                                    <span>Tidak Aktif</span>
                                 </span>
                             @endif
                         </td>
@@ -194,11 +194,11 @@
         <table class="w-full text-left text-xs">
             <thead>
                 <tr class="bg-[#F8F9F3] text-gray-400 font-bold uppercase tracking-wider text-[10px]">
-                    <th class="py-3 px-4 rounded-l-xl">IMAGE</th>
-                    <th class="py-3 px-4">LAUK NAME</th>
+                    <th class="py-3 px-4 rounded-l-xl">GAMBAR</th>
+                    <th class="py-3 px-4">NAMA LAUK</th>
                     <th class="py-3 px-4">KETERANGAN</th>
                     <th class="py-3 px-4">STATUS</th>
-                    <th class="py-3 px-4 text-right rounded-r-xl">ACTION</th>
+                    <th class="py-3 px-4 text-right rounded-r-xl">AKSI</th>
                 </tr>
             </thead>
             <tbody id="laukTableBody" class="divide-y divide-gray-100 font-medium">
@@ -219,12 +219,12 @@
                             @if($lauk->status_aktif)
                                 <span class="flex items-center gap-1.5 text-green-600 font-bold text-xs">
                                     <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                    <span>Active</span>
+                                    <span>Aktif</span>
                                 </span>
                             @else
                                 <span class="flex items-center gap-1.5 text-gray-400 font-medium text-xs">
                                     <span class="w-2 h-2 rounded-full bg-gray-300"></span>
-                                    <span>Inactive</span>
+                                    <span>Tidak Aktif</span>
                                 </span>
                             @endif
                         </td>
@@ -253,7 +253,7 @@
     <!-- PAGINATION FOOTER -->
     <div class="pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 font-medium">
         <div>
-            Showing 1-{{ count($pakets) }} of {{ $totalPaketsCount }} packages | © 2024 RASACI
+            Menampilkan 1-{{ count($pakets) }} dari {{ $totalPaketsCount }} paket | © 2024 RASACI
         </div>
         <div class="flex items-center gap-1">
             <button type="button" class="w-8 h-8 rounded-xl border border-gray-200 text-gray-400 hover:bg-gray-50 flex items-center justify-center font-bold">‹</button>

@@ -276,7 +276,7 @@
     </div>
 
     <!-- Right Column: Sticky Sidebar (Span 4) -->
-    <aside class="lg:col-span-4 lg:sticky lg:top-24 space-y-4">
+    <aside class="lg:col-span-4 lg:sticky lg:top-24 space-y-4 z-10">
         <div class="bg-white rounded-3xl overflow-hidden ambient-shadow border border-[#E5E5DC] p-5 space-y-5">
             <div>
                 <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">MULAI DARI</span>
@@ -294,7 +294,7 @@
                 <!-- Date Picker -->
                 <div class="space-y-1.5">
                     <label for="detailTglAcara" class="block text-[11px] font-semibold text-gray-700">Tanggal Pengiriman</label>
-                    <input type="date" id="detailTglAcara" name="tgl_acara" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2D5A27] text-xs bg-[#F8F9F3]">
+                    <input type="date" id="detailTglAcara" name="tgl_acara" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2D5A27] text-xs bg-[#F8F9F3] cursor-pointer relative z-20">
                 </div>
 
                 <!-- Pax Input -->
@@ -354,7 +354,7 @@
             </div>
             <div class="flex-1 min-w-0">
                 <h4 class="font-bold text-xs text-gray-900">Konsultasi Menu Corporate?</h4>
-                <a href="https://wa.me/6281234567890?text=Halo%20RASACI%20Catering,%20saya%20tertarik%20mengenai%20paket%20Prasmanan" target="_blank" class="text-[#2D5A27] font-semibold text-[11px] hover:underline inline-flex items-center gap-1">
+                <a href="https://wa.me/6281389025947?text=Halo%20RASACI%20Catering,%20saya%20tertarik%20mengenai%20paket%20Prasmanan" target="_blank" class="text-[#2D5A27] font-semibold text-[11px] hover:underline inline-flex items-center gap-1">
                     Chat via Whatsapp &gt;
                 </a>
             </div>

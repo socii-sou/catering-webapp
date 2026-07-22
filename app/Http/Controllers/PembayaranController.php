@@ -16,22 +16,24 @@ class PembayaranController extends Controller
 
     #[OA\Post(
         path: '/api/pesanan/{pesanan}/bayar',
-        summary: 'Generate Snap Token untuk munculkan popup pembayaran Midtrans',
+        summary: 'Generate Snap Token untuk pembayaran DP atau Pelunasan',
+        description: 'Nominal DIHITUNG DI SERVER (persentase DP dari config), bukan dari input pelanggan, supaya tidak bisa dimanipulasi.',
         tags: ['Pembayaran'],
         security: [['bearerAuth' => []]],
         parameters: [new OA\Parameter(name: 'pesanan', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['jumlah_bayar'],
+                required: ['jenis_pembayaran'],
                 properties: [
-                    new OA\Property(property: 'jumlah_bayar', type: 'number', format: 'float', example: 2500000),
+                    new OA\Property(property: 'jenis_pembayaran', type: 'string', enum: ['dp', 'pelunasan'], example: 'dp'),
                 ]
             )
         ),
         responses: [
             new OA\Response(response: 200, description: 'snap_token siap dipakai di frontend'),
             new OA\Response(response: 403, description: 'Bukan pemilik pesanan ini'),
+            new OA\Response(response: 422, description: 'Pesanan sudah lunas, atau DP sudah pernah diminta sebelumnya'),
         ]
     )]
     public function createSnapToken(Request $request, Pesanan $pesanan)
@@ -39,13 +41,36 @@ class PembayaranController extends Controller
         abort_unless($pesanan->user_id === $request->user()->id, 403);
 
         $data = $request->validate([
-            'jumlah_bayar' => ['required', 'numeric', 'min:1'],
+            'jenis_pembayaran' => ['required', 'in:dp,pelunasan'],
         ]);
 
-        $pembayaran = $this->midtransService->createSnapToken($pesanan, $data['jumlah_bayar']);
+        $sisaTagihan = $pesanan->sisaTagihan();
+
+        if ($sisaTagihan <= 0) {
+            return response()->json(['message' => 'Pesanan ini sudah lunas.'], 422);
+        }
+
+        if ($data['jenis_pembayaran'] === 'dp') {
+            // DP cuma boleh diminta sekali, di awal sebelum ada pembayaran apapun.
+            if ($pesanan->totalDibayar() > 0) {
+                return response()->json(['message' => 'DP hanya bisa diminta sebelum ada pembayaran lain.'], 422);
+            }
+
+            $persenDp = (float) config('services.midtrans.dp_percentage', 50);
+            $totalKeseluruhan = (float) $pesanan->total_harga + (float) $pesanan->biaya_pengiriman;
+            $jumlahBayar = round($totalKeseluruhan * ($persenDp / 100));
+        } else {
+            // Pelunasan = sisa tagihan apa adanya (baik itu 100% kalau belum pernah bayar,
+            // atau 50% sisanya kalau DP sudah dibayar duluan).
+            $jumlahBayar = $sisaTagihan;
+        }
+
+        $pembayaran = $this->midtransService->createSnapToken($pesanan, $jumlahBayar, $data['jenis_pembayaran']);
 
         return response()->json([
             'pembayaran_id' => $pembayaran->id,
+            'jenis_pembayaran' => $pembayaran->jenis_pembayaran,
+            'jumlah_bayar' => (float) $pembayaran->jml_bayar,
             'snap_token' => $pembayaran->snap_token,
         ]);
     }
@@ -81,6 +106,13 @@ class PembayaranController extends Controller
         };
 
         $pembayaran->update(['status_bayar' => $statusBayar]);
+
+        if ($statusBayar === 'lunas' && $pembayaran->pesanan) {
+            $pesanan = $pembayaran->pesanan;
+            if (in_array($pesanan->status_pesanan, ['menunggu_validasi', 'pending'])) {
+                $pesanan->update(['status_pesanan' => 'dikonfirmasi']);
+            }
+        }
 
         return response()->json(['message' => 'OK']);
     }

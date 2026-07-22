@@ -24,4 +24,4 @@ class GubukanSeeder extends Seeder
             );
         }
     }
-}   
+}

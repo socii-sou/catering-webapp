@@ -12,6 +12,7 @@ class Pembayaran extends Model
 
     protected $fillable = [
         'pesanan_id',
+        'jenis_pembayaran',
         'tgl_bayar',
         'jml_bayar',
         'metode_bayar',
@@ -28,6 +29,12 @@ class Pembayaran extends Model
             'jml_bayar' => 'decimal:2',
         ];
     }
+
+    /*
+    |--------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------
+    */
 
     public function pesanan(): BelongsTo
     {

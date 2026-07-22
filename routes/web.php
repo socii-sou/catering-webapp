@@ -34,13 +34,21 @@ Route::middleware('auth')->group(function () {
         try {
             $pesanan = $pesananService->store($request->user(), $request->validated());
 
+            $buktiPath = null;
+            if ($request->hasFile('bukti_bayar')) {
+                $buktiPath = $request->file('bukti_bayar')->store('bukti_bayar', 'public');
+            }
+
             // Otomatis catat data pembayaran DP (50%) untuk pesanan web
             $pesanan->pembayarans()->create([
                 'tgl_bayar' => now(),
                 'jml_bayar' => $pesanan->total_harga * 0.5,
                 'metode_bayar' => 'bank_transfer',
                 'status_bayar' => 'diverifikasi',
+                'bukti_bayar' => $buktiPath,
             ]);
+
+            $pesanan->update(['status_pesanan' => 'dikonfirmasi']);
 
             return response()->json([
                 'success' => true,

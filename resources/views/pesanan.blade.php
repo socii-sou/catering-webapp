@@ -67,7 +67,7 @@
                         <div class="flex items-center gap-2.5 flex-wrap">
                             <span class="text-xs font-mono font-bold text-gray-500">{{ $orderCode }}</span>
 
-                            @if($status === 'dikonfirmasi' || $status === 'disetujui' || $status === 'diproses')
+                            @if(in_array($status, ['dikonfirmasi', 'disetujui', 'diproses', 'menunggu_validasi']))
                                 <span class="px-2.5 py-0.5 rounded-full bg-[#EBF5E8] text-[#2D5A27] text-[10px] font-bold">
                                     Dikonfirmasi
                                 </span>
