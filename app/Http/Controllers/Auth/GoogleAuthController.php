@@ -27,7 +27,11 @@ class GoogleAuthController extends Controller
     public function handleGoogleCallback(Request $request)
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            try {
+                $googleUser = Socialite::driver('google')->user();
+            } catch (Throwable $e) {
+                $googleUser = Socialite::driver('google')->stateless()->user();
+            }
 
             // Find user by google_id or by email
             $user = User::where('google_id', $googleUser->getId())
@@ -80,7 +84,7 @@ class GoogleAuthController extends Controller
             return redirect()->intended('/')->with('status', 'Berhasil masuk dengan akun Google!');
         } catch (Throwable $e) {
             report($e);
-            return redirect()->route('login')->withErrors(['google' => 'Gagal melakukan autentikasi dengan Google. Silakan coba lagi.']);
+            return redirect()->route('login')->withErrors(['google' => 'Gagal melakukan autentikasi dengan Google (' . $e->getMessage() . '). Silakan coba lagi.']);
         }
     }
 }

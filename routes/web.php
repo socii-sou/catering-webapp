@@ -23,12 +23,12 @@ Route::get('/', function () {
 
 Route::get('/test-welcome-email', function () {
     $dummyUser = new \App\Models\User();
-    $dummyUser->name = 'Ilham Prabu Zaky';
-    $dummyUser->email = 'ilhamprabuzakys@gmail.com';
+    $dummyUser->name = 'aci';
+    $dummyUser->email = 'ascii99932@gmail.com';
 
     try {
-        \Illuminate\Support\Facades\Mail::to('ilhamprabuzakys@gmail.com')->send(new \App\Mail\WelcomeMail($dummyUser));
-        return 'Email selamat datang berhasil dikirim ke ilhamprabuzakys@gmail.com!';
+        \Illuminate\Support\Facades\Mail::to('ascii99932@gmail.com')->send(new \App\Mail\WelcomeMail($dummyUser));
+        return 'Email selamat datang berhasil dikirim ke ascii99932@gmail.com!';
     } catch (\Throwable $e) {
         return 'Gagal mengirim email: ' . $e->getMessage();
     }
