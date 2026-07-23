@@ -319,11 +319,14 @@
                 };
 
                 let totalGubukanPricePerPax = 0;
+                let activeGubukanNames = [];
                 const activeGubukanCards = document.querySelectorAll('.prasmanan-gubukan-card.active-card');
                 activeGubukanCards.forEach(card => {
                     const gubId = Number(card.getAttribute('data-gubukan-id'));
+                    const gubName = card.querySelector('span.font-bold')?.innerText || 'Gubukan';
                     if (gubukanPrices[gubId]) {
                         totalGubukanPricePerPax += gubukanPrices[gubId];
+                        activeGubukanNames.push(gubName);
                     }
                 });
 
@@ -338,10 +341,14 @@
                 if (subtotalLabel) subtotalLabel.innerText = 'Rp ' + paketSubtotal.toLocaleString('id-ID');
 
                 const gubukanRow = document.getElementById('summaryGubukanRow');
+                const gubukanLabel = document.getElementById('summaryGubukanLabel');
                 const gubukanVal = document.getElementById('summaryGubukanValue');
                 if (gubukanRow && gubukanVal) {
                     if (gubukanSubtotal > 0) {
                         gubukanRow.classList.remove('hidden');
+                        if (gubukanLabel) {
+                            gubukanLabel.innerText = `Gubukan (${activeGubukanNames.join(', ')} × ${pax} pax)`;
+                        }
                         gubukanVal.innerText = 'Rp ' + gubukanSubtotal.toLocaleString('id-ID');
                     } else {
                         gubukanRow.classList.add('hidden');

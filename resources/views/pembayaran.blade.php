@@ -104,7 +104,7 @@
 
                     @if($selectedGubukan)
                     <div class="flex justify-between text-gray-600 font-light">
-                        <span>Gubukan ({{ $selectedGubukan->nama_gubukan }})</span>
+                        <span>Gubukan {{ $selectedGubukan->nama_gubukan }} (Rp {{ number_format($selectedGubukan->harga_gubukan, 0, ',', '.') }} × {{ $jumlahPax }} pax)</span>
                         <span class="font-medium text-gray-900">Rp {{ number_format($gubukanSubtotal, 0, ',', '.') }}</span>
                     </div>
                     @endif
@@ -178,35 +178,19 @@
                     <div class="w-8 h-8 rounded-xl bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center text-base">
                         💳
                     </div>
-                    <h2 class="text-xl font-bold font-serif text-gray-900">Pilih Metode Pembayaran</h2>
+                    <h2 class="text-xl font-bold font-serif text-gray-900">Metode Pembayaran</h2>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Option 1: Midtrans QRIS & Instant VA -->
-                    <div onclick="switchPaymentMethod('midtrans')" id="methodCardMidtrans" class="payment-method-card bg-[#F4F7EE] border-2 border-[#2D5A27] rounded-2xl p-4 cursor-pointer flex flex-col justify-between transition-all">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs font-bold text-[#2D5A27] flex items-center gap-1.5">
-                                <span>📱</span> QRIS / Midtrans (Instan)
-                            </span>
-                            <input type="radio" id="pay_method_midtrans" name="metode_pembayaran_choice" value="midtrans" checked class="accent-[#2D5A27] pointer-events-none">
-                        </div>
-                        <p class="text-[11px] text-gray-600 font-light leading-relaxed">
-                            Scan QRIS via GoPay, OVO, ShopeePay, Dana, BCA Mobile & VA Bank. Verifikasi otomatis.
-                        </p>
+                <div class="payment-method-card bg-[#F4F7EE] border-2 border-[#2D5A27] rounded-2xl p-4 flex flex-col justify-between transition-all">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-[#2D5A27] flex items-center gap-1.5">
+                            <span>📱</span> QRIS & Virtual Account (Midtrans)
+                        </span>
+                        <input type="radio" id="pay_method_midtrans" name="metode_pembayaran_choice" value="midtrans" checked class="accent-[#2D5A27] pointer-events-none">
                     </div>
-
-                    <!-- Option 2: Transfer Bank Manual -->
-                    <div onclick="switchPaymentMethod('manual')" id="methodCardManual" class="payment-method-card bg-white border border-gray-200 rounded-2xl p-4 cursor-pointer flex flex-col justify-between hover:border-[#2D5A27] transition-all">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs font-bold text-gray-800 flex items-center gap-1.5">
-                                <span>🏦</span> Transfer Bank Manual
-                            </span>
-                            <input type="radio" id="pay_method_manual" name="metode_pembayaran_choice" value="manual" class="accent-[#2D5A27] pointer-events-none">
-                        </div>
-                        <p class="text-[11px] text-gray-600 font-light leading-relaxed">
-                            Transfer ke rekening BCA / BNI & unggah bukti transfer manual.
-                        </p>
-                    </div>
+                    <p class="text-[11px] text-gray-600 font-light leading-relaxed">
+                        Metode pembayaran otomatis instan. Mendukung scan QRIS via E-Wallet (GoPay, OVO, ShopeePay, Dana, LinkAja), Mobile Banking, dan Transfer Virtual Account Bank.
+                    </p>
                 </div>
             </div>
 
@@ -217,130 +201,38 @@
                         ⚡
                     </div>
                     <div>
-                        <h3 class="text-base font-bold text-gray-900 font-serif">Pembayaran QRIS & Snap Midtrans</h3>
-                        <p class="text-xs text-gray-500">Generate QRIS instan dan bayar secara otomatis</p>
+                        <h3 class="text-base font-bold text-gray-900 font-serif">Alur Pembayaran & Verifikasi</h3>
+                        <p class="text-xs text-gray-500">Ikuti langkah mudah di bawah ini untuk menyelesaikan pesanan Anda:</p>
                     </div>
                 </div>
 
-                <div class="p-4 bg-[#EBF5E8]/60 rounded-2xl border border-[#D2E6CE] text-xs text-[#2D5A27] space-y-1.5">
-                    <p class="font-bold flex items-center gap-1">
-                        <span>✅</span> Verifikasi Langsung & Tanpa Upload Bukti
+                <div class="p-5 bg-[#EBF5E8]/60 rounded-2xl border border-[#D2E6CE] text-xs text-[#2D5A27] space-y-3.5">
+                    <p class="font-bold flex items-center gap-1.5">
+                        <span>✅</span> Pembayaran Terverifikasi Otomatis & Tanpa Upload Bukti
                     </p>
-                    <p class="text-[11px] text-gray-600 font-light leading-relaxed">
-                        Saat tombol "KONFIRMASI PESANAN" diklik, popup QRIS akan otomatis muncul. Posisikan kamera m-Banking atau aplikasi E-Wallet Anda untuk scan.
-                    </p>
+                    <div class="text-[11px] text-gray-600 font-light leading-relaxed space-y-2">
+                        <p>
+                            1. Tekan tombol <strong class="font-bold text-gray-800">"KONFIRMASI PESANAN"</strong> berwarna hijau di bagian bawah.
+                        </p>
+                        <p>
+                            2. Pop-up pembayaran aman Midtrans akan langsung terbuka pada layar Anda.
+                        </p>
+                        <p>
+                            3. Pilih metode pembayaran yang diinginkan (contoh: <strong class="font-bold text-gray-800">QRIS</strong> atau <strong class="font-bold text-gray-800">Transfer Virtual Account</strong>).
+                        </p>
+                        <p>
+                            4. Pindai QR code menggunakan aplikasi m-Banking / E-Wallet Anda, atau transfer ke nomor Virtual Account bank Anda.
+                        </p>
+                        <p>
+                            5. Setelah pembayaran terverifikasi sukses, Anda akan diarahkan ke halaman detail pesanan Anda secara otomatis.
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Card 2: Instruksi Transfer Bank Manual (Hidden by Default) -->
-            <div id="manualBankCard" class="hidden bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E5DC] shadow-xs space-y-5">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center text-base">
-                        🏦
-                    </div>
-                    <h2 class="text-xl font-bold font-serif text-gray-900">Instruksi Transfer Bank</h2>
-                </div>
-
-                <p class="text-xs text-gray-600 leading-relaxed">
-                    Silakan lakukan transfer ke salah satu rekening resmi RASACI CATERING di bawah ini untuk mengkonfirmasi pesanan Anda.
-                </p>
-
-                <!-- Bank Cards Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                    <!-- Bank BCA -->
-                    <div class="bg-[#F8F9F3] border border-[#E5E8DD] rounded-2xl p-4 space-y-2 relative group hover:border-[#2D5A27] transition-all">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">BANK CENTRAL ASIA (BCA)</span>
-                            <button type="button" onclick="copyToClipboard('8832109200', this)" class="text-gray-400 hover:text-[#2D5A27] p-1 transition-colors cursor-pointer" title="Salin Nomor Rekening">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="text-lg font-extrabold text-gray-900 tracking-wider font-mono">
-                            8832 1092 00
-                        </div>
-                        <div class="text-xs text-gray-500 font-medium">
-                            a.n. RASACI CATERING
-                        </div>
-                    </div>
-
-                    <!-- Bank BNI -->
-                    <div class="bg-[#F8F9F3] border border-[#E5E8DD] rounded-2xl p-4 space-y-2 relative group hover:border-[#2D5A27] transition-all">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">BANK NEGARA INDONESIA (BNI)</span>
-                            <button type="button" onclick="copyToClipboard('120001229982', this)" class="text-gray-400 hover:text-[#2D5A27] p-1 transition-colors cursor-pointer" title="Salin Nomor Rekening">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="text-lg font-extrabold text-gray-900 tracking-wider font-mono">
-                            1200 0122 9982
-                        </div>
-                        <div class="text-xs text-gray-500 font-medium">
-                            a.n. RASACI CATERING
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Operational Notice -->
-                <div class="p-4 bg-[#EBF5E8] rounded-2xl border border-[#D2E6CE] flex items-start gap-3 text-xs text-[#2D5A27]">
-                    <span class="text-base leading-none">ℹ️</span>
-                    <p class="leading-relaxed">
-                        Transfer sebelum jam 16:00 WIB agar pesanan dapat segera diproses untuk jadwal pengiriman besok.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Card 3: Pembayaran DP (50%) & File Upload (Hidden by Default for Midtrans) -->
-            <div id="manualProofCard" class="hidden bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E5DC] shadow-xs space-y-6">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div class="space-y-1">
-                        <h2 class="text-xl font-bold font-serif text-gray-900">Pembayaran DP (50%)</h2>
-                        <p class="text-xs text-gray-500">Segera unggah bukti transfer untuk verifikasi manual.</p>
-                    </div>
-
-                    <!-- Highlight Box TOTAL DP DIBAYAR -->
-                    <div class="bg-[#FDF0ED] border border-[#F7D6CD] rounded-2xl px-5 py-3 text-right">
-                        <div class="text-[10px] font-bold text-[#A84325] uppercase tracking-wider">TOTAL DP DIBAYAR</div>
-                        <div class="text-2xl font-black text-[#8A3017] font-serif">Rp {{ number_format($dpTotal, 0, ',', '.') }}</div>
-                    </div>
-                </div>
-
-                <!-- Proof of Payment Upload Box -->
-                <div class="space-y-2">
-                    <label class="block text-xs font-bold text-gray-800">Bukti Pembayaran DP</label>
-                    <div id="dropZone" onclick="triggerFileSelect()" class="border-2 border-dashed border-gray-300 hover:border-[#2D5A27] rounded-3xl p-8 text-center transition-all bg-[#FAFBF7] cursor-pointer group space-y-3">
-                        <div class="w-12 h-12 rounded-full bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center mx-auto text-xl shadow-xs group-hover:scale-110 transition-transform">
-                            ☁️
-                        </div>
-                        <div class="space-y-1">
-                            <p class="text-xs font-bold text-gray-800">
-                                Klik untuk unggah <span class="font-normal text-gray-500">atau seret file ke sini</span>
-                            </p>
-                            <p class="text-[11px] text-gray-400">
-                                Maksimal 5MB (JPG, PNG, PDF)
-                            </p>
-                        </div>
-                        <input type="file" id="bukti_bayar_input" name="bukti_bayar" accept="image/*,.pdf" class="hidden" onchange="handleFileSelect(event)">
-                    </div>
-
-                    <!-- File Preview Area -->
-                    <div id="filePreview" class="hidden bg-[#F4F7EE] border border-[#D2E6CE] rounded-2xl p-4 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <span class="text-xl">📄</span>
-                            <div>
-                                <p id="fileName" class="text-xs font-bold text-gray-900 truncate max-w-xs"></p>
-                                <p id="fileSize" class="text-[10px] text-gray-500"></p>
-                            </div>
-                        </div>
-                        <button type="button" onclick="removeFile()" class="text-gray-400 hover:text-red-600 text-sm p-1 transition-colors">
-                            ✕
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <!-- Keep empty hidden containers to avoid Javascript errors on element references -->
+            <div id="manualBankCard" class="hidden"></div>
+            <div id="manualProofCard" class="hidden"></div>
 
             <!-- Submit Action Card -->
             <div class="bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E5DC] shadow-xs space-y-4">
@@ -583,59 +475,51 @@
         .then(data => {
             const pesananId = data.pesanan.id;
 
-            if (selectedPaymentMethod === 'midtrans') {
-                fetch(`/pesanan/${pesananId}/bayar`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({ jenis_pembayaran: 'dp' })
-                })
-                .then(res => res.json())
-                .then(snapData => {
-                    if (submitBtn) submitBtn.disabled = false;
-                    if (spinner) spinner.classList.add('hidden');
-
-                    if (snapData.snap_token && typeof window.snap !== 'undefined') {
-                        window.snap.pay(snapData.snap_token, {
-                            onSuccess: function(result) {
-                                const successModal = document.getElementById('pembayaranSuccessModal');
-                                if (successModal) successModal.classList.remove('hidden');
-                            },
-                            onPending: function(result) {
-                                const successModal = document.getElementById('pembayaranSuccessModal');
-                                if (successModal) successModal.classList.remove('hidden');
-                            },
-                            onError: function(result) {
-                                if (errBanner && errText) {
-                                    errText.innerText = 'Pembayaran gagal. Silakan coba lagi.';
-                                    errBanner.classList.remove('hidden');
-                                }
-                            },
-                            onClose: function() {
-                                const successModal = document.getElementById('pembayaranSuccessModal');
-                                if (successModal) successModal.classList.remove('hidden');
-                            }
-                        });
-                    } else {
-                        const successModal = document.getElementById('pembayaranSuccessModal');
-                        if (successModal) successModal.classList.remove('hidden');
-                    }
-                })
-                .catch(err => {
-                    if (submitBtn) submitBtn.disabled = false;
-                    if (spinner) spinner.classList.add('hidden');
-                    const successModal = document.getElementById('pembayaranSuccessModal');
-                    if (successModal) successModal.classList.remove('hidden');
-                });
-            } else {
+            // Trigger Payment Gateway for DP payment
+            fetch(`/pesanan/${pesananId}/bayar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ jenis_pembayaran: 'dp' })
+            })
+            .then(res => res.json())
+            .then(snapData => {
                 if (submitBtn) submitBtn.disabled = false;
                 if (spinner) spinner.classList.add('hidden');
-                const successModal = document.getElementById('pembayaranSuccessModal');
-                if (successModal) successModal.classList.remove('hidden');
-            }
+
+                if (snapData.snap_token && typeof window.snap !== 'undefined') {
+                    window.snap.pay(snapData.snap_token, {
+                        onSuccess: function(result) {
+                            window.location.href = `/pesanan/${pesananId}`;
+                        },
+                        onPending: function(result) {
+                            window.location.href = `/pesanan/${pesananId}`;
+                        },
+                        onError: function(result) {
+                            if (errBanner && errText) {
+                                errText.innerText = 'Pembayaran DP gagal. Silakan coba lagi.';
+                                errBanner.classList.remove('hidden');
+                            }
+                        },
+                        onClose: function() {
+                            window.location.href = `/pesanan/${pesananId}`;
+                        }
+                    });
+                } else {
+                    window.location.href = `/pesanan/${pesananId}`;
+                }
+            })
+            .catch(err => {
+                if (submitBtn) submitBtn.disabled = false;
+                if (spinner) spinner.classList.add('hidden');
+                if (errBanner && errText) {
+                    errText.innerText = err.message || 'Gagal memulai transaksi Payment Gateway.';
+                    errBanner.classList.remove('hidden');
+                }
+            });
         })
         .catch(error => {
             if (submitBtn) submitBtn.disabled = false;

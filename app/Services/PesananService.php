@@ -63,7 +63,7 @@ class PesananService
 
                 $this->validasiPilihanLauk($paket, $laukIds);
 
-                if ($paket->kategoriProduk?->mendukung_gubukan) {
+                if ($paket->kategoriProduk?->mendukung_gubukan || str_contains(strtolower($paket->nm_paket), 'prasmanan')) {
                     $adaPaketPendukungGubukan = true;
                 }
 
@@ -127,9 +127,13 @@ class PesananService
                 ]);
             }
 
-            if (count($laukIds) > $paket->jumlah_lauk_pilihan) {
+            $maxAllowed = str_contains(strtolower($paket->nm_paket), 'prasmanan') 
+                ? max(5, $paket->jumlah_lauk_pilihan) 
+                : $paket->jumlah_lauk_pilihan;
+
+            if (count($laukIds) > $maxAllowed) {
                 throw ValidationException::withMessages([
-                    'items' => "Paket \"{$paket->nm_paket}\" maksimal hanya boleh memilih {$paket->jumlah_lauk_pilihan} lauk.",
+                    'items' => "Paket \"{$paket->nm_paket}\" maksimal hanya boleh memilih {$maxAllowed} lauk.",
                 ]);
             }
 

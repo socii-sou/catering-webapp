@@ -29,20 +29,16 @@
         </div>
     @endif
 
-    <!-- BREADCRUMBS -->
-    <nav class="flex text-xs text-gray-500 font-medium space-x-2">
-        <a href="/" class="hover:text-gray-900 transition-colors">Beranda</a>
-        <span>›</span>
-        <a href="{{ route('pesanan.index') }}" class="hover:text-gray-900 transition-colors">Pesanan Saya</a>
-        <span>›</span>
-        <span class="text-gray-900 font-bold">ORD-{{ \Carbon\Carbon::parse($pesanan->tgl_pesan)->format('Y') }}-{{ str_pad($pesanan->id, 5, '0', STR_PAD_LEFT) }}</span>
-    </nav>
-
     @php
         $statusRaw = strtolower($pesanan->status_pesanan);
         $prodStatus = strtolower($pesanan->status_produksi);
         $shipStatus = $pesanan->pengiriman ? strtolower($pesanan->pengiriman->status_pengiriman) : 'belum_dikirim';
-        $hasDpPaid = $pesanan->pembayarans && $pesanan->pembayarans->count() > 0;
+        
+        $hasDpPaid = $pesanan->pembayarans
+            ? $pesanan->pembayarans->contains(fn($p) => $p->jenis_pembayaran === 'dp' && in_array(strtolower($p->status_bayar), ['diverifikasi', 'lunas', 'settlement', 'success']))
+            : false;
+
+        $orderCodeText = $hasDpPaid ? '#ORD-' . \Carbon\Carbon::parse($pesanan->tgl_pesan)->format('Y') . '-' . str_pad($pesanan->id, 5, '0', STR_PAD_LEFT) : 'Belum Ada ID (Menunggu DP)';
 
         // Map status to progress step (1 to 5)
         $step = 1; // Default: Menunggu DP
@@ -91,12 +87,21 @@
         $remainingBalance = $grandTotal * 0.5;
     @endphp
 
+    <!-- BREADCRUMBS -->
+    <nav class="flex text-xs text-gray-500 font-medium space-x-2">
+        <a href="/" class="hover:text-gray-900 transition-colors">Beranda</a>
+        <span>›</span>
+        <a href="{{ route('pesanan.index') }}" class="hover:text-gray-900 transition-colors">Pesanan Saya</a>
+        <span>›</span>
+        <span class="text-gray-900 font-bold">{{ $orderCodeText }}</span>
+    </nav>
+
     <!-- HEADER TITLE & PRINT ACTION -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="space-y-1">
             <div class="flex items-center gap-3">
                 <h1 class="text-3xl sm:text-4xl font-extrabold font-serif text-gray-900 tracking-tight">
-                    Order #ORD-{{ \Carbon\Carbon::parse($pesanan->tgl_pesan)->format('Y') }}-{{ str_pad($pesanan->id, 5, '0', STR_PAD_LEFT) }}
+                    Order {{ $orderCodeText }}
                 </h1>
                 <span class="px-3 py-1 rounded-full text-xs font-bold shadow-2xs {{ $statusBg }}">
                     ● {{ $statusText }}
@@ -326,9 +331,16 @@
                 <!-- Price Breakdown -->
                 <div class="space-y-2.5 text-xs">
                     <div class="flex justify-between text-gray-600 font-light">
-                        <span>Subtotal</span>
-                        <span class="font-medium text-gray-900">Rp {{ number_format($paketSubtotal + $gubukanSubtotal, 0, ',', '.') }}</span>
+                        <span>Subtotal Paket</span>
+                        <span class="font-medium text-gray-900">Rp {{ number_format($paketSubtotal, 0, ',', '.') }}</span>
                     </div>
+
+                    @if($pesanan->gubukan)
+                    <div class="flex justify-between text-gray-600 font-light">
+                        <span>Gubukan {{ $pesanan->gubukan->nama_gubukan }} (Rp {{ number_format($pesanan->gubukan->harga_gubukan, 0, ',', '.') }} × {{ $pesanan->jumlah_pax }} pax)</span>
+                        <span class="font-medium text-gray-900">Rp {{ number_format($gubukanSubtotal, 0, ',', '.') }}</span>
+                    </div>
+                    @endif
 
                     <div class="flex justify-between text-gray-600 font-light">
                         <span>Tax (0%)</span>
@@ -377,20 +389,42 @@
                 </div>
 
                 <!-- Pelunasan / Selesai / Review Action Button -->
-                @if($statusRaw === 'disetujui')
-                    <form action="{{ route('pesanan.selesai', $pesanan->id) }}" method="POST" class="w-full">
-                        @csrf
-                        <button type="submit" class="w-full bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 text-xs cursor-pointer">
-                            <span>✓</span>
-                            <span>Konfirmasi Pesanan Selesai</span>
-                        </button>
-                    </form>
-                @elseif($statusRaw === 'selesai' && !$pesanan->review)
-                    <a href="{{ route('pesanan.review.create', $pesanan->id) }}" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 text-xs cursor-pointer text-center">
-                        <span>⭐</span>
-                        <span>Berikan Ulasan Anda</span>
-                    </a>
-                @elseif($statusRaw !== 'selesai' && $statusRaw !== 'batal' && $statusRaw !== 'ditolak')
+                @php
+                    $hasPelunasan = $pesanan->pembayarans
+                        ? $pesanan->pembayarans->contains(fn($p) => $p->jenis_pembayaran === 'pelunasan' && in_array(strtolower($p->status_bayar), ['diverifikasi', 'lunas', 'settlement', 'success']))
+                        : false;
+                @endphp
+
+                @if($statusRaw === 'selesai')
+                    @if(!$pesanan->review)
+                        <a href="{{ route('pesanan.review.create', $pesanan->id) }}" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 text-xs cursor-pointer text-center">
+                            <span>⭐</span>
+                            <span>Berikan Ulasan Anda</span>
+                        </a>
+                    @endif
+                @elseif(in_array($statusRaw, ['disetujui', 'dikonfirmasi']))
+                    @if($hasPelunasan)
+                        <form action="{{ route('pesanan.selesai', $pesanan->id) }}" method="POST" class="w-full">
+                            @csrf
+                            <button type="submit" class="w-full bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 text-xs cursor-pointer">
+                                <span>✓</span>
+                                <span>Konfirmasi Pesanan Selesai</span>
+                            </button>
+                        </form>
+                    @else
+                        <div class="space-y-2 w-full">
+                            <button id="btnPelunasan" onclick="payPelunasan({{ $pesanan->id }})" class="w-full bg-[#3B420C] hover:bg-[#2C3109] text-white font-bold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 text-xs cursor-pointer">
+                                <span id="pelunasanSpinner" class="hidden">⏳</span>
+                                <span>Bayar Pelunasan (50% Sisa)</span>
+                            </button>
+
+                            <button type="button" disabled class="w-full bg-gray-100 text-gray-400 font-bold py-3.5 rounded-2xl text-xs cursor-not-allowed flex items-center justify-center gap-2 border border-gray-200" title="Lakukan pelunasan terlebih dahulu untuk menandai pesanan selesai">
+                                <span>🔒</span>
+                                <span>Konfirmasi Pesanan Selesai (Wajib Pelunasan)</span>
+                            </button>
+                        </div>
+                    @endif
+                @elseif($statusRaw !== 'batal' && $statusRaw !== 'ditolak')
                     <button id="btnPelunasan" onclick="payPelunasan({{ $pesanan->id }})" class="w-full bg-[#3B420C] hover:bg-[#2C3109] text-white font-bold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 text-xs cursor-pointer">
                         <span id="pelunasanSpinner" class="hidden">⏳</span>
                         <span>Selesaikan Pelunasan</span>

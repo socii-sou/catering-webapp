@@ -172,7 +172,7 @@
                         </div>
                     </div>
                     <div class="text-right font-serif">
-                        <span class="font-bold text-gray-900 text-sm block">IDR {{ number_format($pesanan->gubukan->harga_per_pax * $pesanan->jumlah_pax, 0, ',', '.') }}</span>
+                        <span class="font-bold text-gray-900 text-sm block">IDR {{ number_format(($pesanan->gubukan->harga_gubukan ?? 0) * $pesanan->jumlah_pax, 0, ',', '.') }}</span>
                     </div>
                 </div>
                 @endif

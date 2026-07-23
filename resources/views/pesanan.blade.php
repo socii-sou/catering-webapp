@@ -46,14 +46,20 @@
                 }
 
                 $status = strtolower($order->status_pesanan);
+                $prodStatus = strtolower($order->status_produksi);
+                $shipStatus = $order->pengiriman ? strtolower($order->pengiriman->status_pengiriman) : 'belum_dikirim';
+
                 $categoryGroup = 'berlangsung';
-                if (in_array($status, ['selesai', 'completed'])) {
+                if (in_array($status, ['selesai', 'completed']) || $shipStatus === 'sampai') {
                     $categoryGroup = 'selesai';
                 } elseif (in_array($status, ['batal', 'dibatalkan', 'ditolak', 'cancelled'])) {
                     $categoryGroup = 'dibatalkan';
                 }
 
-                $orderCode = '#NSL-' . str_pad($order->id, 8, '0', STR_PAD_LEFT);
+                $hasDpPaid = $order->pembayarans
+                    ? $order->pembayarans->contains(fn($p) => $p->jenis_pembayaran === 'dp' && in_array(strtolower($p->status_bayar), ['diverifikasi', 'lunas', 'settlement', 'success']))
+                    : false;
+                $orderCode = $hasDpPaid ? '#NSL-' . str_pad($order->id, 8, '0', STR_PAD_LEFT) : 'Belum Ada ID (Menunggu DP)';
             @endphp
 
             <!-- ORDER CARD ITEM -->
@@ -67,21 +73,29 @@
                         <div class="flex items-center gap-2.5 flex-wrap">
                             <span class="text-xs font-mono font-bold text-gray-500">{{ $orderCode }}</span>
 
-                            @if(in_array($status, ['dikonfirmasi', 'disetujui', 'diproses', 'menunggu_validasi']))
-                                <span class="px-2.5 py-0.5 rounded-full bg-[#EBF5E8] text-[#2D5A27] text-[10px] font-bold">
-                                    Dikonfirmasi
-                                </span>
-                            @elseif($status === 'selesai')
-                                <span class="px-2.5 py-0.5 rounded-full bg-[#EAEFE2] text-[#3B420C] text-[10px] font-bold">
-                                    Selesai
-                                </span>
-                            @elseif($status === 'batal' || $status === 'dibatalkan' || $status === 'ditolak')
+                            @if($status === 'batal' || $status === 'dibatalkan' || $status === 'ditolak')
                                 <span class="px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 text-[10px] font-bold">
                                     Dibatalkan
                                 </span>
+                            @elseif($status === 'selesai' || $shipStatus === 'sampai')
+                                <span class="px-2.5 py-0.5 rounded-full bg-[#EAEFE2] text-[#3B420C] text-[10px] font-bold">
+                                    Selesai
+                                </span>
+                            @elseif($shipStatus === 'dikirim')
+                                <span class="px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[10px] font-bold">
+                                    🚚 Di Antar (Kurir)
+                                </span>
+                            @elseif($prodStatus === 'diproses')
+                                <span class="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 text-[10px] font-bold">
+                                    🍳 Di Masak (Dapur)
+                                </span>
+                            @elseif(in_array($status, ['dikonfirmasi', 'disetujui']))
+                                <span class="px-2.5 py-0.5 rounded-full bg-[#EBF5E8] text-[#2D5A27] text-[10px] font-bold">
+                                    Dikonfirmasi
+                                </span>
                             @else
-                                <span class="px-2.5 py-0.5 rounded-full bg-[#FDF0ED] text-[#8A3017] text-[10px] font-bold">
-                                    Menunggu DP
+                                <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
+                                    Menunggu Validasi
                                 </span>
                             @endif
                         </div>
@@ -117,14 +131,25 @@
                                 Lihat Detail
                             </a>
                         </div>
-                    @elseif($status === 'disetujui')
+                    @elseif($status === 'disetujui' || $status === 'dikonfirmasi')
+                        @php
+                            $orderHasPelunasan = $order->pembayarans
+                                ? $order->pembayarans->contains(fn($p) => $p->jenis_pembayaran === 'pelunasan' && in_array(strtolower($p->status_bayar), ['diverifikasi', 'lunas', 'settlement', 'success']))
+                                : false;
+                        @endphp
                         <div class="flex items-center gap-2">
-                            <form action="{{ route('pesanan.selesai', $order->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="px-5 py-2.5 bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer whitespace-nowrap">
-                                    Selesai
-                                </button>
-                            </form>
+                            @if($orderHasPelunasan)
+                                <form action="{{ route('pesanan.selesai', $order->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="px-5 py-2.5 bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer whitespace-nowrap">
+                                        Selesai
+                                    </button>
+                                </form>
+                            @else
+                                <a href="{{ route('pesanan.show', $order->id) }}" class="px-5 py-2.5 bg-[#3B420C] hover:bg-[#2C3109] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer whitespace-nowrap">
+                                    Bayar Pelunasan
+                                </a>
+                            @endif
                             <a href="{{ route('pesanan.show', $order->id) }}" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs rounded-xl border border-gray-200 transition-all cursor-pointer whitespace-nowrap">
                                 Detail Pesanan
                             </a>

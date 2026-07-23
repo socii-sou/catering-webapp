@@ -120,7 +120,7 @@
                 <!-- User Profile -->
                 <div class="flex items-center gap-3">
                     <div class="text-right hidden sm:block">
-                        <span class="block text-xs font-bold text-gray-900">{{ Auth::user()->name ?? 'Ahmad Sulaiman' }}</span>
+                        <span class="block text-xs font-bold text-gray-900">PENJUAL</span>
                         <span class="block text-[10px] text-gray-500 font-medium">Kitchen Lead</span>
                     </div>
                     <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80&w=120" alt="Avatar" class="w-10 h-10 rounded-full object-cover border border-[#2D5A27]">

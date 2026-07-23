@@ -104,9 +104,6 @@
                         <span class="text-xl">📍</span>
                         <h2 class="text-xl font-bold font-serif text-gray-900">Lokasi Pengiriman</h2>
                     </div>
-                    <span class="text-[11px] bg-[#EBF5E8] text-[#2D5A27] font-semibold px-3 py-1 rounded-full border border-[#D2E6CE]">
-                        Peta Interaktif Google Maps Style
-                    </span>
                 </div>
 
                 <div class="space-y-2">

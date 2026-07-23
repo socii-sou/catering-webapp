@@ -61,14 +61,8 @@ class PesananController extends Controller
         $this->authorize('updateStatus', $pesanan);
 
         $request->validate([
-            'status_pesanan' => ['required', 'in:disetujui,ditolak'],
+            'status_pesanan' => ['required', 'string', 'in:menunggu_validasi,disetujui,dikonfirmasi,ditolak,batal,selesai'],
         ]);
-
-        if ($request->status_pesanan === 'disetujui' && ! $pesanan->pembayarans()->exists()) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
-                'status_pesanan' => ['Pesanan belum dapat dikonfirmasi karena pelanggan belum melakukan pembayaran DP 50%.'],
-            ]);
-        }
 
         $pesanan->update(['status_pesanan' => $request->status_pesanan]);
 

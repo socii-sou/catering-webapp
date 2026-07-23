@@ -34,32 +34,11 @@ Route::middleware('auth')->group(function () {
         try {
             $pesanan = $pesananService->store($request->user(), $request->validated());
 
-            $buktiPath = null;
-            if ($request->hasFile('bukti_bayar')) {
-                $buktiPath = $request->file('bukti_bayar')->store('bukti_bayar', 'public');
-            }
-
-            $metodeChoice = $request->input('metode_pembayaran_choice', 'midtrans');
-
-            if ($metodeChoice === 'manual') {
-                $pesanan->pembayarans()->create([
-                    'tgl_bayar' => now(),
-                    'jml_bayar' => $pesanan->total_harga * 0.5,
-                    'metode_bayar' => 'bank_transfer',
-                    'status_bayar' => 'diverifikasi',
-                    'bukti_bayar' => $buktiPath,
-                ]);
-
-                $pesanan->update(['status_pesanan' => 'dikonfirmasi']);
-                $message = 'Pesanan Anda berhasil dibuat dan pembayaran DP telah diverifikasi secara otomatis!';
-            } else {
-                $pesanan->update(['status_pesanan' => 'menunggu_validasi']);
-                $message = 'Pesanan Anda berhasil dibuat! Silakan lanjutkan pembayaran.';
-            }
+            $pesanan->update(['status_pesanan' => 'menunggu_validasi']);
 
             return response()->json([
                 'success' => true,
-                'message' => $message,
+                'message' => 'Pesanan Anda berhasil dibuat! Silakan lakukan pembayaran DP via Payment Gateway.',
                 'pesanan' => $pesanan
             ]);
         } catch (\App\Exceptions\KapasitasTerlampauiException $e) {
@@ -192,6 +171,41 @@ Route::get('/pesanan/{pesanan}', function (\App\Models\Pesanan $pesanan) {
     return view('pesanan_detail', compact('pesanan', 'myOrders'));
 })->middleware('auth')->name('pesanan.show');
 
+Route::get('/pesanan/{pesanan}/review', function (\App\Models\Pesanan $pesanan) {
+    if ($pesanan->user_id !== auth()->id()) {
+        abort(403);
+    }
+    
+    if ($pesanan->status_pesanan !== 'selesai') {
+        return redirect()->route('pesanan.show', $pesanan->id)->with('error', 'Anda hanya bisa memberikan ulasan setelah pesanan selesai.');
+    }
+
+    if ($pesanan->review()->exists()) {
+        return redirect()->route('pesanan.show', $pesanan->id)->with('error', 'Pesanan ini sudah Anda ulas.');
+    }
+
+    return view('review', compact('pesanan'));
+})->middleware('auth')->name('pesanan.review.create');
+
+Route::post('/pesanan/{pesanan}/selesai', function (\App\Models\Pesanan $pesanan) {
+    if ($pesanan->user_id !== auth()->id() || !in_array(strtolower($pesanan->status_pesanan), ['disetujui', 'dikonfirmasi'])) {
+        abort(403, 'Aksi tidak diizinkan.');
+    }
+
+    $hasPelunasan = $pesanan->pembayarans()
+        ->where('jenis_pembayaran', 'pelunasan')
+        ->whereIn('status_bayar', ['diverifikasi', 'lunas', 'settlement', 'success'])
+        ->exists();
+
+    if (!$hasPelunasan) {
+        return redirect()->back()->with('error', 'Pesanan belum dapat diselesaikan. Silakan lakukan pelunasan (50% sisa) terlebih dahulu.');
+    }
+
+    $pesanan->update(['status_pesanan' => 'selesai']);
+
+    return redirect()->route('pesanan.review.create', $pesanan->id)->with('success', 'Pesanan ditandai selesai! Silakan berikan ulasan Anda.');
+})->middleware('auth')->name('pesanan.selesai');
+
 Route::post('/pesanan/{pesanan}/review', function (\App\Models\Pesanan $pesanan, \Illuminate\Http\Request $request) {
     if ($pesanan->user_id !== auth()->id() || $pesanan->status_pesanan !== 'selesai') {
         abort(403, 'Aksi tidak diizinkan.');
@@ -202,9 +216,8 @@ Route::post('/pesanan/{pesanan}/review', function (\App\Models\Pesanan $pesanan,
         'ulasan' => ['nullable', 'string', 'max:1000'],
     ]);
 
-    // Make sure we only allow 1 review per order
     if ($pesanan->review()->exists()) {
-        return redirect()->back()->with('error', 'Pesanan ini sudah pernah direview sebelumnya.');
+        return redirect()->route('pesanan.show', $pesanan->id)->with('error', 'Pesanan ini sudah pernah direview sebelumnya.');
     }
 
     $pesanan->review()->create([
@@ -213,33 +226,73 @@ Route::post('/pesanan/{pesanan}/review', function (\App\Models\Pesanan $pesanan,
         'ulasan' => $request->ulasan,
     ]);
 
-    return redirect()->back()->with('success', 'Ulasan Anda berhasil dikirim. Terima kasih banyak!');
+    return redirect()->route('pesanan.show', $pesanan->id)->with('success', 'Ulasan Anda berhasil dikirim. Terima kasih banyak!');
 })->middleware('auth')->name('pesanan.review.store');
 
 Route::post('/pesanan/{pesanan}/bayar', [\App\Http\Controllers\PembayaranController::class, 'createSnapToken'])->middleware('auth')->name('pesanan.bayar');
 
 Route::get('/penjual/dashboard', function () {
-    $totalOrdersCount = \App\Models\Pesanan::count();
-    $totalRevenueSum = \App\Models\Pesanan::sum('total_harga');
+    $totalOrdersCount = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'dibatalkan', 'ditolak'])->count();
+    $totalRevenueSum = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'dibatalkan', 'ditolak'])->sum('total_harga');
     
-    // Count orders with pending balance or active status
-    $pendingPaymentsCount = \App\Models\Pesanan::whereNotIn('status_pesanan', ['selesai', 'batal', 'ditolak'])->count();
+    // Count orders with pending validation status
+    $pendingPaymentsCount = \App\Models\Pesanan::where('status_pesanan', 'menunggu_validasi')->count();
 
-    // Deliveries scheduled for today or active
-    $todayDeliveriesCount = \App\Models\Pesanan::whereNotIn('status_pesanan', ['selesai', 'batal', 'ditolak'])->count();
+    // Active deliveries
+    $todayDeliveriesCount = \App\Models\Pengiriman::where('status_pengiriman', 'dikirim')->count();
 
-    // Recent orders
-    $recentOrders = \App\Models\Pesanan::with(['user', 'pesananPaket.paket', 'pembayarans', 'pengiriman'])
+    // Recent orders (excluding cancelled/rejected orders)
+    $recentOrders = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'dibatalkan', 'ditolak'])
+        ->with(['user', 'pesananPaket.paket', 'pembayarans', 'pengiriman'])
         ->latest('created_at')
         ->take(10)
         ->get();
+
+    // Capacity calculation
+    $maxCapacity = \App\Models\CapacitySetting::whereNull('tanggal')->value('kapasitas_maks_pax') ?? 1000;
+    $paxToday = \App\Models\Pesanan::whereIn('status_pesanan', ['menunggu_validasi', 'disetujui'])
+        ->whereDate('tgl_acara', now()->toDateString())
+        ->sum('jumlah_pax');
+    $capacityPctToday = $maxCapacity > 0 ? min(round(($paxToday / $maxCapacity) * 100), 100) : 0;
+    $sisaKapasitasToday = max(0, $maxCapacity - $paxToday);
+
+    // Weekly sales (revenue per day for the current week)
+    $daysOfWeek = [
+        'Mon' => 0, 'Tue' => 0, 'Wed' => 0, 'Thu' => 0, 'Fri' => 0, 'Sat' => 0, 'Sun' => 0
+    ];
+    $startOfWeek = now()->startOfWeek();
+    $endOfWeek = now()->endOfWeek();
+
+    $ordersThisWeek = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'dibatalkan', 'ditolak'])
+        ->whereBetween('tgl_pesan', [$startOfWeek, $endOfWeek])
+        ->get();
+
+    foreach ($ordersThisWeek as $order) {
+        $dayName = $order->tgl_pesan->format('D');
+        // Map to Mon-Sun
+        if (isset($daysOfWeek[$dayName])) {
+            $daysOfWeek[$dayName] += $order->total_harga;
+        }
+    }
+
+    $maxWeeklyRevenue = max($daysOfWeek);
+    $weeklyPercentages = [];
+    foreach ($daysOfWeek as $day => $rev) {
+        $weeklyPercentages[$day] = $maxWeeklyRevenue > 0 ? round(($rev / $maxWeeklyRevenue) * 100) : 0;
+    }
 
     return view('penjual.dashboard', compact(
         'totalOrdersCount',
         'totalRevenueSum',
         'pendingPaymentsCount',
         'todayDeliveriesCount',
-        'recentOrders'
+        'recentOrders',
+        'capacityPctToday',
+        'sisaKapasitasToday',
+        'maxCapacity',
+        'paxToday',
+        'daysOfWeek',
+        'weeklyPercentages'
     ));
 })->middleware(['auth'])->name('penjual.dashboard');
 
@@ -265,14 +318,15 @@ Route::get('/penjual/packages', function () {
 })->middleware(['auth'])->name('penjual.packages');
 
 Route::get('/penjual/orders', function () {
-    $orders = \App\Models\Pesanan::with(['user', 'pesananPaket.paket', 'pembayarans', 'pengiriman'])
+    $orders = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'dibatalkan', 'ditolak'])
+        ->with(['user', 'pesananPaket.paket', 'pembayarans', 'pengiriman'])
         ->latest('created_at')
         ->get();
 
     $totalOrders = $orders->count();
     $pendingValidationCount = $orders->where('status_pesanan', 'menunggu_validasi')->count();
     $inPreparationCount = $orders->where('status_produksi', 'diproses')->count();
-    $todayRevenueSum = \App\Models\Pesanan::sum('total_harga');
+    $todayRevenueSum = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'dibatalkan', 'ditolak'])->sum('total_harga');
 
     return view('penjual.orders', compact(
         'orders',
@@ -323,24 +377,153 @@ Route::post('/penjual/orders/{pesanan}/validasi-action', function (\App\Models\P
     return redirect()->back();
 })->middleware(['auth'])->name('penjual.orders.validasi.action');
 
-Route::get('/penjual/reports', function () {
-    $transactions = \App\Models\Pesanan::with(['user', 'pesananPaket.paket', 'pembayarans', 'pengiriman'])
-        ->latest('created_at')
-        ->get();
+Route::post('/penjual/orders/{pesanan}/update-status', function (\App\Models\Pesanan $pesanan, \Illuminate\Http\Request $request) {
+    $stage = $request->input('stage');
 
-    $totalSalesSum = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'ditolak'])->sum('total_harga');
-    $totalOrdersCount = $transactions->count();
+    $currentStatus = strtolower($pesanan->status_pesanan);
+    $currentProdStatus = strtolower($pesanan->status_produksi);
+    $currentShipStatus = $pesanan->pengiriman ? strtolower($pesanan->pengiriman->status_pengiriman) : 'belum_dikirim';
+
+    // 0. Jika status saat ini adalah "Selesai" (selesai)
+    if ($currentStatus === 'selesai') {
+        return response()->json([
+            'success' => false,
+            'message' => 'Status pesanan yang sudah Selesai tidak dapat diubah kembali!'
+        ], 422);
+    }
+
+    // 1. Jika status saat ini adalah "Di Masak" (diproses)
+    if ($currentProdStatus === 'diproses') {
+        if (in_array($stage, ['menunggu_validasi', 'dikonfirmasi'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Status tidak dapat dikembalikan ke status sebelumnya setelah masuk proses memasak (Di Masak).'
+            ], 422);
+        }
+    }
+
+    // 2. Jika status saat ini adalah "Di Kirim" (dikirim)
+    if ($currentShipStatus === 'dikirim') {
+        if (in_array($stage, ['menunggu_validasi', 'dikonfirmasi', 'di_masak'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Status tidak dapat dikembalikan ke status sebelumnya setelah pesanan dalam proses pengiriman (Di Kirim).'
+            ], 422);
+        }
+    }
+
+    if ($stage === 'dikonfirmasi') {
+        $pesanan->update([
+            'status_pesanan' => 'disetujui',
+        ]);
+    } elseif ($stage === 'di_masak') {
+        $pesanan->update([
+            'status_pesanan' => 'disetujui',
+            'status_produksi' => 'diproses',
+        ]);
+    } elseif ($stage === 'di_antar') {
+        $pesanan->update([
+            'status_pesanan' => 'disetujui',
+            'status_produksi' => 'selesai',
+        ]);
+        $pesanan->pengiriman()->updateOrCreate(
+            ['pesanan_id' => $pesanan->id],
+            [
+                'alamat_tujuan' => $pesanan->alamat_pengiriman,
+                'status_pengiriman' => 'dikirim',
+                'waktu_berangkat' => now(),
+            ]
+        );
+    } elseif ($stage === 'selesai') {
+        $hasPelunasanPaid = $pesanan->pembayarans
+            ? $pesanan->pembayarans->contains(fn($p) => $p->jenis_pembayaran === 'pelunasan' && in_array(strtolower($p->status_bayar), ['diverifikasi', 'lunas', 'settlement', 'success']))
+            : false;
+
+        if (!$hasPelunasanPaid) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Status tidak dapat diubah menjadi Selesai karena sisa pelunasan belum dibayar/diverifikasi!'
+            ], 422);
+        }
+
+        $pesanan->update([
+            'status_pesanan' => 'selesai',
+            'status_produksi' => 'selesai',
+        ]);
+        $pesanan->pengiriman()->updateOrCreate(
+            ['pesanan_id' => $pesanan->id],
+            [
+                'alamat_tujuan' => $pesanan->alamat_pengiriman,
+                'status_pengiriman' => 'sampai',
+                'waktu_tiba' => now(),
+            ]
+        );
+    } elseif ($stage === 'batal') {
+        $pesanan->update([
+            'status_pesanan' => 'ditolak',
+        ]);
+    } else { // menunggu_validasi
+        $pesanan->update([
+            'status_pesanan' => 'menunggu_validasi',
+            'status_produksi' => 'belum_diproses',
+        ]);
+        if ($pesanan->pengiriman) {
+            $pesanan->pengiriman->update(['status_pengiriman' => 'belum_dikirim']);
+        }
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Status pesanan berhasil diperbarui!',
+        'pesanan' => $pesanan->fresh(['pengiriman'])
+    ]);
+})->middleware(['auth'])->name('penjual.orders.update-status');
+
+Route::get('/penjual/reports', function () {
+    $transactions = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'dibatalkan', 'ditolak'])
+        ->with(['user', 'pesananPaket.paket', 'pembayarans', 'pengiriman'])
+        ->latest('created_at')
+        ->paginate(10);
+
+    $totalSalesSum = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'dibatalkan', 'ditolak'])->sum('total_harga');
+    $totalOrdersCount = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'dibatalkan', 'ditolak'])->count();
     $avgOrderValue = $totalOrdersCount > 0 ? round($totalSalesSum / $totalOrdersCount) : 0;
 
     $popularPaket = \App\Models\Paket::withCount('pesananPaket')->orderBy('pesanan_paket_count', 'desc')->first();
     $popularPaketName = $popularPaket ? $popularPaket->nm_paket : 'Royal Wedding Buffet';
+
+    // Calculate real monthly revenue for the last 6 months
+    $monthlyGrowth = [];
+    $maxMonthlyRevenue = 0;
+
+    for ($i = 5; $i >= 0; $i--) {
+        $date = now()->subMonths($i);
+        $monthName = $date->translatedFormat('M');
+
+        $sum = (float) \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'ditolak'])
+            ->whereYear('tgl_pesan', $date->year)
+            ->whereMonth('tgl_pesan', $date->month)
+            ->sum('total_harga');
+
+        if ($sum > $maxMonthlyRevenue) {
+            $maxMonthlyRevenue = $sum;
+        }
+
+        $monthlyGrowth[] = [
+            'month' => strtoupper($monthName),
+            'revenue' => $sum,
+            'is_current' => ($i === 0),
+        ];
+    }
 
     return view('penjual.reports', compact(
         'transactions',
         'totalSalesSum',
         'totalOrdersCount',
         'avgOrderValue',
-        'popularPaketName'
+        'popularPaketName',
+        'monthlyGrowth',
+        'maxMonthlyRevenue'
     ));
 })->middleware(['auth'])->name('penjual.reports');
 

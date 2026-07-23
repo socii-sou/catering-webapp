@@ -70,59 +70,69 @@
             <!-- 2-Column Lauk Cards Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                 @php
-                    $sampleLauks = [
-                        [
-                            'id' => 3,
-                            'name' => 'Rendang Daging Sapi',
-                            'desc' => 'Dimasak 8 jam dengan bumbu rempah otentik.',
-                            'img' => 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=200',
-                            'checked' => true
-                        ],
-                        [
-                            'id' => 1,
-                            'name' => 'Ayam Goreng Serundeng',
-                            'desc' => 'Ayam pejantan gurih dengan taburan kelapa.',
-                            'img' => 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&q=80&w=200',
-                            'checked' => true
-                        ],
-                        [
-                            'id' => 5,
-                            'name' => 'Empal Gepuk',
-                            'desc' => 'Daging empuk dengan rasa manis gurih meresap.',
-                            'img' => 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=200',
-                            'checked' => false
-                        ],
-                        [
-                            'id' => 17,
-                            'name' => 'Ikan Bakar Rica',
-                            'desc' => 'Fillet ikan kakap segar dengan sambal rica pedas.',
-                            'img' => 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=200',
-                            'checked' => false
-                        ]
-                    ];
+                    $displayLauks = [];
 
-                    if(isset($lauks) && $lauks->count() > 0) {
-                        $dbLauks = [];
-                        foreach($lauks->take(4) as $idx => $l) {
+                    if (isset($lauks) && $lauks->count() > 0) {
+                        foreach ($lauks as $idx => $l) {
                             $lName = strtolower($l->nama_lauk);
                             $img = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=200';
-                            if (str_contains($lName, 'ayam')) $img = 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&q=80&w=200';
-                            elseif (str_contains($lName, 'empal')) $img = 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=200';
-                            elseif (str_contains($lName, 'ikan')) $img = 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=200';
-                            
-                            $dbLauks[] = [
+                            if (str_contains($lName, 'ayam')) {
+                                $img = 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&q=80&w=200';
+                            } elseif (str_contains($lName, 'sate')) {
+                                $img = 'https://images.unsplash.com/photo-1529563023403-f38b299a9a3b?auto=format&fit=crop&q=80&w=200';
+                            } elseif (str_contains($lName, 'rendang') || str_contains($lName, 'sapi') || str_contains($lName, 'empal') || str_contains($lName, 'daging') || str_contains($lName, 'semur') || str_contains($lName, 'dendeng')) {
+                                $img = 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=200';
+                            } elseif (str_contains($lName, 'ikan')) {
+                                $img = 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=200';
+                            } elseif (str_contains($lName, 'udang') || str_contains($lName, 'cumi')) {
+                                $img = 'https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&q=80&w=200';
+                            } elseif (str_contains($lName, 'telur')) {
+                                $img = 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=200';
+                            }
+
+                            $displayLauks[] = [
                                 'id' => $l->id,
                                 'name' => $l->nama_lauk,
-                                'desc' => !empty($l->keterangan) ? $l->keterangan : 'Pilihan lauk Nusantara dengan cita rasa khas gurih.',
+                                'desc' => !empty($l->keterangan) ? $l->keterangan : 'Pilihan lauk Nusantara dengan cita rasa gurih meresap.',
                                 'img' => $img,
                                 'checked' => $idx < $paket->jumlah_lauk_pilihan
                             ];
                         }
-                        if (count($dbLauks) >= 2) $sampleLauks = $dbLauks;
+                    } else {
+                        $displayLauks = [
+                            [
+                                'id' => 3,
+                                'name' => 'Rendang Daging Sapi',
+                                'desc' => 'Dimasak 8 jam dengan bumbu rempah otentik.',
+                                'img' => 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=200',
+                                'checked' => true
+                            ],
+                            [
+                                'id' => 1,
+                                'name' => 'Ayam Goreng Serundeng',
+                                'desc' => 'Ayam pejantan gurih dengan taburan kelapa.',
+                                'img' => 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&q=80&w=200',
+                                'checked' => true
+                            ],
+                            [
+                                'id' => 5,
+                                'name' => 'Empal Gepuk',
+                                'desc' => 'Daging empuk dengan rasa manis gurih meresap.',
+                                'img' => 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=200',
+                                'checked' => false
+                            ],
+                            [
+                                'id' => 17,
+                                'name' => 'Ikan Bakar Rica',
+                                'desc' => 'Fillet ikan kakap segar dengan sambal rica pedas.',
+                                'img' => 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=200',
+                                'checked' => false
+                            ]
+                        ];
                     }
                 @endphp
 
-                @foreach($sampleLauks as $lItem)
+                @foreach($displayLauks as $lItem)
                     <div onclick="toggleLaukCard(this, {{ $paket->jumlah_lauk_pilihan }})" 
                          data-lauk-id="{{ $lItem['id'] }}"
                          class="lauk-card p-3 bg-white rounded-2xl border @if($lItem['checked']) active-lauk-card border-[#2D5A27] @else border-gray-200 @endif relative shadow-sm hover:shadow-md transition-all cursor-pointer select-none flex items-center gap-3">

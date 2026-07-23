@@ -6,15 +6,15 @@
 <!-- TOP HEADER BAR & SEARCH -->
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div>
-        <h1 class="text-3xl font-extrabold font-serif text-gray-900 tracking-tight">Order Management</h1>
-        <p class="text-xs text-gray-500 font-light mt-1">Review and manage all incoming catering requests.</p>
+        <h1 class="text-3xl font-extrabold font-serif text-gray-900 tracking-tight">Manajemen Pesanan</h1>
+        <p class="text-xs text-gray-500 font-light mt-1">Kelola dan pantau seluruh pesanan catering yang masuk.</p>
     </div>
 
     <!-- Search Input & Filter Icon -->
     <div class="flex items-center gap-3">
         <div class="relative w-64">
             <span class="absolute inset-y-0 left-3.5 flex items-center text-gray-400 text-sm">🔍</span>
-            <input type="text" id="orderSearchInput" onkeyup="filterOrdersTable()" placeholder="Search orders..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium focus:outline-none focus:border-[#2D5A27] shadow-2xs">
+            <input type="text" id="orderSearchInput" onkeyup="filterOrdersTable()" placeholder="Cari pesanan..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium focus:outline-none focus:border-[#2D5A27] shadow-2xs">
         </div>
         <button type="button" class="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors shadow-2xs cursor-pointer">
             ⚡
@@ -24,54 +24,60 @@
 
 <!-- 4 METRIC SUMMARY CARDS GRID -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-    <!-- Card 1: TOTAL ORDERS -->
+    <!-- Card 1: TOTAL PESANAN -->
     <div class="bg-white rounded-3xl p-5 border border-[#E5E5DC] shadow-xs space-y-2 hover:shadow-md transition-all">
-        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">TOTAL ORDERS</span>
+        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">TOTAL PESANAN</span>
         <div class="flex items-center justify-between">
             <div class="text-3xl font-extrabold font-serif text-gray-900">
-                {{ $totalOrders > 0 ? $totalOrders : 128 }}
+                {{ $totalOrders }}
             </div>
             <span class="text-xs font-bold text-green-600 flex items-center gap-0.5">
-                <span>↗</span> +12%
+                <span>📦</span> Semua Pesanan
             </span>
         </div>
     </div>
 
-    <!-- Card 2: PENDING VALIDATION -->
+    <!-- Card 2: MENUNGGU VALIDASI -->
     <div class="bg-white rounded-3xl p-5 border border-[#E5E5DC] shadow-xs space-y-2 hover:shadow-md transition-all">
-        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">PENDING VALIDATION</span>
+        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">MENUNGGU VALIDASI</span>
         <div class="flex items-center justify-between">
             <div class="text-3xl font-extrabold font-serif text-gray-900">
-                {{ $pendingValidationCount > 0 ? $pendingValidationCount : 14 }}
+                {{ $pendingValidationCount }}
             </div>
-            <span class="px-2 py-0.5 rounded-md bg-red-100 text-red-600 text-[10px] font-extrabold tracking-wider uppercase">
-                URGENT
-            </span>
+            @if($pendingValidationCount > 0)
+                <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 text-[10px] font-extrabold tracking-wider uppercase">
+                    PERLU TINDAKAN
+                </span>
+            @else
+                <span class="px-2 py-0.5 rounded-md bg-green-100 text-green-700 text-[10px] font-extrabold tracking-wider uppercase">
+                    TERVALIDASI
+                </span>
+            @endif
         </div>
     </div>
 
-    <!-- Card 3: IN PREPARATION -->
+    <!-- Card 3: SEDANG DIPROSES -->
     <div class="bg-white rounded-3xl p-5 border border-[#E5E5DC] shadow-xs space-y-2 hover:shadow-md transition-all">
-        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">IN PREPARATION</span>
+        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">SEDANG DIPROSES</span>
         <div class="flex items-center justify-between">
             <div class="text-3xl font-extrabold font-serif text-gray-900">
-                {{ $inPreparationCount > 0 ? $inPreparationCount : 32 }}
+                {{ $inPreparationCount }}
             </div>
             <span class="text-[11px] font-medium text-gray-500">
-                Kitchen Busy
+                🍳 Dapur Masak
             </span>
         </div>
     </div>
 
-    <!-- Card 4: REVENUE (TODAY) -->
+    <!-- Card 4: TOTAL PENDAPATAN -->
     <div class="bg-white rounded-3xl p-5 border border-[#E5E5DC] shadow-xs space-y-2 hover:shadow-md transition-all">
-        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">REVENUE (TODAY)</span>
+        <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">TOTAL PENDAPATAN</span>
         <div class="flex items-center justify-between">
-            <div class="text-2xl font-extrabold font-serif text-gray-900">
-                Rp {{ $todayRevenueSum > 0 ? number_format($todayRevenueSum / 1000000, 1) . 'M' : '4.2M' }}
+            <div class="text-xl sm:text-2xl font-extrabold font-serif text-gray-900 truncate">
+                Rp {{ number_format($todayRevenueSum, 0, ',', '.') }}
             </div>
-            <span class="text-[11px] font-bold text-green-600">
-                Target Met
+            <span class="text-[11px] font-bold text-green-600 shrink-0">
+                Omzet Aktif
             </span>
         </div>
     </div>
@@ -103,13 +109,13 @@
         <table class="w-full text-left text-xs">
             <thead>
                 <tr class="bg-[#F8F9F3] text-gray-400 font-bold uppercase tracking-wider text-[10px]">
-                    <th class="py-3 px-4 rounded-l-xl">ORDER ID</th>
-                    <th class="py-3 px-4">CUSTOMER</th>
-                    <th class="py-3 px-4">DATE</th>
-                    <th class="py-3 px-4">TOTAL</th>
-                    <th class="py-3 px-4">PAYMENT STATUS</th>
-                    <th class="py-3 px-4">ORDER STATUS</th>
-                    <th class="py-3 px-4 text-right rounded-r-xl">ACTION</th>
+                    <th class="py-3 px-4 rounded-l-xl">ID PESANAN</th>
+                    <th class="py-3 px-4">PELANGGAN</th>
+                    <th class="py-3 px-4">TANGGAL</th>
+                    <th class="py-3 px-4">TOTAL HARGA</th>
+                    <th class="py-3 px-4">STATUS PEMBAYARAN</th>
+                    <th class="py-3 px-4">STATUS PESANAN</th>
+                    <th class="py-3 px-4 text-right rounded-r-xl">AKSI</th>
                 </tr>
             </thead>
             <tbody id="ordersTableBody" class="divide-y divide-gray-100 font-medium">
@@ -215,11 +221,6 @@
                                 <button type="button" onclick="openUpdateStatusOrderModal({{ $order->id }}, '{{ $statusRaw }}', '{{ $prodStatus }}', '{{ $shipStatus }}')" class="font-bold text-[#2D5A27] hover:text-green-900 hover:underline cursor-pointer">
                                     Update Status
                                 </button>
-
-                                <!-- Action 3: View Detail Icon -->
-                                <a href="{{ route('pesanan.show', $order->id) }}" class="p-1 text-gray-400 hover:text-[#2D5A27] transition-colors" title="View Detail">
-                                    👁️
-                                </a>
                             </div>
                         </td>
                     </tr>
@@ -244,7 +245,6 @@
                         <td class="py-4 px-4 text-right">
                             <div class="flex items-center justify-end gap-3 text-xs">
                                 <button type="button" onclick="openValidasiPembayaranModal(8821, 'Pending')" class="font-bold text-green-700 hover:underline">Validasi Pembayaran</button>
-                                <a href="/pesanan/1" class="p-1 text-gray-400 hover:text-[#2D5A27]">👁️</a>
                             </div>
                         </td>
                     </tr>
@@ -267,7 +267,6 @@
                         <td class="py-4 px-4 text-right">
                             <div class="flex items-center justify-end gap-3 text-xs">
                                 <button type="button" onclick="openUpdateStatusOrderModal(8820, 'disetujui', 'diproses', 'belum_dikirim')" class="font-bold text-[#2D5A27] hover:underline">Update Status</button>
-                                <a href="/pesanan/1" class="p-1 text-gray-400 hover:text-[#2D5A27]">👁️</a>
                             </div>
                         </td>
                     </tr>
@@ -290,7 +289,6 @@
                         <td class="py-4 px-4 text-right">
                             <div class="flex items-center justify-end gap-3 text-xs">
                                 <button type="button" onclick="openUpdateStatusOrderModal(8819, 'disetujui', 'selesai', 'dikirim')" class="font-bold text-[#2D5A27] hover:underline">Update Status</button>
-                                <a href="/pesanan/1" class="p-1 text-gray-400 hover:text-[#2D5A27]">👁️</a>
                             </div>
                         </td>
                     </tr>
@@ -376,9 +374,11 @@
                 <label class="font-bold text-gray-700 block">Status Tahapan Orderan</label>
                 <select id="selectStageOrder" class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 font-medium">
                     <option value="menunggu_validasi">Menunggu Validasi</option>
+                    <option value="dikonfirmasi">Dikonfirmasi (Pesanan Disetujui)</option>
                     <option value="di_masak">Di Masak (Sedang Diproses Dapur)</option>
                     <option value="di_antar">Di Antar (Kurir Sedang Mengirim)</option>
                     <option value="selesai">Selesai (Tiba di Lokasi)</option>
+                    <option value="batal">Dibatalkan / Ditolak</option>
                 </select>
             </div>
 
@@ -391,6 +391,27 @@
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- MODAL 3: ERROR / WARNING NOTIFICATION MODAL -->
+<div id="errorAlertModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-60 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center space-y-5 ambient-shadow border border-gray-100 animate-fade-in">
+        <!-- Warning Icon -->
+        <div class="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto text-3xl border border-red-100">
+            ⚠️
+        </div>
+        
+        <div class="space-y-2">
+            <h3 class="text-xl font-bold font-serif text-gray-900">Peringatan</h3>
+            <p id="errorAlertMessage" class="text-xs text-gray-600 font-light leading-relaxed"></p>
+        </div>
+
+        <div class="pt-2">
+            <button type="button" onclick="closeErrorAlertModal()" class="w-full bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold py-3.5 rounded-xl transition-all cursor-pointer shadow-md text-xs">
+                Mengerti
+            </button>
+        </div>
     </div>
 </div>
 @endsection
@@ -480,10 +501,10 @@
                 window.location.reload();
             } else {
                 const data = await res.json();
-                alert(data.message || 'Gagal mengubah status pembayaran.');
+                showErrorAlert(data.message || 'Gagal mengubah status pembayaran.');
             }
         } catch(err) {
-            alert('Terjadi kesalahan jaringan.');
+            showErrorAlert('Terjadi kesalahan jaringan.');
         }
     }
 
@@ -493,12 +514,16 @@
         document.getElementById('updateOrderCode').innerText = '#ORD-' + String(orderId).padStart(4, '0');
 
         const select = document.getElementById('selectStageOrder');
-        if (shipStatus === 'dikirim') {
+        if (statusRaw === 'ditolak' || statusRaw === 'batal') {
+            select.value = 'batal';
+        } else if (statusRaw === 'selesai' || shipStatus === 'sampai') {
+            select.value = 'selesai';
+        } else if (shipStatus === 'dikirim') {
             select.value = 'di_antar';
         } else if (prodStatus === 'diproses') {
             select.value = 'di_masak';
-        } else if (statusRaw === 'selesai' || shipStatus === 'sampai') {
-            select.value = 'selesai';
+        } else if (statusRaw === 'disetujui' || statusRaw === 'dikonfirmasi') {
+            select.value = 'dikonfirmasi';
         } else {
             select.value = 'menunggu_validasi';
         }
@@ -516,45 +541,36 @@
         const stage = document.getElementById('selectStageOrder').value;
 
         try {
-            if (stage === 'di_masak') {
-                // Set validasi disetujui & produksi diproses
-                await fetch(`/api/penjual/pesanan/${orderId}/validasi`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
-                    body: JSON.stringify({ status_pesanan: 'disetujui' })
-                });
-                await fetch(`/api/penjual/pesanan/${orderId}/produksi`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
-                    body: JSON.stringify({ status_produksi: 'diproses' })
-                });
-            } else if (stage === 'di_antar') {
-                // Set pengiriman dikirim
-                await fetch(`/api/penjual/pesanan/${orderId}/pengiriman`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
-                    body: JSON.stringify({ status_pengiriman: 'dikirim' })
-                });
-            } else if (stage === 'selesai') {
-                // Set pengiriman sampai & pesanan selesai
-                await fetch(`/api/penjual/pesanan/${orderId}/pengiriman`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
-                    body: JSON.stringify({ status_pengiriman: 'sampai' })
-                });
-            } else {
-                // Reset to menunggu validasi
-                await fetch(`/api/penjual/pesanan/${orderId}/validasi`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
-                    body: JSON.stringify({ status_pesanan: 'menunggu_validasi' })
-                });
-            }
+            const res = await fetch(`/penjual/orders/${orderId}/update-status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ stage: stage })
+            });
 
-            window.location.reload();
+            const data = await res.json();
+            if (res.ok && data.success) {
+                window.location.reload();
+            } else {
+                showErrorAlert(data.message || 'Gagal mengupdate status order.');
+            }
         } catch(err) {
-            alert('Gagal mengupdate status order.');
+            showErrorAlert('Terjadi kesalahan saat mengupdate status order.');
         }
+    }
+
+    function showErrorAlert(message) {
+        closeUpdateStatusOrderModal();
+        closeValidasiPembayaranModal();
+        document.getElementById('errorAlertMessage').innerText = message;
+        document.getElementById('errorAlertModal').classList.remove('hidden');
+    }
+
+    function closeErrorAlertModal() {
+        document.getElementById('errorAlertModal').classList.add('hidden');
     }
 </script>
 @endsection

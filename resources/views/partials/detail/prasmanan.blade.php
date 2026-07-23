@@ -321,7 +321,7 @@
                         <span id="detailSubtotal">Rp {{ number_format($hargaAwal * 20, 0, ',', '.') }}</span>
                     </div>
                     <div id="summaryGubukanRow" class="hidden flex justify-between text-gray-600 font-light">
-                        <span>Tambahan Gubukan</span>
+                        <span id="summaryGubukanLabel">Tambahan Gubukan</span>
                         <span id="summaryGubukanValue" class="text-gray-900 font-medium">Rp 0</span>
                     </div>
                     <div class="flex justify-between text-gray-600 font-light">

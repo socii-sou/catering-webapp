@@ -98,44 +98,39 @@
                                 </div>
                                 <div class="flex items-center gap-2">
                                     @php
-                                        $statusColors = [
-                                            'menunggu_validasi' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
-                                            'disetujui' => 'bg-blue-100 text-blue-700 border-blue-200',
-                                            'ditolak' => 'bg-red-100 text-red-700 border-red-200',
-                                            'selesai' => 'bg-green-100 text-green-700 border-green-200',
-                                        ];
-                                        $statusLabel = [
-                                            'menunggu_validasi' => 'Menunggu Validasi',
-                                            'disetujui' => 'Disetujui',
-                                            'ditolak' => 'Ditolak',
-                                            'selesai' => 'Selesai',
-                                        ];
-                                        $statusClass = $statusColors[$order->status_pesanan] ?? 'bg-gray-100 text-gray-700 border-gray-200';
-                                        $statusTxt = $statusLabel[$order->status_pesanan] ?? $order->status_pesanan;
+                                         $statusColors = [
+                                             'menunggu_validasi' => 'bg-amber-100 text-amber-800 border-amber-200',
+                                             'disetujui' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                                             'dikonfirmasi' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                                             'ditolak' => 'bg-red-100 text-red-700 border-red-200',
+                                             'batal' => 'bg-red-100 text-red-700 border-red-200',
+                                             'selesai' => 'bg-green-100 text-green-700 border-green-200',
+                                         ];
+                                         $statusLabel = [
+                                             'menunggu_validasi' => 'Menunggu Validasi',
+                                             'disetujui' => 'Dikonfirmasi',
+                                             'dikonfirmasi' => 'Dikonfirmasi',
+                                             'ditolak' => 'Ditolak',
+                                             'batal' => 'Dibatalkan',
+                                             'selesai' => 'Selesai',
+                                         ];
+                                         $statusClass = $statusColors[$order->status_pesanan] ?? 'bg-gray-100 text-gray-700 border-gray-200';
+                                         $statusTxt = $statusLabel[$order->status_pesanan] ?? $order->status_pesanan;
+
+                                         $prodStatus = strtolower($order->status_produksi ?? 'belum_diproses');
+                                         $shipStatus = $order->pengiriman ? strtolower($order->pengiriman->status_pengiriman) : 'belum_dikirim';
                                     @endphp
                                     <span class="text-[10px] font-bold py-1 px-2.5 rounded-full border {{ $statusClass }}">
                                         {{ $statusTxt }}
                                     </span>
 
-                                    @php
-                                        $prodColors = [
-                                            'belum_diproses' => 'bg-stone-100 text-stone-600 border-stone-200',
-                                            'sedang_dimasak' => 'bg-indigo-100 text-indigo-700 border-indigo-200',
-                                            'siap_diantar' => 'bg-amber-100 text-amber-700 border-amber-200',
-                                            'selesai' => 'bg-green-100 text-green-700 border-green-200',
-                                        ];
-                                        $prodLabel = [
-                                            'belum_diproses' => 'Belum Diproses',
-                                            'sedang_dimasak' => 'Sedang Dimasak',
-                                            'siap_diantar' => 'Siap Diantar',
-                                            'selesai' => 'Pengiriman Selesai',
-                                        ];
-                                        $prodClass = $prodColors[$order->status_produksi] ?? 'bg-gray-100 text-gray-600 border-gray-200';
-                                        $prodTxt = $prodLabel[$order->status_produksi] ?? $order->status_produksi;
-                                    @endphp
-                                    @if($order->status_pesanan === 'disetujui' || $order->status_pesanan === 'selesai')
-                                        <span class="text-[10px] font-bold py-1 px-2.5 rounded-full border {{ $prodClass }}">
-                                            🍳 {{ $prodTxt }}
+                                    @if($shipStatus === 'dikirim')
+                                        <span class="text-[10px] font-bold py-1 px-2.5 rounded-full border bg-purple-100 text-purple-800 border-purple-200">
+                                            🚚 Di Antar (Kurir)
+                                        </span>
+                                    @elseif($prodStatus === 'diproses')
+                                        <span class="text-[10px] font-bold py-1 px-2.5 rounded-full border bg-indigo-100 text-indigo-800 border-indigo-200">
+                                            🍳 Di Masak (Dapur)
                                         </span>
                                     @endif
                                 </div>

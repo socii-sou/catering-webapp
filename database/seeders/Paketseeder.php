@@ -20,7 +20,7 @@ class PaketSeeder extends Seeder
             [
                 'nm_paket' => 'Prasmanan',
                 'harga_paket' => 65000,
-                'jumlah_lauk_pilihan' => 4,
+                'jumlah_lauk_pilihan' => 5,
                 'deskripsi' => 'Pilihan tepat untuk pesta pernikahan, reuni, atau acara besar keluarga dengan variasi menu terlengkap.',
                 'status_aktif' => true,
             ],

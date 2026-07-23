@@ -1,9 +1,6 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Katalog\GubukanController as KatalogGubukanController;
-use App\Http\Controllers\Katalog\KategoriController;
-use App\Http\Controllers\Katalog\PaketController as KatalogPaketController;
 use App\Http\Controllers\Pelanggan\PesananController as PelangganPesananController;
 use App\Http\Controllers\Pelanggan\ReviewController as PelangganReviewController;
 use App\Http\Controllers\PembayaranController;
@@ -30,19 +27,6 @@ Route::post('/login', [AuthController::class, 'login']);
 |--------------------------------------------------------------------------
 */
 Route::get('/reviews', [ReviewController::class, 'index']);
-
-/*
-|--------------------------------------------------------------------------
-| Katalog (publik) -- browsing produk sebelum pelanggan login/checkout
-|--------------------------------------------------------------------------
-*/
-Route::prefix('katalog')->group(function () {
-    Route::get('/kategori-produk', [KategoriController::class, 'kategoriProduk']);
-    Route::get('/kategori-lauk', [KategoriController::class, 'kategoriLauk']);
-    Route::get('/pakets', [KatalogPaketController::class, 'index']);
-    Route::get('/pakets/{paket}', [KatalogPaketController::class, 'show']);
-    Route::get('/gubukans', [KatalogGubukanController::class, 'index']);
-});
 
 /*
 |--------------------------------------------------------------------------
