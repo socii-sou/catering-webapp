@@ -156,6 +156,38 @@ Route::get('/pesanan/{pesanan}', function (\App\Models\Pesanan $pesanan) {
         abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
     }
 
+    // Sinkronisasi status pembayaran pending langsung ke Midtrans sebelum merender halaman
+    $pendingPembayarans = $pesanan->pembayarans()->where('status_bayar', 'pending')->get();
+    if ($pendingPembayarans->isNotEmpty()) {
+        $midtrans = app(\App\Services\MidtransService::class);
+        foreach ($pendingPembayarans as $pembayaran) {
+            $statusData = $midtrans->getTransactionStatus($pembayaran->transaction_id);
+            if ($statusData) {
+                $transactionStatus = $statusData['transaction_status'] ?? '';
+                $fraudStatus = $statusData['fraud_status'] ?? '';
+
+                $statusBayar = match (true) {
+                    $transactionStatus === 'capture' && $fraudStatus === 'accept' => ($pembayaran->jenis_pembayaran === 'dp' ? 'diverifikasi' : 'lunas'),
+                    $transactionStatus === 'settlement' => ($pembayaran->jenis_pembayaran === 'dp' ? 'diverifikasi' : 'lunas'),
+                    in_array($transactionStatus, ['deny', 'cancel', 'expire']) => 'gagal',
+                    $transactionStatus === 'pending' => 'pending',
+                    default => $pembayaran->status_bayar,
+                };
+
+                if ($statusBayar !== $pembayaran->status_bayar) {
+                    $pembayaran->update(['status_bayar' => $statusBayar]);
+                    if ($statusBayar === 'lunas') {
+                        $pesanan->update(['status_pesanan' => 'selesai']);
+                    } elseif ($statusBayar === 'diverifikasi') {
+                        if (in_array($pesanan->status_pesanan, ['menunggu_validasi', 'pending'])) {
+                            $pesanan->update(['status_pesanan' => 'dikonfirmasi']);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     $pesanan->load([
         'pesananPaket.paket',
         'pesananPaket.lauks.lauk',

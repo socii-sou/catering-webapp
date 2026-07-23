@@ -89,4 +89,28 @@ class MidtransService
 
         return hash_equals($expected, (string) $signatureKey);
     }
+
+    /**
+     * Dapatkan status transaksi langsung dari API Midtrans.
+     */
+    public function getTransactionStatus(string $transactionId): ?array
+    {
+        $apiBaseUrl = config('services.midtrans.is_production')
+            ? 'https://api.midtrans.com/v2'
+            : 'https://api.sandbox.midtrans.com/v2';
+
+        try {
+            $response = Http::withBasicAuth($this->serverKey, '')
+                ->acceptJson()
+                ->get("{$apiBaseUrl}/{$transactionId}/status");
+
+            if ($response->successful()) {
+                return $response->json();
+            }
+        } catch (\Exception $e) {
+            // Abaikan error / log jika diperlukan
+        }
+
+        return null;
+    }
 }

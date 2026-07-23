@@ -9,7 +9,7 @@
         <h1 class="text-3xl font-extrabold font-serif text-gray-900 tracking-tight">Kelola Paket & Lauk</h1>
         <p class="text-xs text-gray-500 font-light mt-1">Konfigurasi dan kelola menu catering serta variasi lauk pauk Anda.</p>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2">
         <button type="button" onclick="openCreatePaketModal()" class="bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold py-3 px-5 rounded-xl shadow-md text-xs flex items-center gap-2 transition-all cursor-pointer">
             <span>+</span>
             <span>Tambah Paket Baru</span>

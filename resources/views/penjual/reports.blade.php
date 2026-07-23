@@ -11,7 +11,7 @@
     </div>
 
     <!-- Date Range Selector & PDF Export Button -->
-    <div class="flex items-center gap-3">
+    <div class="flex flex-wrap items-center gap-3">
         <div class="relative">
             <select id="reportDateRange" class="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 pr-8 text-xs font-bold text-gray-700 shadow-2xs focus:outline-none focus:border-[#2D5A27] cursor-pointer">
                 <option value="oct">📅 Bulan Ini (Aktif)</option>
