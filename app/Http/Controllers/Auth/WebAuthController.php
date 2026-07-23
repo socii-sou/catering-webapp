@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Mail\WelcomeMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class WebAuthController extends Controller
@@ -106,6 +108,12 @@ class WebAuthController extends Controller
         ]);
 
         Auth::login($user);
+
+        try {
+            Mail::to($user->email)->send(new WelcomeMail($user));
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return redirect('/')->with('status', 'Registrasi berhasil! Anda telah otomatis masuk.');
     }

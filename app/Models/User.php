@@ -18,6 +18,8 @@ class User extends Authenticatable
         'role',
         'no_telp',
         'alamat',
+        'google_id',
+        'avatar',
     ];
 
     protected $hidden = [
@@ -63,5 +65,18 @@ class User extends Authenticatable
     public function isPelanggan(): bool
     {
         return $this->role === 'pelanggan';
+    }
+
+    public function getAvatarUrlAttribute(): string
+    {
+        if (empty($this->avatar)) {
+            return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=2D5A27&color=ffffff&bold=true';
+        }
+
+        if (str_starts_with($this->avatar, 'http://') || str_starts_with($this->avatar, 'https://')) {
+            return $this->avatar;
+        }
+
+        return asset('storage/' . $this->avatar);
     }
 }

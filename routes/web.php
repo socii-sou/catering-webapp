@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\WebAuthController;
+use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\ProfileController;
 use App\Models\Paket;
 use App\Models\Review;
 use App\Models\Lauk;
@@ -19,16 +21,39 @@ Route::get('/', function () {
     return view('welcome', compact('pakets', 'reviews', 'lauks', 'gubukans', 'myOrders'));
 });
 
+Route::get('/test-welcome-email', function () {
+    $dummyUser = new \App\Models\User();
+    $dummyUser->name = 'Ilham Prabu Zaky';
+    $dummyUser->email = 'ilhamprabuzakys@gmail.com';
+
+    try {
+        \Illuminate\Support\Facades\Mail::to('ilhamprabuzakys@gmail.com')->send(new \App\Mail\WelcomeMail($dummyUser));
+        return 'Email selamat datang berhasil dikirim ke ilhamprabuzakys@gmail.com!';
+    } catch (\Throwable $e) {
+        return 'Gagal mengirim email: ' . $e->getMessage();
+    }
+});
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [WebAuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [WebAuthController::class, 'login']);
     Route::get('/register', [WebAuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [WebAuthController::class, 'register']);
+
+    // Google OAuth Routes
+    Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google.redirect');
+    Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 });
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
-    
+
+    // Rute Pengaturan & Profil Pelanggan
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
     // Rute pemesanan via web landing page
     Route::post('/pesanan', function (StorePesananRequest $request, PesananService $pesananService) {
         try {
@@ -207,7 +232,7 @@ Route::get('/pesanan/{pesanan}/review', function (\App\Models\Pesanan $pesanan) 
     if ($pesanan->user_id !== auth()->id()) {
         abort(403);
     }
-    
+
     if ($pesanan->status_pesanan !== 'selesai') {
         return redirect()->route('pesanan.show', $pesanan->id)->with('error', 'Anda hanya bisa memberikan ulasan setelah pesanan selesai.');
     }
@@ -266,7 +291,7 @@ Route::post('/pesanan/{pesanan}/bayar', [\App\Http\Controllers\PembayaranControl
 Route::get('/penjual/dashboard', function () {
     $totalOrdersCount = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'dibatalkan', 'ditolak'])->count();
     $totalRevenueSum = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'dibatalkan', 'ditolak'])->sum('total_harga');
-    
+
     // Count orders with pending validation status
     $pendingPaymentsCount = \App\Models\Pesanan::where('status_pesanan', 'menunggu_validasi')->count();
 

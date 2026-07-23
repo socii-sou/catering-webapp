@@ -32,4 +32,10 @@ return [
         'dp_percentage' => env('MIDTRANS_DP_PERCENTAGE', 50),
     ],
 
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
 ];
