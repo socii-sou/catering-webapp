@@ -137,9 +137,8 @@
 
     <!-- Social Login Button -->
     <div class="mt-6 flex justify-center">
-        <button 
-            type="button" 
-            onclick="mockGoogleLogin()"
+        <a 
+            href="{{ route('auth.google.redirect') }}"
             class="w-full flex items-center justify-center py-3 px-4 border border-stone-200 rounded-xl bg-white hover:bg-stone-50 active:bg-stone-100 transition-colors shadow-xs text-stone-700 font-semibold text-xs cursor-pointer"
         >
             <!-- Google Logo SVG -->
@@ -150,7 +149,7 @@
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
             </svg>
             Lanjutkan dengan Google
-        </button>
+        </a>
     </div>
 
 </div>
@@ -160,7 +159,7 @@
     &copy; 2024 RASACI. Seluruh hak cipta dilindungi.
 </div>
 
-<!-- Tiny script for password visibility toggle and Google login mock -->
+<!-- Tiny script for password visibility toggle -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const toggleBtn = document.getElementById('toggle-password');
@@ -183,29 +182,5 @@
             }
         });
     });
-
-    function mockGoogleLogin() {
-        alert("[GOOGLE LOGIN] Menghubungkan ke Google Account...\nBerhasil masuk sebagai Budi Santoso!");
-        const payload = {
-            login: 'budi@example.test',
-            password: 'password'
-        };
-        fetch('{{ route("login") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify(payload)
-        })
-        .then(response => {
-            if (response.ok) {
-                window.location.href = '/';
-            } else {
-                alert("Gagal melakukan login otomatis.");
-            }
-        });
-    }
 </script>
 @endsection
