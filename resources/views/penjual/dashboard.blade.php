@@ -24,13 +24,17 @@
             <div class="text-3xl font-extrabold font-serif text-gray-900">
                 {{ number_format($totalOrdersCount, 0, ',', '.') }}
             </div>
-            <div class="flex items-center gap-1 text-xs font-bold text-green-600">
-                <span>📦</span>
+            <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
+                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                </svg>
                 <span>Semua Pesanan Aktif</span>
             </div>
         </div>
         <div class="w-12 h-12 rounded-2xl bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center text-xl shrink-0">
-            🛍️
+            <svg class="w-6 h-6 text-[#2D5A27]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
         </div>
     </div>
 
@@ -41,13 +45,17 @@
             <div class="text-xl sm:text-2xl font-extrabold font-serif text-gray-900 truncate">
                 Rp {{ number_format($totalRevenueSum, 0, ',', '.') }}
             </div>
-            <div class="flex items-center gap-1 text-xs font-bold text-green-600">
-                <span>💵</span>
+            <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
+                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
                 <span>Total Omzet Aktif</span>
             </div>
         </div>
         <div class="w-12 h-12 rounded-2xl bg-[#EBF5E8] text-[#2D5A27] flex items-center justify-center text-xl shrink-0">
-            💳
+            <svg class="w-6 h-6 text-[#2D5A27]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
         </div>
     </div>
 
@@ -58,25 +66,27 @@
             <div class="text-3xl font-extrabold font-serif text-gray-900">
                 {{ $pendingPaymentsCount }}
             </div>
-            <div class="flex items-center gap-1 text-xs font-bold {{ $pendingPaymentsCount > 0 ? 'text-amber-600' : 'text-green-600' }}">
-                <span>⏱️</span>
+            <div class="flex items-center gap-1.5 text-xs font-bold {{ $pendingPaymentsCount > 0 ? 'text-amber-600' : 'text-emerald-700' }}">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
                 <span>{{ $pendingPaymentsCount > 0 ? 'Perlu Tindakan Penjual' : 'Semua Tervalidasi' }}</span>
             </div>
         </div>
         <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl shrink-0">
-            📋
+            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+            </svg>
         </div>
     </div>
 </div>
-
-
 
 <!-- BOTTOM SECTION: PESANAN TERBARU TABLE -->
 <div class="bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E5DC] shadow-xs space-y-6">
     <div class="flex justify-between items-center border-b border-gray-100 pb-4">
         <h3 class="text-2xl font-bold font-serif text-gray-900">Pesanan Terbaru</h3>
         <a href="{{ route('penjual.orders') }}" class="text-xs font-bold text-gray-600 hover:text-[#2D5A27] transition-colors">
-            Lihat Semua Pesanan
+            Lihat Semua Pesanan &rarr;
         </a>
     </div>
 
@@ -168,136 +178,4 @@
         </table>
     </div>
 </div>
-@endsection
-
-@section('modals')
-<!-- EDIT STATUS MODAL -->
-<div id="sellerStatusModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-5 ambient-shadow border border-gray-100 animate-fade-in">
-        <div class="flex justify-between items-center pb-3 border-b border-gray-100">
-            <div>
-                <span id="modalEditOrderCode" class="text-xs font-mono font-bold text-gray-500"></span>
-                <h3 class="text-xl font-bold font-serif text-gray-900">Update Status Timeline Pesanan</h3>
-            </div>
-            <button onclick="closeSellerStatusModal()" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
-        </div>
-
-        <form id="sellerStatusForm" onsubmit="submitSellerStatus(event)" class="space-y-4 text-xs">
-            <input type="hidden" id="editOrderId">
-
-            <div class="space-y-1.5">
-                <label class="font-bold text-gray-700 block">1. Status Konfirmasi Pesanan (Validasi)</label>
-                <select id="editStatusPesanan" class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 font-medium">
-                    <option value="menunggu_validasi">Menunggu DP / Validasi</option>
-                    <option value="disetujui">Setujui / Dikonfirmasi</option>
-                    <option value="ditolak">Tolak Pesanan</option>
-                    <option value="batal">Batalkan Pesanan</option>
-                </select>
-            </div>
-
-            <div class="space-y-1.5">
-                <label class="font-bold text-gray-700 block">2. Status Dapur / Produksi</label>
-                <select id="editStatusProduksi" class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 font-medium">
-                    <option value="belum_diproses">Belum Diproses</option>
-                    <option value="diproses">Sedang Diproses (Memasak)</option>
-                    <option value="selesai">Selesai Memasak</option>
-                </select>
-            </div>
-
-            <div class="space-y-1.5">
-                <label class="font-bold text-gray-700 block">3. Status Pengiriman / Shipping Timeline</label>
-                <select id="editStatusPengiriman" class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 font-medium">
-                    <option value="belum_dikirim">Belum Dikirim</option>
-                    <option value="dikirim">Kurir Dikirim (In Transit)</option>
-                    <option value="sampai">Sampai / Pesanan Tiba</option>
-                </select>
-            </div>
-
-            <div class="pt-3 flex gap-2">
-                <button type="submit" id="saveStatusSubmitBtn" class="flex-1 bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold py-3 rounded-xl transition-all cursor-pointer shadow-md">
-                    Simpan Perubahan
-                </button>
-                <button type="button" onclick="closeSellerStatusModal()" class="px-4 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-all cursor-pointer">
-                    Batal
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-@endsection
-
-@section('scripts')
-<script>
-    function openSellerStatusModal(orderId, currentStatus, currentProd, currentShip) {
-        document.getElementById('editOrderId').value = orderId;
-        document.getElementById('modalEditOrderCode').innerText = '#ORD-' + String(orderId).padStart(5, '0');
-        if (currentStatus) document.getElementById('editStatusPesanan').value = currentStatus;
-        if (currentProd) document.getElementById('editStatusProduksi').value = currentProd;
-        if (currentShip) document.getElementById('editStatusPengiriman').value = currentShip;
-        document.getElementById('sellerStatusModal').classList.remove('hidden');
-    }
-
-    function closeSellerStatusModal() {
-        document.getElementById('sellerStatusModal').classList.add('hidden');
-    }
-
-    async function submitSellerStatus(e) {
-        e.preventDefault();
-        const orderId = document.getElementById('editOrderId').value;
-        const statusPesanan = document.getElementById('editStatusPesanan').value;
-        const statusProduksi = document.getElementById('editStatusProduksi').value;
-        const statusPengiriman = document.getElementById('editStatusPengiriman').value;
-
-        const btn = document.getElementById('saveStatusSubmitBtn');
-        if (btn) btn.disabled = true;
-
-        try {
-            // 1. Update Validasi / Status Pesanan
-            const resValidasi = await fetch(`/api/penjual/pesanan/${orderId}/validasi`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ status_pesanan: statusPesanan })
-            });
-            const dataValidasi = await resValidasi.json();
-
-            if (!resValidasi.ok) {
-                const errMsg = dataValidasi.errors?.status_pesanan?.[0] || dataValidasi.message || 'Gagal mengupdate status konfirmasi.';
-                alert(errMsg);
-                if (btn) btn.disabled = false;
-                return;
-            }
-
-            // 2. Update Produksi Dapur
-            await fetch(`/api/penjual/pesanan/${orderId}/produksi`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ status_produksi: statusProduksi })
-            });
-
-            // 3. Update Pengiriman / Shipping Status
-            await fetch(`/api/penjual/pesanan/${orderId}/pengiriman`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ status_pengiriman: statusPengiriman })
-            });
-
-            window.location.reload();
-        } catch (err) {
-            alert('Terjadi kesalahan koneksi.');
-            if (btn) btn.disabled = false;
-        }
-    }
-</script>
 @endsection

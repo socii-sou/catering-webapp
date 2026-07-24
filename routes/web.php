@@ -3,6 +3,9 @@
 use App\Http\Controllers\Auth\WebAuthController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Penjual\PenjualUserController;
+use App\Http\Controllers\Penjual\PenjualProfileController;
+use App\Http\Controllers\Penjual\PenjualReviewController;
 use App\Models\Paket;
 use App\Models\Review;
 use App\Models\Lauk;
@@ -39,6 +42,13 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [WebAuthController::class, 'login']);
     Route::get('/register', [WebAuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [WebAuthController::class, 'register']);
+
+    // Registrasi Alur OTP & Set Password
+    Route::get('/register/verify-otp', [WebAuthController::class, 'showVerifyOtp'])->name('register.otp.show');
+    Route::post('/register/verify-otp', [WebAuthController::class, 'verifyOtp'])->name('register.otp.verify');
+    Route::post('/register/resend-otp', [WebAuthController::class, 'resendOtp'])->name('register.otp.resend');
+    Route::get('/register/set-password', [WebAuthController::class, 'showSetPassword'])->name('register.password.show');
+    Route::post('/register/set-password', [WebAuthController::class, 'setPassword'])->name('register.password.set');
 
     // Google OAuth Routes
     Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google.redirect');
@@ -94,7 +104,6 @@ Route::get('/checkout', function (\Illuminate\Http\Request $request) {
     $paket = \App\Models\Paket::findOrFail($paketId);
 
     $jumlahPax = (int) $request->query('jumlah_pax', 20);
-    $jumlahPaxGubukan = max(100, (int) $request->query('jumlah_pax_gubukan', 100));
     $tglAcara = $request->query('tgl_acara', now()->addDay()->toDateString());
 
     $rawLaukIds = $request->query('lauk_ids');
@@ -109,7 +118,6 @@ Route::get('/checkout', function (\Illuminate\Http\Request $request) {
     return view('checkout', compact(
         'paket',
         'jumlahPax',
-        'jumlahPaxGubukan',
         'tglAcara',
         'laukIds',
         'selectedLauks',
@@ -123,7 +131,6 @@ Route::get('/pembayaran', function (\Illuminate\Http\Request $request) {
     $paket = \App\Models\Paket::findOrFail($paketId);
 
     $jumlahPax = (int) $request->query('jumlah_pax', 20);
-    $jumlahPaxGubukan = max(100, (int) $request->query('jumlah_pax_gubukan', 100));
     $tglAcara = $request->query('tgl_acara', now()->addDay()->toDateString());
 
     $rawLaukIds = $request->query('lauk_ids');
@@ -141,7 +148,6 @@ Route::get('/pembayaran', function (\Illuminate\Http\Request $request) {
     return view('pembayaran', compact(
         'paket',
         'jumlahPax',
-        'jumlahPaxGubukan',
         'tglAcara',
         'laukIds',
         'selectedLauks',
@@ -587,6 +593,24 @@ Route::get('/penjual/reports', function () {
         'maxMonthlyRevenue'
     ));
 })->middleware(['auth'])->name('penjual.reports');
+
+// Rute Manajemen Pengguna Penjual / Admin
+Route::get('/penjual/users', [PenjualUserController::class, 'index'])->middleware(['auth'])->name('penjual.users');
+Route::delete('/penjual/users/{user}', [PenjualUserController::class, 'destroy'])->middleware(['auth'])->name('penjual.users.destroy');
+
+// Rute Pengaturan Profil Penjual / Admin
+Route::get('/penjual/profile', [PenjualProfileController::class, 'edit'])->middleware(['auth'])->name('penjual.profile.edit');
+Route::put('/penjual/profile', [PenjualProfileController::class, 'updateProfile'])->middleware(['auth'])->name('penjual.profile.update');
+Route::post('/penjual/profile/avatar', [PenjualProfileController::class, 'updateAvatar'])->middleware(['auth'])->name('penjual.profile.avatar.update');
+Route::put('/penjual/profile/password', [PenjualProfileController::class, 'updatePassword'])->middleware(['auth'])->name('penjual.profile.password.update');
+Route::get('/penjual/profile/google/link', [PenjualProfileController::class, 'linkGoogleRedirect'])->middleware(['auth'])->name('penjual.profile.google.link');
+Route::post('/penjual/profile/google/unlink', [PenjualProfileController::class, 'unlinkGoogle'])->middleware(['auth'])->name('penjual.profile.google.unlink');
+
+// Rute Manajemen Ulasan / Review Penjual
+Route::get('/penjual/reviews', [PenjualReviewController::class, 'index'])->middleware(['auth'])->name('penjual.reviews');
+Route::delete('/penjual/reviews/{review}', [PenjualReviewController::class, 'destroy'])->middleware(['auth'])->name('penjual.reviews.destroy');
+
+
 
 Route::get('/penjual/laporan/cetak-pdf', function () {
     $orders = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'dibatalkan', 'ditolak'])

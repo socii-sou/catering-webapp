@@ -33,13 +33,45 @@ class GoogleAuthController extends Controller
                 $googleUser = Socialite::driver('google')->stateless()->user();
             }
 
-            // Find user by google_id or by email
+            // Check if this callback was triggered to link an active seller/user account
+            if ($request->session()->has('link_google_user_id')) {
+                $targetUserId = $request->session()->pull('link_google_user_id');
+                $targetUser = User::find($targetUserId);
+
+                if ($targetUser) {
+                    $existingGoogleUser = User::where('google_id', $googleUser->getId())
+                        ->where('id', '!=', $targetUser->id)
+                        ->first();
+
+                    if ($existingGoogleUser) {
+                        $redirectRoute = $targetUser->isPenjual() ? 'penjual.profile.edit' : 'profile.edit';
+                        return redirect()->route($redirectRoute)->withErrors([
+                            'google' => 'Akun Google (' . $googleUser->getEmail() . ') ini sudah dikaitkan dengan pengguna lain.'
+                        ]);
+                    }
+
+                    $targetUser->update([
+                        'google_id' => $googleUser->getId(),
+                        'avatar' => $targetUser->avatar ?: $googleUser->getAvatar(),
+                    ]);
+
+                    Auth::login($targetUser, true);
+                    $request->session()->regenerate();
+
+                    if ($targetUser->isPenjual()) {
+                        return redirect()->route('penjual.profile.edit')->with('success', 'Akun Google (' . $googleUser->getEmail() . ') berhasil dikaitkan!');
+                    }
+
+                    return redirect()->route('profile.edit')->with('success', 'Akun Google (' . $googleUser->getEmail() . ') berhasil dikaitkan!');
+                }
+            }
+
+            // Normal login/signup flow
             $user = User::where('google_id', $googleUser->getId())
                 ->orWhere('email', $googleUser->getEmail())
                 ->first();
 
             if ($user) {
-                // Update google_id, avatar, or email_verified_at if missing
                 $updateData = [];
                 if (empty($user->google_id)) {
                     $updateData['google_id'] = $googleUser->getId();
@@ -54,7 +86,6 @@ class GoogleAuthController extends Controller
                     $user->update($updateData);
                 }
             } else {
-                // Automatic account creation (signup) if user doesn't exist yet
                 $name = $googleUser->getName() ?: ($googleUser->getNickname() ?: explode('@', $googleUser->getEmail())[0]);
 
                 $user = User::create([
