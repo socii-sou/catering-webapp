@@ -40,6 +40,13 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [WebAuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [WebAuthController::class, 'register']);
 
+    // Registrasi Alur OTP & Set Password
+    Route::get('/register/verify-otp', [WebAuthController::class, 'showVerifyOtp'])->name('register.otp.show');
+    Route::post('/register/verify-otp', [WebAuthController::class, 'verifyOtp'])->name('register.otp.verify');
+    Route::post('/register/resend-otp', [WebAuthController::class, 'resendOtp'])->name('register.otp.resend');
+    Route::get('/register/set-password', [WebAuthController::class, 'showSetPassword'])->name('register.password.show');
+    Route::post('/register/set-password', [WebAuthController::class, 'setPassword'])->name('register.password.set');
+
     // Google OAuth Routes
     Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google.redirect');
     Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
@@ -94,7 +101,6 @@ Route::get('/checkout', function (\Illuminate\Http\Request $request) {
     $paket = \App\Models\Paket::findOrFail($paketId);
 
     $jumlahPax = (int) $request->query('jumlah_pax', 20);
-    $jumlahPaxGubukan = max(100, (int) $request->query('jumlah_pax_gubukan', 100));
     $tglAcara = $request->query('tgl_acara', now()->addDay()->toDateString());
 
     $rawLaukIds = $request->query('lauk_ids');
@@ -109,7 +115,6 @@ Route::get('/checkout', function (\Illuminate\Http\Request $request) {
     return view('checkout', compact(
         'paket',
         'jumlahPax',
-        'jumlahPaxGubukan',
         'tglAcara',
         'laukIds',
         'selectedLauks',
@@ -123,7 +128,6 @@ Route::get('/pembayaran', function (\Illuminate\Http\Request $request) {
     $paket = \App\Models\Paket::findOrFail($paketId);
 
     $jumlahPax = (int) $request->query('jumlah_pax', 20);
-    $jumlahPaxGubukan = max(100, (int) $request->query('jumlah_pax_gubukan', 100));
     $tglAcara = $request->query('tgl_acara', now()->addDay()->toDateString());
 
     $rawLaukIds = $request->query('lauk_ids');
@@ -141,7 +145,6 @@ Route::get('/pembayaran', function (\Illuminate\Http\Request $request) {
     return view('pembayaran', compact(
         'paket',
         'jumlahPax',
-        'jumlahPaxGubukan',
         'tglAcara',
         'laukIds',
         'selectedLauks',
