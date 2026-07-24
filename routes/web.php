@@ -49,11 +49,11 @@ Route::middleware('guest')->group(function () {
     Route::post('/register/resend-otp', [WebAuthController::class, 'resendOtp'])->name('register.otp.resend');
     Route::get('/register/set-password', [WebAuthController::class, 'showSetPassword'])->name('register.password.show');
     Route::post('/register/set-password', [WebAuthController::class, 'setPassword'])->name('register.password.set');
-
-    // Google OAuth Routes
-    Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google.redirect');
-    Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 });
+
+// Google OAuth Routes (accessible by guests for login/signup, and logged in users for account linking)
+Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google.redirect');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
