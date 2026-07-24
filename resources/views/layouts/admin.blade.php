@@ -101,11 +101,11 @@
 
         <!-- Sidebar Bottom Actions -->
         <div class="space-y-4 pt-4 border-t border-[#D8E0CE]">
-            <a href="/#packages" class="w-full bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold py-3.5 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 text-xs transition-all cursor-pointer">
+            <a href="/" class="w-full bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold py-3.5 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 text-xs transition-all cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                 </svg>
-                <span>My Packages</span>
+                <span>Beranda</span>
             </a>
 
             <div class="space-y-1 text-xs">
@@ -200,11 +200,11 @@
 
             <!-- Bottom Actions -->
             <div class="space-y-3 pt-4 border-t border-[#D8E0CE]">
-                <a href="{{ route('penjual.packages') }}" class="w-full bg-[#2D5A27] text-white font-bold py-3 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 text-xs">
+                <a href="/" class="w-full bg-[#2D5A27] text-white font-bold py-3 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 text-xs">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                     </svg>
-                    <span>My Packages</span>
+                    <span>Beranda</span>
                 </a>
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
