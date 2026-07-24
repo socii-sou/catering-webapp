@@ -7,6 +7,10 @@
 
         <title>@yield('title', 'RASACI Catering')</title>
 
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+        <link rel="shortcut icon" href="{{ asset('favicon.png') }}" type="image/png">
+
         <!-- Meta Description for SEO -->
         <meta name="description" content="@yield('meta-description', 'RASACI Catering menghadirkan layanan catering bintang lima dengan cita rasa Nusantara autentik untuk pesta pernikahan, rapat kantor, syukuran, dan acara spesial Anda.')">
 

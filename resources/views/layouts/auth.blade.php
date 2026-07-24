@@ -7,6 +7,10 @@
 
     <title>@yield('title', 'Autentikasi') - Rasaci Catering</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.png') }}" type="image/png">
+
     <!-- Meta Description for SEO -->
     <meta name="description" content="Masuk atau daftar ke akun Rasaci Catering untuk menikmati cita rasa hidangan autentik terbaik.">
 
