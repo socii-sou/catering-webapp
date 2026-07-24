@@ -588,6 +588,26 @@ Route::get('/penjual/reports', function () {
     ));
 })->middleware(['auth'])->name('penjual.reports');
 
+Route::get('/penjual/laporan/cetak-pdf', function () {
+    $orders = \App\Models\Pesanan::whereNotIn('status_pesanan', ['batal', 'dibatalkan', 'ditolak'])
+        ->with(['user', 'pesananPaket.paket', 'pembayarans', 'pengiriman', 'gubukan'])
+        ->latest('tgl_pesan')
+        ->get();
+
+    $totalSalesSum = $orders->sum('total_harga');
+    $totalOrdersCount = $orders->count();
+    $avgOrderValue = $totalOrdersCount > 0 ? round($totalSalesSum / $totalOrdersCount) : 0;
+    $pendingValidationCount = $orders->where('status_pesanan', 'menunggu_validasi')->count();
+
+    return view('penjual.print_laporan', compact(
+        'orders',
+        'totalSalesSum',
+        'totalOrdersCount',
+        'avgOrderValue',
+        'pendingValidationCount'
+    ));
+})->middleware(['auth'])->name('penjual.laporan.cetak');
+
 
 
 

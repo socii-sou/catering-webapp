@@ -3,6 +3,18 @@
 @section('title', 'Ringkasan Dashboard - Manajemen Dapur RASACI')
 
 @section('content')
+<!-- TOP ACTION BAR: CETAK PDF LAPORAN PENJUALAN -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-[#E5E5DC] shadow-xs">
+    <div class="space-y-0.5">
+        <h2 class="text-xl font-bold font-serif text-gray-900">Ringkasan Operational Dapur</h2>
+        <p class="text-xs text-gray-500 font-light">Pantau performa penjualan, total pendapatan, dan cetak rekapitulasi laporan resmi.</p>
+    </div>
+    <a href="{{ route('penjual.laporan.cetak') }}" target="_blank" class="bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold py-3 px-6 rounded-2xl shadow-md text-xs flex items-center justify-center gap-2.5 transition-all cursor-pointer hover:shadow-lg shrink-0">
+        <span class="text-base">📄</span>
+        <span>Cetak PDF Laporan Penjualan</span>
+    </a>
+</div>
+
 <!-- 3 METRIC CARDS GRID -->
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
     <!-- Card 1: TOTAL PESANAN -->

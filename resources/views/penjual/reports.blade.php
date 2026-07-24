@@ -20,10 +20,10 @@
             <span class="absolute inset-y-0 right-3 flex items-center text-gray-400 pointer-events-none text-xs">∨</span>
         </div>
 
-        <button type="button" onclick="window.print()" class="bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold py-2.5 px-5 rounded-xl shadow-md text-xs flex items-center gap-2 transition-all cursor-pointer">
+        <a href="{{ route('penjual.laporan.cetak') }}" target="_blank" class="bg-[#2D5A27] hover:bg-[#1E3E1A] text-white font-bold py-2.5 px-5 rounded-xl shadow-md text-xs flex items-center gap-2 transition-all cursor-pointer">
             <span>📥</span>
-            <span>Unduh Laporan (PDF/CSV)</span>
-        </button>
+            <span>Cetak PDF Laporan Penjualan</span>
+        </a>
     </div>
 </div>
 
