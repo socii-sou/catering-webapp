@@ -36,17 +36,21 @@ class PesananService
         $this->pastikanKapasitasCukup($data['tgl_acara'], $data['jumlah_pax']);
 
         return DB::transaction(function () use ($user, $data) {
+            $gubukanId = is_array($data['gubukan_id'] ?? null) 
+                ? ($data['gubukan_id'][0] ?? null) 
+                : ($data['gubukan_id'] ?? (is_array($data['gubukan_ids'] ?? null) ? ($data['gubukan_ids'][0] ?? null) : null));
+            $jumlahPaxGubukan = $gubukanId ? max(100, (int) ($data['jumlah_pax_gubukan'] ?? 100)) : null;
+
             $pesanan = Pesanan::create([
                 'user_id' => $user->id,
                 'nama_acara' => $data['nama_acara'] ?? 'Acara Pelanggan',
                 'tipe_acara' => $data['tipe_acara'] ?? null,
                 'alamat_pengiriman' => $data['alamat_pengiriman'] ?? ($user->alamat ?? ''),
-                'gubukan_id' => is_array($data['gubukan_id'] ?? null) 
-                    ? ($data['gubukan_id'][0] ?? null) 
-                    : ($data['gubukan_id'] ?? (is_array($data['gubukan_ids'] ?? null) ? ($data['gubukan_ids'][0] ?? null) : null)),
+                'gubukan_id' => $gubukanId,
                 'tgl_pesan' => now()->toDateString(),
                 'tgl_acara' => $data['tgl_acara'],
                 'jumlah_pax' => $data['jumlah_pax'],
+                'jumlah_pax_gubukan' => $jumlahPaxGubukan,
                 'status_pesanan' => 'menunggu_validasi',
                 'status_produksi' => 'belum_diproses',
                 'catatan' => $data['catatan'] ?? null,
@@ -86,7 +90,8 @@ class PesananService
             }
 
             if ($pesanan->gubukan_id) {
-                $totalHarga += ($pesanan->gubukan->harga_gubukan * $pesanan->jumlah_pax);
+                $paxGub = $pesanan->jumlah_pax_gubukan ?? 100;
+                $totalHarga += ($pesanan->gubukan->harga_gubukan * $paxGub);
             }
 
             $pesanan->update(['total_harga' => $totalHarga]);

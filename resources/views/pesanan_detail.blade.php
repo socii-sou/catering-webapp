@@ -80,7 +80,8 @@
         foreach ($pesanan->pesananPaket as $item) {
             $paketSubtotal += ($item->paket->harga_paket ?? 0) * ($item->jml_paket ?? $pesanan->jumlah_pax);
         }
-        $gubukanSubtotal = $pesanan->gubukan ? ($pesanan->gubukan->harga_gubukan * $pesanan->jumlah_pax) : 0;
+        $paxGubukan = $pesanan->jumlah_pax_gubukan ?? $pesanan->jumlah_pax;
+        $gubukanSubtotal = $pesanan->gubukan ? ($pesanan->gubukan->harga_gubukan * $paxGubukan) : 0;
         $deliveryFee = $pesanan->biaya_pengiriman ?? 150000;
         $grandTotal = $pesanan->total_harga > 0 ? $pesanan->total_harga : ($paketSubtotal + $gubukanSubtotal + $deliveryFee);
         $dpPaid = $grandTotal * 0.5;
@@ -267,13 +268,13 @@
                                     Gubukan - {{ $pesanan->gubukan->nama_gubukan }}
                                 </h4>
                                 <p class="text-xs text-gray-500 font-light">
-                                    {{ $pesanan->jumlah_pax }} Pax • Special Gubukan Stall
+                                    {{ $paxGubukan }} Pax • Special Gubukan Stall
                                 </p>
                             </div>
                         </div>
                         <div class="text-right whitespace-nowrap">
                             <span class="text-sm font-bold text-gray-900 font-serif">
-                                Rp {{ number_format($pesanan->gubukan->harga_gubukan * $pesanan->jumlah_pax, 0, ',', '.') }}
+                                Rp {{ number_format($pesanan->gubukan->harga_gubukan * $paxGubukan, 0, ',', '.') }}
                             </span>
                         </div>
                     </div>
@@ -337,7 +338,7 @@
 
                     @if($pesanan->gubukan)
                     <div class="flex justify-between text-gray-600 font-light">
-                        <span>Gubukan {{ $pesanan->gubukan->nama_gubukan }} (Rp {{ number_format($pesanan->gubukan->harga_gubukan, 0, ',', '.') }} × {{ $pesanan->jumlah_pax }} pax)</span>
+                        <span>Gubukan {{ $pesanan->gubukan->nama_gubukan }} (Rp {{ number_format($pesanan->gubukan->harga_gubukan, 0, ',', '.') }} × {{ $paxGubukan }} pax)</span>
                         <span class="font-medium text-gray-900">Rp {{ number_format($gubukanSubtotal, 0, ',', '.') }}</span>
                     </div>
                     @endif

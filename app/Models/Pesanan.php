@@ -24,6 +24,7 @@ class Pesanan extends Model
         'tgl_pesan',
         'tgl_acara',
         'jumlah_pax',
+        'jumlah_pax_gubukan',
         'status_pesanan',
         'status_produksi',
         'catatan',
@@ -37,6 +38,7 @@ class Pesanan extends Model
             'tgl_pesan' => 'date',
             'tgl_acara' => 'date',
             'jumlah_pax' => 'integer',
+            'jumlah_pax_gubukan' => 'integer',
             'biaya_pengiriman' => 'decimal:2',
             'total_harga' => 'decimal:2',
         ];

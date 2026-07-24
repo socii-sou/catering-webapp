@@ -21,6 +21,7 @@ class StorePesananRequest extends FormRequest
             'tipe_acara' => ['nullable', 'string', 'max:100'],
             'alamat_pengiriman' => ['required', 'string', 'max:1000'],
             'gubukan_id' => ['nullable', 'exists:gubukans,id'],
+            'jumlah_pax_gubukan' => ['nullable', 'integer', 'min:100'],
             'tgl_acara' => ['required', 'date', 'after_or_equal:tomorrow'],
             'jumlah_pax' => ['required', 'integer', 'min:1'],
             'catatan' => ['nullable', 'string', 'max:1000'],
@@ -38,8 +39,11 @@ class StorePesananRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            if ($this->filled('gubukan_id') && (int) $this->input('jumlah_pax', 0) < 100) {
-                $validator->errors()->add('jumlah_pax', 'Minimal pemesanan paket dengan Gubukan adalah 100 porsi.');
+            if ($this->filled('gubukan_id')) {
+                $paxGub = (int) $this->input('jumlah_pax_gubukan', 100);
+                if ($paxGub < 100) {
+                    $validator->errors()->add('jumlah_pax_gubukan', 'Minimal pemesanan untuk menu Gubukan adalah 100 porsi.');
+                }
             }
         });
     }

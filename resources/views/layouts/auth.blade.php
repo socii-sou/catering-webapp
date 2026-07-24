@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Autentikasi') - SeleraAci Catering</title>
+    <title>@yield('title', 'Autentikasi') - Rasaci Catering</title>
 
     <!-- Meta Description for SEO -->
-    <meta name="description" content="Masuk atau daftar ke akun SeleraAci Catering untuk menikmati cita rasa hidangan autentik terbaik.">
+    <meta name="description" content="Masuk atau daftar ke akun Rasaci Catering untuk menikmati cita rasa hidangan autentik terbaik.">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">

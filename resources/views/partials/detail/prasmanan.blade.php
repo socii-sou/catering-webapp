@@ -310,6 +310,20 @@
                     </div>
                 </div>
 
+                <!-- Dedicated Gubukan Pax Input (Visible only when a Gubukan is checked) -->
+                <div id="gubukanPaxContainer" class="hidden space-y-1.5 p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-2xl">
+                    <div class="flex justify-between items-center text-[11px] font-bold text-amber-900">
+                        <span>Porsi Gubukan (Pax)</span>
+                        <span class="text-[10px] text-amber-800 font-bold bg-amber-200/60 px-2 py-0.5 rounded-md">Min. 100 pax</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button type="button" onclick="decrementGubukanPax()" class="w-8 h-8 flex items-center justify-center rounded-xl border border-amber-300 bg-white hover:bg-amber-100 text-amber-900 font-bold transition-colors cursor-pointer text-sm shadow-2xs">-</button>
+                        <input type="number" id="detailJumlahPaxGubukan" name="jumlah_pax_gubukan" min="100" value="100" required oninput="calculateDetailPrice()" class="flex-1 text-center font-bold text-sm bg-white border border-amber-300 text-amber-950 py-1 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-600 shadow-2xs">
+                        <button type="button" onclick="incrementGubukanPax()" class="w-8 h-8 flex items-center justify-center rounded-xl border border-amber-300 bg-white hover:bg-amber-100 text-amber-900 font-bold transition-colors cursor-pointer text-sm shadow-2xs">+</button>
+                    </div>
+                    <p class="text-[10px] text-amber-800/80 font-light">Kuantitas khusus untuk pesanan menu gubukan (minimal 100 pax).</p>
+                </div>
+
                 <!-- Price Breakdown -->
                 <div class="pt-3 border-t border-gray-100 space-y-2 text-xs">
                     <div class="flex justify-between text-gray-600 font-light">

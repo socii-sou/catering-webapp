@@ -242,14 +242,42 @@
                         icon.innerText = "✓";
                     }
                     if (input) input.checked = true;
+                }
 
-                    const paxInput = document.getElementById('detailJumlahPax');
-                    if (paxInput && Number(paxInput.value) < 100) {
-                        paxInput.value = 100;
+                // Show/hide dedicated gubukan pax container in sidebar
+                const activeCards = document.querySelectorAll('.prasmanan-gubukan-card.active-card');
+                const gubContainer = document.getElementById('gubukanPaxContainer');
+                if (gubContainer) {
+                    if (activeCards.length > 0) {
+                        gubContainer.classList.remove('hidden');
+                        const gubPaxInput = document.getElementById('detailJumlahPaxGubukan');
+                        if (gubPaxInput && Number(gubPaxInput.value) < 100) {
+                            gubPaxInput.value = 100;
+                        }
+                    } else {
+                        gubContainer.classList.add('hidden');
                     }
                 }
 
                 if (typeof calculateDetailPrice === 'function') calculateDetailPrice();
+            }
+
+            // Gubukan Pax Increment / Decrement
+            function incrementGubukanPax() {
+                const input = document.getElementById('detailJumlahPaxGubukan');
+                if (!input) return;
+                input.value = parseInt(input.value || 100) + 10;
+                calculateDetailPrice();
+            }
+
+            function decrementGubukanPax() {
+                const input = document.getElementById('detailJumlahPaxGubukan');
+                if (!input) return;
+                const current = parseInt(input.value || 100);
+                if (current > 100) {
+                    input.value = current - 10;
+                    calculateDetailPrice();
+                }
             }
 
             // Nasi Kotak Lauk Card Toggle
@@ -318,20 +346,23 @@
                     5: 15000  // Dimsum
                 };
 
-                let totalGubukanPricePerPax = 0;
+                let totalGubukanPricePerUnit = 0;
                 let activeGubukanNames = [];
                 const activeGubukanCards = document.querySelectorAll('.prasmanan-gubukan-card.active-card');
                 activeGubukanCards.forEach(card => {
                     const gubId = Number(card.getAttribute('data-gubukan-id'));
                     const gubName = card.querySelector('span.font-bold')?.innerText || 'Gubukan';
                     if (gubukanPrices[gubId]) {
-                        totalGubukanPricePerPax += gubukanPrices[gubId];
+                        totalGubukanPricePerUnit += gubukanPrices[gubId];
                         activeGubukanNames.push(gubName);
                     }
                 });
 
+                const gubPaxInput = document.getElementById('detailJumlahPaxGubukan');
+                const gubukanPax = gubPaxInput ? Math.max(100, Number(gubPaxInput.value) || 100) : 100;
+
                 const paketSubtotal = pax * currentUnitPrice;
-                const gubukanSubtotal = pax * totalGubukanPricePerPax;
+                const gubukanSubtotal = activeGubukanCards.length > 0 ? (gubukanPax * totalGubukanPricePerUnit) : 0;
                 const grandTotal = paketSubtotal + gubukanSubtotal;
 
                 const summaryLabel = document.getElementById('summaryHargaPerPax');
@@ -347,7 +378,7 @@
                     if (gubukanSubtotal > 0) {
                         gubukanRow.classList.remove('hidden');
                         if (gubukanLabel) {
-                            gubukanLabel.innerText = `Gubukan (${activeGubukanNames.join(', ')} × ${pax} pax)`;
+                            gubukanLabel.innerText = `Gubukan (${activeGubukanNames.join(', ')} × ${gubukanPax} pax)`;
                         }
                         gubukanVal.innerText = 'Rp ' + gubukanSubtotal.toLocaleString('id-ID');
                     } else {
@@ -375,8 +406,11 @@
                 const selectedGubukanIds = Array.from(activeGubukanCards).map(c => Number(c.getAttribute('data-gubukan-id')));
                 const gubukanId = selectedGubukanIds.length > 0 ? selectedGubukanIds[0] : null;
 
-                if (selectedGubukanIds.length > 0 && Number(paxInput) < 100) {
-                    showDetailError('Minimal pemesanan paket dengan Gubukan adalah 100 porsi.');
+                const gubPaxInput = document.getElementById('detailJumlahPaxGubukan');
+                const gubukanPax = gubPaxInput ? Number(gubPaxInput.value) : 100;
+
+                if (selectedGubukanIds.length > 0 && gubukanPax < 100) {
+                    showDetailError('Minimal pemesanan untuk menu Gubukan adalah 100 porsi.');
                     return;
                 }
 
@@ -385,7 +419,8 @@
                     + '&tgl_acara=' + encodeURIComponent(tglAcara)
                     + '&lauk_ids=' + encodeURIComponent(selectedLaukIds.join(','));
                 if (gubukanId) {
-                    url += '&gubukan_id=' + encodeURIComponent(gubukanId);
+                    url += '&gubukan_id=' + encodeURIComponent(gubukanId)
+                        + '&jumlah_pax_gubukan=' + encodeURIComponent(gubukanPax);
                 }
 
                 window.location.href = url;

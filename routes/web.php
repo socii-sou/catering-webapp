@@ -94,6 +94,7 @@ Route::get('/checkout', function (\Illuminate\Http\Request $request) {
     $paket = \App\Models\Paket::findOrFail($paketId);
 
     $jumlahPax = (int) $request->query('jumlah_pax', 20);
+    $jumlahPaxGubukan = max(100, (int) $request->query('jumlah_pax_gubukan', 100));
     $tglAcara = $request->query('tgl_acara', now()->addDay()->toDateString());
 
     $rawLaukIds = $request->query('lauk_ids');
@@ -108,6 +109,7 @@ Route::get('/checkout', function (\Illuminate\Http\Request $request) {
     return view('checkout', compact(
         'paket',
         'jumlahPax',
+        'jumlahPaxGubukan',
         'tglAcara',
         'laukIds',
         'selectedLauks',
@@ -121,6 +123,7 @@ Route::get('/pembayaran', function (\Illuminate\Http\Request $request) {
     $paket = \App\Models\Paket::findOrFail($paketId);
 
     $jumlahPax = (int) $request->query('jumlah_pax', 20);
+    $jumlahPaxGubukan = max(100, (int) $request->query('jumlah_pax_gubukan', 100));
     $tglAcara = $request->query('tgl_acara', now()->addDay()->toDateString());
 
     $rawLaukIds = $request->query('lauk_ids');
@@ -138,6 +141,7 @@ Route::get('/pembayaran', function (\Illuminate\Http\Request $request) {
     return view('pembayaran', compact(
         'paket',
         'jumlahPax',
+        'jumlahPaxGubukan',
         'tglAcara',
         'laukIds',
         'selectedLauks',

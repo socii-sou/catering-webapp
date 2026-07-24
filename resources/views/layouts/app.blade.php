@@ -112,34 +112,7 @@
                 }, 300);
             }
 
-            function mockGoogleLogin() {
-                alert("[GOOGLE LOGIN] Menghubungkan ke Google Account...\nBerhasil masuk sebagai Budi Santoso!");
-                
-                const payload = {
-                    login: 'budi@example.test',
-                    password: 'password'
-                };
-                
-                fetch('{{ route("login") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.reload();
-                    } else {
-                        alert("Gagal melakukan login otomatis. Silakan coba login manual.");
-                    }
-                })
-                .catch(error => {
-                    alert("Koneksi bermasalah: " + error.message);
-                });
-            }
+
 
             function closeSuccessOverlay() {
                 const overlay = document.getElementById('successOverlay');

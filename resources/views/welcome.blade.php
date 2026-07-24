@@ -187,17 +187,12 @@
             const tglAcara = document.getElementById('tglAcaraInput').value;
             const gubukanId = document.getElementById('gubukanSelect').value;
 
-            if (gubukanId && Number(paxInput) < 100) {
-                showFormError('Minimal pemesanan paket dengan Gubukan adalah 100 porsi.');
-                return;
-            }
-
             let url = '{{ route("checkout") }}?paket_id=' + currentPackage.id
                 + '&jumlah_pax=' + encodeURIComponent(paxInput)
                 + '&tgl_acara=' + encodeURIComponent(tglAcara)
                 + '&lauk_ids=' + encodeURIComponent(selectedLaukIds.join(','));
             if (gubukanId) {
-                url += '&gubukan_id=' + encodeURIComponent(gubukanId);
+                url += '&gubukan_id=' + encodeURIComponent(gubukanId) + '&jumlah_pax_gubukan=100';
             }
 
             window.location.href = url;

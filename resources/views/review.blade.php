@@ -89,7 +89,7 @@
         </div>
 
         <!-- FORM ULASAN -->
-        <form action="{{ route('pesanan.review.store', $pesanan->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form action="{{ route('pesanan.review.store', $pesanan->id) }}" method="POST" class="space-y-6">
             @csrf
             <input type="hidden" name="rating" id="ratingInput" value="" required>
 
@@ -109,26 +109,6 @@
             <div class="space-y-2">
                 <label class="font-bold text-gray-700 block text-xs">Ceritakan pengalaman Anda</label>
                 <textarea name="ulasan" id="ulasanTextarea" rows="5" required placeholder="Tuliskan ulasan Anda mengenai rasa, pelayanan, atau kemasan kami..." class="w-full p-4 rounded-2xl border border-gray-200 bg-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent shadow-2xs resize-none leading-relaxed"></textarea>
-            </div>
-
-            <!-- SECTION 4: UPLOAD PHOTO -->
-            <div class="space-y-2">
-                <label class="font-bold text-gray-700 block text-xs">Tambah Foto</label>
-                <div class="flex items-center gap-3 overflow-x-auto py-1">
-                    <!-- Dashed Upload trigger box -->
-                    <label for="photoUpload" class="w-24 h-24 rounded-2xl border-2 border-dashed border-gray-300 bg-white hover:bg-gray-50 transition-all flex flex-col items-center justify-center gap-1.5 cursor-pointer shrink-0">
-                        <span class="text-xl">📷</span>
-                        <span class="text-[9px] font-bold text-gray-400 tracking-wider">UNGGAH</span>
-                    </label>
-                    <input type="file" id="photoUpload" name="photo" accept="image/jpeg,image/png" class="hidden" onchange="previewImage(event)">
-
-                    <!-- Preview box container -->
-                    <div id="imagePreviewContainer" class="hidden relative w-24 h-24 rounded-2xl overflow-hidden border border-gray-200 shadow-2xs shrink-0 group">
-                        <img id="imagePreview" src="" alt="Uploaded Proof Preview" class="w-full h-full object-cover">
-                        <button type="button" onclick="removePreview()" class="absolute top-1 right-1 bg-black/60 hover:bg-black text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] transition-colors">✕</button>
-                    </div>
-                </div>
-                <p class="text-[10px] text-gray-400 font-light">Maksimal 5 foto. Format JPG, PNG.</p>
             </div>
 
             <!-- SUBMIT BUTTON -->
@@ -178,31 +158,6 @@
                 });
             });
         });
-
-        // Image upload preview logic
-        function previewImage(event) {
-            const input = event.target;
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('imagePreview');
-                    const container = document.getElementById('imagePreviewContainer');
-                    preview.src = e.target.result;
-                    container.classList.remove('hidden');
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function removePreview() {
-            const fileInput = document.getElementById('photoUpload');
-            const preview = document.getElementById('imagePreview');
-            const container = document.getElementById('imagePreviewContainer');
-            
-            fileInput.value = '';
-            preview.src = '';
-            container.classList.add('hidden');
-        }
     </script>
 </body>
 </html>
