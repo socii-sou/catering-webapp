@@ -43,7 +43,7 @@
                 
                 <div class="h-4 w-px bg-gray-300 hidden md:block"></div>
 
-                <a href="{{ route('profile.edit') }}" class="flex items-center gap-2 hover:opacity-90 transition-all group">
+                <a href="{{ Auth::user()->isPenjual() ? route('penjual.profile.edit') : route('profile.edit') }}" class="flex items-center gap-2 hover:opacity-90 transition-all group">
                     <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" class="w-8 h-8 rounded-full object-cover border border-brand-green/30 group-hover:scale-105 transition-transform shadow-xs">
                     <span class="text-gray-700 text-sm hidden sm:inline font-medium">Hai, <span class="text-brand-green group-hover:underline">{{ Auth::user()->name }}</span></span>
                 </a>

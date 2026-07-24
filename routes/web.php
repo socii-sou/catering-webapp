@@ -3,6 +3,9 @@
 use App\Http\Controllers\Auth\WebAuthController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Penjual\PenjualUserController;
+use App\Http\Controllers\Penjual\PenjualProfileController;
+use App\Http\Controllers\Penjual\PenjualReviewController;
 use App\Models\Paket;
 use App\Models\Review;
 use App\Models\Lauk;
@@ -590,6 +593,24 @@ Route::get('/penjual/reports', function () {
         'maxMonthlyRevenue'
     ));
 })->middleware(['auth'])->name('penjual.reports');
+
+// Rute Manajemen Pengguna Penjual / Admin
+Route::get('/penjual/users', [PenjualUserController::class, 'index'])->middleware(['auth'])->name('penjual.users');
+Route::delete('/penjual/users/{user}', [PenjualUserController::class, 'destroy'])->middleware(['auth'])->name('penjual.users.destroy');
+
+// Rute Pengaturan Profil Penjual / Admin
+Route::get('/penjual/profile', [PenjualProfileController::class, 'edit'])->middleware(['auth'])->name('penjual.profile.edit');
+Route::put('/penjual/profile', [PenjualProfileController::class, 'updateProfile'])->middleware(['auth'])->name('penjual.profile.update');
+Route::post('/penjual/profile/avatar', [PenjualProfileController::class, 'updateAvatar'])->middleware(['auth'])->name('penjual.profile.avatar.update');
+Route::put('/penjual/profile/password', [PenjualProfileController::class, 'updatePassword'])->middleware(['auth'])->name('penjual.profile.password.update');
+Route::get('/penjual/profile/google/link', [PenjualProfileController::class, 'linkGoogleRedirect'])->middleware(['auth'])->name('penjual.profile.google.link');
+Route::post('/penjual/profile/google/unlink', [PenjualProfileController::class, 'unlinkGoogle'])->middleware(['auth'])->name('penjual.profile.google.unlink');
+
+// Rute Manajemen Ulasan / Review Penjual
+Route::get('/penjual/reviews', [PenjualReviewController::class, 'index'])->middleware(['auth'])->name('penjual.reviews');
+Route::delete('/penjual/reviews/{review}', [PenjualReviewController::class, 'destroy'])->middleware(['auth'])->name('penjual.reviews.destroy');
+
+
 
 
 
